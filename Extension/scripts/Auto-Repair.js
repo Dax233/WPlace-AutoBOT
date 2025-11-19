@@ -505,127 +505,173 @@
   // Find module if pawtect_chunk is null
   pawtect_chunk ??= await findTokenModule("pawtect_wasm_bg.BvxCe1S1.wasm");
 
+  // ============================================================
+  // [Helper] 定义 WASM 需要的 Imports 环境 (根据网站源码 aa() 还原)
+  // ============================================================
+  let wasmExports = null; // 用于在 imports 内部访问 exports
+  const textEncoder = new TextEncoder();
+  const textDecoder = new TextDecoder("utf-8");
+
+  function getImports() {
+    return {
+      wbg: {
+        // --- 基础内存操作 ---
+        __wbg_buffer_609cc3eee51ed158: (e) => e.buffer,
+        __wbg_new_a12002a7f91c75be: (e) => new Uint8Array(e),
+        __wbg_newwithbyteoffsetandlength_d97e637ebe145a9a: (e, t, n) =>
+          new Uint8Array(e, t >>> 0, n >>> 0),
+        __wbg_newwithlength_a381634e90c276d4: (e) => new Uint8Array(e >>> 0),
+        __wbg_subarray_aa9065fa9dc5df96: (e, t, n) =>
+          e.subarray(t >>> 0, n >>> 0),
+        __wbg_set_65595bdd868b3009: (e, t, n) => e.set(t, n >>> 0),
+
+        // --- 字符串处理 ---
+        __wbindgen_string_new: (ptr, len) => {
+          const memory = new Uint8Array(wasmExports.memory.buffer);
+          return textDecoder.decode(memory.subarray(ptr, ptr + len));
+        },
+
+        // --- 异常处理 ---
+        __wbindgen_throw: (ptr, len) => {
+          const memory = new Uint8Array(wasmExports.memory.buffer);
+          throw new Error(textDecoder.decode(memory.subarray(ptr, ptr + len)));
+        },
+
+        // --- 关键：ExternRef 表初始化 (对应 aa() 中的逻辑) ---
+        __wbindgen_init_externref_table: () => {
+          const table = wasmExports.__wbindgen_export_2;
+          const offset = table.grow(4);
+          table.set(0, undefined);
+          table.set(offset + 0, undefined);
+          table.set(offset + 1, null);
+          table.set(offset + 2, true);
+          table.set(offset + 3, false);
+        },
+
+        // --- 全局对象访问 ---
+        __wbg_static_accessor_GLOBAL_88a902d13a557d07: () => globalThis,
+        __wbg_static_accessor_GLOBAL_THIS_56578be7e9f832b0: () => globalThis,
+        __wbg_static_accessor_SELF_37c5d418e4bf5819: () => self,
+        __wbg_static_accessor_WINDOW_5de37043a91a9c40: () => window,
+
+        // --- Crypto ---
+        __wbg_crypto_574e78ad8b13b65f: (e) => e.crypto,
+        __wbg_msCrypto_a61aeb35a24c1329: (e) => e.msCrypto,
+        __wbg_getRandomValues_b8f5dbd5f3995a9e: (e, t) => e.getRandomValues(t),
+        __wbg_randomFillSync_ac0988aba3254290: (e, t) => e.randomFillSync(t),
+
+        // --- 其他杂项 ---
+        __wbg_call_672a4d21634d4a24: (e, t) => e.call(t),
+        __wbg_call_7cccdd69e0791ae2: (e, t, n) => e.call(t, n),
+        __wbindgen_memory: () => wasmExports.memory,
+        __wbg_process_dc0fbacc7c1c06f7: (e) => e.process,
+        __wbg_versions_c01dfd4722a88165: (e) => e.versions,
+        __wbg_node_905d3e251edff8a2: (e) => e.node,
+        __wbg_require_60cc747a6bc5215a: () => null,
+        __wbg_newnoargs_105ed471475aaf50: (e, t) => new Function(), // 简化处理
+
+        // --- 类型判断 ---
+        __wbindgen_is_function: (e) => typeof e === "function",
+        __wbindgen_is_object: (e) => typeof e === "object" && e !== null,
+        __wbindgen_is_string: (e) => typeof e === "string",
+        __wbindgen_is_undefined: (e) => e === undefined,
+      },
+    };
+  }
+
+  // ============================================================
+  // [Fix] 重写 createWasmToken
+  // ============================================================
   async function createWasmToken(regionX, regionY, payload) {
     try {
-      // Load the Pawtect module and WASM
-      const mod = await import(
-        new URL("/_app/immutable/chunks/" + pawtect_chunk, location.origin).href
+      // 1. 确定 WASM 文件 URL
+      // 注意：网站现在的结构，.wasm 通常在 /_app/immutable/assets/ 目录下
+      // pawtect_chunk 变量如果只是文件名(如 "pawtect_wasm_bg.BvxCe1S1.wasm")，我们需要拼接正确的路径
+      // 建议先在 Network 面板确认一下 fetch 的完整 URL
+      let wasmUrl;
+      if (pawtect_chunk.startsWith("http")) {
+        wasmUrl = pawtect_chunk;
+      } else {
+        // 尝试自动修正路径：如果 pawtect_chunk 是文件名
+        // 如果之前代码是在 chunks 目录下找，现在可能需要去 assets 找
+        wasmUrl = new URL(
+          `/_app/immutable/assets/${pawtect_chunk}`,
+          location.origin
+        ).href;
+      }
+
+      console.log("🌐 Fetching WASM from:", wasmUrl);
+
+      // 2. 下载 WASM
+      const response = await fetch(wasmUrl);
+      if (!response.ok)
+        throw new Error(`Failed to fetch WASM: ${response.status}`);
+      const wasmBytes = await response.arrayBuffer();
+
+      // 3. 实例化 WASM
+      // 这里我们自己提供 imports，不再依赖 mod._()
+      const { instance } = await WebAssembly.instantiate(
+        wasmBytes,
+        getImports()
       );
-      let wasm;
-      try {
-        wasm = await mod._();
-        console.log("✅ WASM initialized successfully");
-      } catch (wasmError) {
-        console.error("❌ WASM initialization failed:", wasmError);
-        return null;
-      }
-      try {
-        try {
-          const me = await fetch(`https://backend.wplace.live/me`, {
-            credentials: "include",
-          }).then((r) => (r.ok ? r.json() : null));
-          if (me?.id) {
-            mod.i(me.id);
-            console.log("✅ user ID set:", me.id);
-          }
-        } catch {}
-      } catch (userIdError) {
-        console.log("⚠️ Error setting user ID:", userIdError.message);
-      }
-      try {
-        const testUrl = `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`;
-        if (mod.r) {
-          mod.r(testUrl);
-          console.log("✅ Request URL set:", testUrl);
-        } else {
-          console.log("⚠️ request_url function (mod.r) not available");
-        }
-      } catch (urlError) {
-        console.log("⚠️ Error setting request URL:", urlError.message);
-      }
 
-      console.log("🔍 payload:", payload);
+      // 保存 exports 供 helper 函数使用
+      wasmExports = instance.exports;
+      const wasm = wasmExports; // 兼容你下方的命名
 
-      // Encode payload
-      const enc = new TextEncoder();
-      const dec = new TextDecoder();
+      // 初始化 (如果有 start 函数)
+      if (wasm.__wbindgen_start) {
+        wasm.__wbindgen_start();
+      }
+      console.log("✅ WASM initialized manually");
+
+      // 4. (可选) 检查是否有设置 ID/URL 的导出函数
+      // 新版疑似已移除 mod.i 和 mod.r，这里打印一下看看有哪些函数
+      // console.log('Available Exports:', Object.keys(wasm));
+
+      // 5. 准备 Payload
       const bodyStr = JSON.stringify(payload);
-      const bytes = enc.encode(bodyStr);
-      console.log("🔍 Payload size:", bytes.length, "bytes");
-      console.log("🔄 Payload string:", bodyStr);
+      const bytes = textEncoder.encode(bodyStr);
 
-      // Allocate WASM memory with validation
-      let inPtr;
-      try {
-        if (!wasm.__wbindgen_malloc) {
-          console.error("❌ __wbindgen_malloc function not found");
-          return null;
-        }
-
-        inPtr = wasm.__wbindgen_malloc(bytes.length, 1);
-        console.log("✅ WASM memory allocated, pointer:", inPtr);
-
-        // Copy data to WASM memory
-        const wasmBuffer = new Uint8Array(
-          wasm.memory.buffer,
-          inPtr,
-          bytes.length
-        );
-        wasmBuffer.set(bytes);
-        console.log("✅ Data copied to WASM memory");
-      } catch (memError) {
-        console.error("❌ Memory allocation error:", memError);
+      // 6. 分配内存
+      if (!wasm.__wbindgen_malloc) {
+        console.error("❌ __wbindgen_malloc function not found");
         return null;
       }
+      const inPtr = wasm.__wbindgen_malloc(bytes.length, 1);
+      const memory = new Uint8Array(wasm.memory.buffer);
+      memory.set(bytes, inPtr);
 
-      // Call the WASM function
+      // 7. 调用核心函数
+      // 新版签名: get_pawtected_endpoint_payload(inPtr, inLen) -> [outPtr, outLen]
       console.log("🚀 Calling get_pawtected_endpoint_payload...");
-      let outPtr, outLen, token;
-      try {
-        const result = wasm.get_pawtected_endpoint_payload(inPtr, bytes.length);
-        console.log("✅ Function called, result type:", typeof result, result);
+      const result = wasm.get_pawtected_endpoint_payload(inPtr, bytes.length);
 
-        if (Array.isArray(result) && result.length === 2) {
-          [outPtr, outLen] = result;
-          console.log("✅ Got output pointer:", outPtr, "length:", outLen);
+      let token = null;
+      let outPtr, outLen;
 
-          // Decode the result
-          const outputBuffer = new Uint8Array(
-            wasm.memory.buffer,
-            outPtr,
-            outLen
-          );
-          token = dec.decode(outputBuffer);
-          console.log("✅ Token decoded successfully");
-        } else {
-          console.error("❌ Unexpected function result format:", result);
-          return null;
-        }
-      } catch (funcError) {
-        console.error("❌ Function call error:", funcError);
-        console.error("Stack trace:", funcError.stack);
-        return null;
+      // 处理返回值
+      if (Array.isArray(result) && result.length === 2) {
+        // 你的代码里已经正确处理了这种情况，这很好！
+        [outPtr, outLen] = result;
+        const outputBuffer = new Uint8Array(wasm.memory.buffer, outPtr, outLen);
+        token = textDecoder.decode(outputBuffer);
+        console.log("✅ Token decoded successfully");
+      } else {
+        // 防御性编程：如果它返回的是指针(旧版行为)，虽然不太可能
+        console.error("❌ Unexpected result format:", result);
       }
 
-      // Cleanup memory
-      try {
-        if (wasm.__wbindgen_free && outPtr && outLen) {
-          wasm.__wbindgen_free(outPtr, outLen, 1);
-          console.log("✅ Output memory freed");
-        }
-        if (wasm.__wbindgen_free && inPtr) {
-          wasm.__wbindgen_free(inPtr, bytes.length, 1);
-          console.log("✅ Input memory freed");
-        }
-      } catch (cleanupError) {
-        console.log("⚠️ Cleanup warning:", cleanupError.message);
+      // 8. 清理内存
+      if (wasm.__wbindgen_free) {
+        if (outPtr && outLen) wasm.__wbindgen_free(outPtr, outLen, 1);
+        if (inPtr) wasm.__wbindgen_free(inPtr, bytes.length, 1);
       }
 
-      console.log("🎉 SUCCESS!");
-      console.log("🔑 Full token:", token);
+      console.log("🔑 Token generated:", token);
       return token;
     } catch (error) {
-      console.error("❌ Failed to generate fp parameter:", error);
+      console.error("❌ WASM Logic Failed:", error);
       return null;
     }
   }
