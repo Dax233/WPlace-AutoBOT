@@ -10,22 +10,23 @@
 // ==/UserScript==
 localStorage.removeItem("lp");
 
-
-; (async () => {
+(async () => {
   // Prevent multiple instances of this script from running
   if (window.WPLACE_AUTO_IMAGE_LOADED) {
-    console.log('%c⚠️ Auto-Image script already loaded, skipping duplicate execution', 'color: #ff9800; font-weight: bold;');
+    console.log(
+      "%c⚠️ Auto-Image script already loaded, skipping duplicate execution",
+      "color: #ff9800; font-weight: bold;"
+    );
     return;
   }
   window.WPLACE_AUTO_IMAGE_LOADED = true;
 
-  console.log('%c🚀 WPlace AutoBot Auto-Image Starting...', 'color: #00ff41; font-weight: bold; font-size: 16px;');
+  console.log(
+    "%c🚀 WPlace AutoBot Auto-Image Starting...",
+    "color: #00ff41; font-weight: bold; font-size: 16px;"
+  );
 
-  const buyTypes = [
-    'none',
-    'max_charges',
-    'paint_charges'
-  ];
+  const buyTypes = ["none", "max_charges", "paint_charges"];
 
   // CONFIGURATION CONSTANTS
   const CONFIG = {
@@ -38,15 +39,15 @@ localStorage.removeItem("lp");
       MAX: 1000, // Maximum 1000 pixels batch size
       DEFAULT: 5, // Default 5 pixels batch size
     },
-    BATCH_MODE: 'normal', // "normal" or "random" - default to normal
+    BATCH_MODE: "normal", // "normal" or "random" - default to normal
     RANDOM_BATCH_RANGE: {
       MIN: 3, // Random range minimum
       MAX: 20, // Random range maximum
     },
-    PAINTING_ORDER: 'sequential', // "sequential" or "color-by-color" - default to sequential
+    PAINTING_ORDER: "sequential", // "sequential" or "color-by-color" - default to sequential
     PAINTING_SPEED_ENABLED: false, // Off by default
     AUTO_CAPTCHA_ENABLED: true, // Turnstile generator enabled by default
-    TOKEN_SOURCE: 'generator', // "generator", "manual", or "hybrid" - default to generator
+    TOKEN_SOURCE: "generator", // "generator", "manual", or "hybrid" - default to generator
     COOLDOWN_CHARGE_THRESHOLD: 1, // Default wait threshold
     // Desktop Notifications (defaults)
     NOTIFICATIONS: {
@@ -62,70 +63,70 @@ localStorage.removeItem("lp");
     }, // --- START: Color data from colour-converter.js ---
     // New color structure with proper ID mapping
     COLOR_MAP: {
-      0: { id: 1, name: 'Black', rgb: { r: 0, g: 0, b: 0 } },
-      1: { id: 2, name: 'Dark Gray', rgb: { r: 60, g: 60, b: 60 } },
-      2: { id: 3, name: 'Gray', rgb: { r: 120, g: 120, b: 120 } },
-      3: { id: 4, name: 'Light Gray', rgb: { r: 210, g: 210, b: 210 } },
-      4: { id: 5, name: 'White', rgb: { r: 255, g: 255, b: 255 } },
-      5: { id: 6, name: 'Deep Red', rgb: { r: 96, g: 0, b: 24 } },
-      6: { id: 7, name: 'Red', rgb: { r: 237, g: 28, b: 36 } },
-      7: { id: 8, name: 'Orange', rgb: { r: 255, g: 127, b: 39 } },
-      8: { id: 9, name: 'Gold', rgb: { r: 246, g: 170, b: 9 } },
-      9: { id: 10, name: 'Yellow', rgb: { r: 249, g: 221, b: 59 } },
-      10: { id: 11, name: 'Light Yellow', rgb: { r: 255, g: 250, b: 188 } },
-      11: { id: 12, name: 'Dark Green', rgb: { r: 14, g: 185, b: 104 } },
-      12: { id: 13, name: 'Green', rgb: { r: 19, g: 230, b: 123 } },
-      13: { id: 14, name: 'Light Green', rgb: { r: 135, g: 255, b: 94 } },
-      14: { id: 15, name: 'Dark Teal', rgb: { r: 12, g: 129, b: 110 } },
-      15: { id: 16, name: 'Teal', rgb: { r: 16, g: 174, b: 166 } },
-      16: { id: 17, name: 'Light Teal', rgb: { r: 19, g: 225, b: 190 } },
-      17: { id: 20, name: 'Cyan', rgb: { r: 96, g: 247, b: 242 } },
-      18: { id: 44, name: 'Light Cyan', rgb: { r: 187, g: 250, b: 242 } },
-      19: { id: 18, name: 'Dark Blue', rgb: { r: 40, g: 80, b: 158 } },
-      20: { id: 19, name: 'Blue', rgb: { r: 64, g: 147, b: 228 } },
-      21: { id: 21, name: 'Indigo', rgb: { r: 107, g: 80, b: 246 } },
-      22: { id: 22, name: 'Light Indigo', rgb: { r: 153, g: 177, b: 251 } },
-      23: { id: 23, name: 'Dark Purple', rgb: { r: 120, g: 12, b: 153 } },
-      24: { id: 24, name: 'Purple', rgb: { r: 170, g: 56, b: 185 } },
-      25: { id: 25, name: 'Light Purple', rgb: { r: 224, g: 159, b: 249 } },
-      26: { id: 26, name: 'Dark Pink', rgb: { r: 203, g: 0, b: 122 } },
-      27: { id: 27, name: 'Pink', rgb: { r: 236, g: 31, b: 128 } },
-      28: { id: 28, name: 'Light Pink', rgb: { r: 243, g: 141, b: 169 } },
-      29: { id: 29, name: 'Dark Brown', rgb: { r: 104, g: 70, b: 52 } },
-      30: { id: 30, name: 'Brown', rgb: { r: 149, g: 104, b: 42 } },
-      31: { id: 31, name: 'Beige', rgb: { r: 248, g: 178, b: 119 } },
-      32: { id: 52, name: 'Light Beige', rgb: { r: 255, g: 197, b: 165 } },
-      33: { id: 32, name: 'Medium Gray', rgb: { r: 170, g: 170, b: 170 } },
-      34: { id: 33, name: 'Dark Red', rgb: { r: 165, g: 14, b: 30 } },
-      35: { id: 34, name: 'Light Red', rgb: { r: 250, g: 128, b: 114 } },
-      36: { id: 35, name: 'Dark Orange', rgb: { r: 228, g: 92, b: 26 } },
-      37: { id: 37, name: 'Dark Goldenrod', rgb: { r: 156, g: 132, b: 49 } },
-      38: { id: 38, name: 'Goldenrod', rgb: { r: 197, g: 173, b: 49 } },
-      39: { id: 39, name: 'Light Goldenrod', rgb: { r: 232, g: 212, b: 95 } },
-      40: { id: 40, name: 'Dark Olive', rgb: { r: 74, g: 107, b: 58 } },
-      41: { id: 41, name: 'Olive', rgb: { r: 90, g: 148, b: 74 } },
-      42: { id: 42, name: 'Light Olive', rgb: { r: 132, g: 197, b: 115 } },
-      43: { id: 43, name: 'Dark Cyan', rgb: { r: 15, g: 121, b: 159 } },
-      44: { id: 45, name: 'Light Blue', rgb: { r: 125, g: 199, b: 255 } },
-      45: { id: 46, name: 'Dark Indigo', rgb: { r: 77, g: 49, b: 184 } },
-      46: { id: 47, name: 'Dark Slate Blue', rgb: { r: 74, g: 66, b: 132 } },
-      47: { id: 48, name: 'Slate Blue', rgb: { r: 122, g: 113, b: 196 } },
-      48: { id: 49, name: 'Light Slate Blue', rgb: { r: 181, g: 174, b: 241 } },
-      49: { id: 53, name: 'Dark Peach', rgb: { r: 155, g: 82, b: 73 } },
-      50: { id: 54, name: 'Peach', rgb: { r: 209, g: 128, b: 120 } },
-      51: { id: 55, name: 'Light Peach', rgb: { r: 250, g: 182, b: 164 } },
-      52: { id: 50, name: 'Light Brown', rgb: { r: 219, g: 164, b: 99 } },
-      53: { id: 56, name: 'Dark Tan', rgb: { r: 123, g: 99, b: 82 } },
-      54: { id: 57, name: 'Tan', rgb: { r: 156, g: 132, b: 107 } },
-      55: { id: 36, name: 'Light Tan', rgb: { r: 214, g: 181, b: 148 } },
-      56: { id: 51, name: 'Dark Beige', rgb: { r: 209, g: 128, b: 81 } },
-      57: { id: 61, name: 'Dark Stone', rgb: { r: 109, g: 100, b: 63 } },
-      58: { id: 62, name: 'Stone', rgb: { r: 148, g: 140, b: 107 } },
-      59: { id: 63, name: 'Light Stone', rgb: { r: 205, g: 197, b: 158 } },
-      60: { id: 58, name: 'Dark Slate', rgb: { r: 51, g: 57, b: 65 } },
-      61: { id: 59, name: 'Slate', rgb: { r: 109, g: 117, b: 141 } },
-      62: { id: 60, name: 'Light Slate', rgb: { r: 179, g: 185, b: 209 } },
-      63: { id: 0, name: 'Transparent', rgb: null },
+      0: { id: 1, name: "Black", rgb: { r: 0, g: 0, b: 0 } },
+      1: { id: 2, name: "Dark Gray", rgb: { r: 60, g: 60, b: 60 } },
+      2: { id: 3, name: "Gray", rgb: { r: 120, g: 120, b: 120 } },
+      3: { id: 4, name: "Light Gray", rgb: { r: 210, g: 210, b: 210 } },
+      4: { id: 5, name: "White", rgb: { r: 255, g: 255, b: 255 } },
+      5: { id: 6, name: "Deep Red", rgb: { r: 96, g: 0, b: 24 } },
+      6: { id: 7, name: "Red", rgb: { r: 237, g: 28, b: 36 } },
+      7: { id: 8, name: "Orange", rgb: { r: 255, g: 127, b: 39 } },
+      8: { id: 9, name: "Gold", rgb: { r: 246, g: 170, b: 9 } },
+      9: { id: 10, name: "Yellow", rgb: { r: 249, g: 221, b: 59 } },
+      10: { id: 11, name: "Light Yellow", rgb: { r: 255, g: 250, b: 188 } },
+      11: { id: 12, name: "Dark Green", rgb: { r: 14, g: 185, b: 104 } },
+      12: { id: 13, name: "Green", rgb: { r: 19, g: 230, b: 123 } },
+      13: { id: 14, name: "Light Green", rgb: { r: 135, g: 255, b: 94 } },
+      14: { id: 15, name: "Dark Teal", rgb: { r: 12, g: 129, b: 110 } },
+      15: { id: 16, name: "Teal", rgb: { r: 16, g: 174, b: 166 } },
+      16: { id: 17, name: "Light Teal", rgb: { r: 19, g: 225, b: 190 } },
+      17: { id: 20, name: "Cyan", rgb: { r: 96, g: 247, b: 242 } },
+      18: { id: 44, name: "Light Cyan", rgb: { r: 187, g: 250, b: 242 } },
+      19: { id: 18, name: "Dark Blue", rgb: { r: 40, g: 80, b: 158 } },
+      20: { id: 19, name: "Blue", rgb: { r: 64, g: 147, b: 228 } },
+      21: { id: 21, name: "Indigo", rgb: { r: 107, g: 80, b: 246 } },
+      22: { id: 22, name: "Light Indigo", rgb: { r: 153, g: 177, b: 251 } },
+      23: { id: 23, name: "Dark Purple", rgb: { r: 120, g: 12, b: 153 } },
+      24: { id: 24, name: "Purple", rgb: { r: 170, g: 56, b: 185 } },
+      25: { id: 25, name: "Light Purple", rgb: { r: 224, g: 159, b: 249 } },
+      26: { id: 26, name: "Dark Pink", rgb: { r: 203, g: 0, b: 122 } },
+      27: { id: 27, name: "Pink", rgb: { r: 236, g: 31, b: 128 } },
+      28: { id: 28, name: "Light Pink", rgb: { r: 243, g: 141, b: 169 } },
+      29: { id: 29, name: "Dark Brown", rgb: { r: 104, g: 70, b: 52 } },
+      30: { id: 30, name: "Brown", rgb: { r: 149, g: 104, b: 42 } },
+      31: { id: 31, name: "Beige", rgb: { r: 248, g: 178, b: 119 } },
+      32: { id: 52, name: "Light Beige", rgb: { r: 255, g: 197, b: 165 } },
+      33: { id: 32, name: "Medium Gray", rgb: { r: 170, g: 170, b: 170 } },
+      34: { id: 33, name: "Dark Red", rgb: { r: 165, g: 14, b: 30 } },
+      35: { id: 34, name: "Light Red", rgb: { r: 250, g: 128, b: 114 } },
+      36: { id: 35, name: "Dark Orange", rgb: { r: 228, g: 92, b: 26 } },
+      37: { id: 37, name: "Dark Goldenrod", rgb: { r: 156, g: 132, b: 49 } },
+      38: { id: 38, name: "Goldenrod", rgb: { r: 197, g: 173, b: 49 } },
+      39: { id: 39, name: "Light Goldenrod", rgb: { r: 232, g: 212, b: 95 } },
+      40: { id: 40, name: "Dark Olive", rgb: { r: 74, g: 107, b: 58 } },
+      41: { id: 41, name: "Olive", rgb: { r: 90, g: 148, b: 74 } },
+      42: { id: 42, name: "Light Olive", rgb: { r: 132, g: 197, b: 115 } },
+      43: { id: 43, name: "Dark Cyan", rgb: { r: 15, g: 121, b: 159 } },
+      44: { id: 45, name: "Light Blue", rgb: { r: 125, g: 199, b: 255 } },
+      45: { id: 46, name: "Dark Indigo", rgb: { r: 77, g: 49, b: 184 } },
+      46: { id: 47, name: "Dark Slate Blue", rgb: { r: 74, g: 66, b: 132 } },
+      47: { id: 48, name: "Slate Blue", rgb: { r: 122, g: 113, b: 196 } },
+      48: { id: 49, name: "Light Slate Blue", rgb: { r: 181, g: 174, b: 241 } },
+      49: { id: 53, name: "Dark Peach", rgb: { r: 155, g: 82, b: 73 } },
+      50: { id: 54, name: "Peach", rgb: { r: 209, g: 128, b: 120 } },
+      51: { id: 55, name: "Light Peach", rgb: { r: 250, g: 182, b: 164 } },
+      52: { id: 50, name: "Light Brown", rgb: { r: 219, g: 164, b: 99 } },
+      53: { id: 56, name: "Dark Tan", rgb: { r: 123, g: 99, b: 82 } },
+      54: { id: 57, name: "Tan", rgb: { r: 156, g: 132, b: 107 } },
+      55: { id: 36, name: "Light Tan", rgb: { r: 214, g: 181, b: 148 } },
+      56: { id: 51, name: "Dark Beige", rgb: { r: 209, g: 128, b: 81 } },
+      57: { id: 61, name: "Dark Stone", rgb: { r: 109, g: 100, b: 63 } },
+      58: { id: 62, name: "Stone", rgb: { r: 148, g: 140, b: 107 } },
+      59: { id: 63, name: "Light Stone", rgb: { r: 205, g: 197, b: 158 } },
+      60: { id: 58, name: "Dark Slate", rgb: { r: 51, g: 57, b: 65 } },
+      61: { id: 59, name: "Slate", rgb: { r: 109, g: 117, b: 141 } },
+      62: { id: 60, name: "Light Slate", rgb: { r: 179, g: 185, b: 209 } },
+      63: { id: 0, name: "Transparent", rgb: null },
     }, // --- END: Color data ---
     // Optimized CSS Classes for reuse
     CSS_CLASSES: {
@@ -152,151 +153,155 @@ localStorage.removeItem("lp");
       `,
     },
     THEMES: {
-      'Classic Autobot': {
-        primary: '#000000',
-        secondary: '#111111',
-        accent: '#222222',
-        text: '#ffffff',
-        highlight: '#775ce3',
-        success: '#00ff00',
-        error: '#ff0000',
-        warning: '#ffaa00',
+      "Classic Autobot": {
+        primary: "#000000",
+        secondary: "#111111",
+        accent: "#222222",
+        text: "#ffffff",
+        highlight: "#775ce3",
+        success: "#00ff00",
+        error: "#ff0000",
+        warning: "#ffaa00",
         fontFamily: "'Segoe UI', Roboto, sans-serif",
-        borderRadius: '12px',
-        borderStyle: 'solid',
-        borderWidth: '1px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1)',
-        backdropFilter: 'blur(10px)',
+        borderRadius: "12px",
+        borderStyle: "solid",
+        borderWidth: "1px",
+        boxShadow:
+          "0 8px 32px rgba(0,0,0,0.6), 0 0 0 1px rgba(255,255,255,0.1)",
+        backdropFilter: "blur(10px)",
         animations: {
           glow: false,
           scanline: false,
-          'pixel-blink': false,
+          "pixel-blink": false,
         },
       },
-      'Classic Light': {
-        primary: '#E0E0E1',
-        secondary: '#FBFBFB',
-        accent: '#F3F3F3',
-        text: '#203C5D',
-        highlight: '#203C5D',
-        success: '#28a745',
-        error: '#dc3545',
-        warning: '#ffc107',
+      "Classic Light": {
+        primary: "#E0E0E1",
+        secondary: "#FBFBFB",
+        accent: "#F3F3F3",
+        text: "#203C5D",
+        highlight: "#203C5D",
+        success: "#28a745",
+        error: "#dc3545",
+        warning: "#ffc107",
         fontFamily: "'Segoe UI', Roboto, sans-serif",
-        borderRadius: '12px',
-        borderStyle: 'solid',
-        borderWidth: '1px',
-        boxShadow: '0 8px 32px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.08)',
-        backdropFilter: 'blur(10px)',
+        borderRadius: "12px",
+        borderStyle: "solid",
+        borderWidth: "1px",
+        boxShadow: "0 8px 32px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.08)",
+        backdropFilter: "blur(10px)",
         animations: {
           glow: false,
           scanline: false,
-          'pixel-blink': false,
+          "pixel-blink": false,
         },
       },
-      'Neon Retro': {
-        primary: '#1a1a2e',
-        secondary: '#16213e',
-        accent: '#0f3460',
-        text: '#00ff41',
-        highlight: '#ff6b35',
-        success: '#39ff14',
-        error: '#ff073a',
-        warning: '#ffff00',
-        neon: '#00ffff',
-        purple: '#bf00ff',
-        pink: '#ff1493',
+      "Neon Retro": {
+        primary: "#1a1a2e",
+        secondary: "#16213e",
+        accent: "#0f3460",
+        text: "#00ff41",
+        highlight: "#ff6b35",
+        success: "#39ff14",
+        error: "#ff073a",
+        warning: "#ffff00",
+        neon: "#00ffff",
+        purple: "#bf00ff",
+        pink: "#ff1493",
         fontFamily: "'Press Start 2P', monospace",
-        borderRadius: '0',
-        borderStyle: 'solid',
-        borderWidth: '3px',
-        boxShadow: '0 0 20px rgba(0, 255, 65, 0.3), inset 0 0 20px rgba(0, 255, 65, 0.1)',
-        backdropFilter: 'none',
+        borderRadius: "0",
+        borderStyle: "solid",
+        borderWidth: "3px",
+        boxShadow:
+          "0 0 20px rgba(0, 255, 65, 0.3), inset 0 0 20px rgba(0, 255, 65, 0.1)",
+        backdropFilter: "none",
         animations: {
           glow: true,
           scanline: true,
-          'pixel-blink': true,
+          "pixel-blink": true,
         },
       },
-      'Neon Retro Cyan': {
-        primary: '#1959A1',
-        secondary: '#3C74AF',
-        accent: '#538CC0',
-        text: '#81DCF7',
-        highlight: '#EA9C00',
-        success: '#39ff14',
-        error: '#ff073a',
-        warning: '#ffff00',
-        neon: '00ffff',
-        purple: '#bf00ff',
-        pink: '#ff1493',
+      "Neon Retro Cyan": {
+        primary: "#1959A1",
+        secondary: "#3C74AF",
+        accent: "#538CC0",
+        text: "#81DCF7",
+        highlight: "#EA9C00",
+        success: "#39ff14",
+        error: "#ff073a",
+        warning: "#ffff00",
+        neon: "00ffff",
+        purple: "#bf00ff",
+        pink: "#ff1493",
         fontFamily: "'Press Start 2P', monospace",
-        borderRadius: '0',
-        borderStyle: 'solid',
-        borderWidth: '3px',
-        boxShadow: '0 0 20px rgba(234 156 0, 0.3), inset 0 0 20px rgba(234 156 0, 0.1)',
-        backdropFilter: 'none',
+        borderRadius: "0",
+        borderStyle: "solid",
+        borderWidth: "3px",
+        boxShadow:
+          "0 0 20px rgba(234 156 0, 0.3), inset 0 0 20px rgba(234 156 0, 0.1)",
+        backdropFilter: "none",
         animations: {
           glow: true,
           scanline: true,
-          'pixel-blink': true,
+          "pixel-blink": true,
         },
       },
-      'Neon Retro Light': {
-        primary: '#E0E0E1',
-        secondary: '#FBFBFB',
-        accent: '#F3F3F3',
-        text: '#203C5D',
-        highlight: '#203C5D',
-        success: '#39ff14',
-        error: '#ff073a',
-        warning: '#ffff00',
-        neon: '#203C5D',
-        purple: '#bf00ff',
-        pink: '#ff1493',
+      "Neon Retro Light": {
+        primary: "#E0E0E1",
+        secondary: "#FBFBFB",
+        accent: "#F3F3F3",
+        text: "#203C5D",
+        highlight: "#203C5D",
+        success: "#39ff14",
+        error: "#ff073a",
+        warning: "#ffff00",
+        neon: "#203C5D",
+        purple: "#bf00ff",
+        pink: "#ff1493",
         fontFamily: "'Press Start 2P', monospace",
-        borderRadius: '0',
-        borderStyle: 'solid',
-        borderWidth: '3px',
-        boxShadow: '0 0 20px rgba(234 156 0, 0.3), inset 0 0 20px rgba(234 156 0, 0.1)',
-        backdropFilter: 'none',
+        borderRadius: "0",
+        borderStyle: "solid",
+        borderWidth: "3px",
+        boxShadow:
+          "0 0 20px rgba(234 156 0, 0.3), inset 0 0 20px rgba(234 156 0, 0.1)",
+        backdropFilter: "none",
         animations: {
           glow: true,
           scanline: true,
-          'pixel-blink': true,
+          "pixel-blink": true,
         },
       },
-      'Acrylic': {
-        primary: '#00000080',
-        secondary: '#00000040',
-        accent: 'rgba(0,0,0,0.75)',
-        text: '#ffffff',
-        highlight: '#ffffff',
-        success: '#00e500',
-        error: '#e50000',
-        warning: '#e5e500',
+      Acrylic: {
+        primary: "#00000080",
+        secondary: "#00000040",
+        accent: "rgba(0,0,0,0.75)",
+        text: "#ffffff",
+        highlight: "#ffffff",
+        success: "#00e500",
+        error: "#e50000",
+        warning: "#e5e500",
         fontFamily: "'Inter', 'Apple Color Emoji'",
-        borderRadius: '10px',
-        borderStyle: 'solid',
-        borderWidth: '0px',
-        boxShadow: 'none',
-        backdropFilter: 'blur(20px)',
+        borderRadius: "10px",
+        borderStyle: "solid",
+        borderWidth: "0px",
+        boxShadow: "none",
+        backdropFilter: "blur(20px)",
         animations: {
           glow: false,
           scanline: false,
-          'pixel-blink': false,
+          "pixel-blink": false,
         },
       },
     },
-    currentTheme: 'Classic Autobot',
+    currentTheme: "Classic Autobot",
     PAINT_UNAVAILABLE: true,
-    COORDINATE_MODE: 'rows',
-    COORDINATE_DIRECTION: 'top-left',
+    COORDINATE_MODE: "rows",
+    COORDINATE_DIRECTION: "top-left",
     COORDINATE_SNAKE: true,
     COORDINATE_BLOCK_WIDTH: 6,
     COORDINATE_BLOCK_HEIGHT: 2,
     autoSwap: true,
-    autoBuy: 'none', // "none", "max_charges", or "paint_charges"
+    autoBuy: "none", // "none", "max_charges", or "paint_charges"
     autoBuyToggle: false,
     maxChargesStopEnable: false,
     maxChargesBeforeStop: 1500,
@@ -323,59 +328,80 @@ localStorage.removeItem("lp");
   // Add this helper (place it after getCurrentTheme/switchTheme definitions)
   function applyTheme() {
     const theme = getCurrentTheme();
-    console.group('%c🎨 Applying Theme in Auto-Image Script', 'color: #8b5cf6; font-weight: bold;');
-    console.log(`%c🎯 Target theme: ${CONFIG.currentTheme}`, 'color: #8b5cf6;');
+    console.group(
+      "%c🎨 Applying Theme in Auto-Image Script",
+      "color: #8b5cf6; font-weight: bold;"
+    );
+    console.log(`%c🎯 Target theme: ${CONFIG.currentTheme}`, "color: #8b5cf6;");
 
     // Toggle theme class on documentElement so CSS vars cascade to our UI
     document.documentElement.classList.remove(
-      'wplace-theme-classic',
-      'wplace-theme-classic-light',
-      'wplace-theme-acrylic',
-      'wplace-theme-neon',
-      'wplace-theme-neon-cyan',
-      'wplace-theme-neon-light'
+      "wplace-theme-classic",
+      "wplace-theme-classic-light",
+      "wplace-theme-acrylic",
+      "wplace-theme-neon",
+      "wplace-theme-neon-cyan",
+      "wplace-theme-neon-light"
     );
 
-    let themeClass = 'wplace-theme-classic'; // default
-    let themeFileName = 'classic'; // corresponding file name
+    let themeClass = "wplace-theme-classic"; // default
+    let themeFileName = "classic"; // corresponding file name
 
-    if (CONFIG.currentTheme === 'Neon Retro') {
-      themeClass = 'wplace-theme-neon';
-      themeFileName = 'neon';
-    } else if (CONFIG.currentTheme === 'Classic Light') {
-      themeClass = 'wplace-theme-classic-light';
-      themeFileName = 'classic-light';
-    } else if (CONFIG.currentTheme === 'Neon Retro Cyan') {
-      themeClass = 'wplace-theme-neon-cyan';
-      themeFileName = 'neon-cyan';
-    } else if (CONFIG.currentTheme === 'Neon Retro Light') {
-      themeClass = 'wplace-theme-neon-light';
-      themeFileName = 'neon-light';
-    } else if (CONFIG.currentTheme === 'Acrylic') {
-      themeClass = 'wplace-theme-acrylic';
-      themeFileName = 'acrylic';
+    if (CONFIG.currentTheme === "Neon Retro") {
+      themeClass = "wplace-theme-neon";
+      themeFileName = "neon";
+    } else if (CONFIG.currentTheme === "Classic Light") {
+      themeClass = "wplace-theme-classic-light";
+      themeFileName = "classic-light";
+    } else if (CONFIG.currentTheme === "Neon Retro Cyan") {
+      themeClass = "wplace-theme-neon-cyan";
+      themeFileName = "neon-cyan";
+    } else if (CONFIG.currentTheme === "Neon Retro Light") {
+      themeClass = "wplace-theme-neon-light";
+      themeFileName = "neon-light";
+    } else if (CONFIG.currentTheme === "Acrylic") {
+      themeClass = "wplace-theme-acrylic";
+      themeFileName = "acrylic";
     }
 
     document.documentElement.classList.add(themeClass);
-    console.log(`%c✅ Applied theme class: ${themeClass}`, 'color: #8b5cf6;');
+    console.log(`%c✅ Applied theme class: ${themeClass}`, "color: #8b5cf6;");
 
     // Use extension's applyTheme helper if available (loads from local extension resources)
-    if (typeof window.applyTheme === 'function') {
-      console.log(`%c🔧 Using extension's applyTheme() helper for: ${themeFileName}`, 'color: #10b981; font-weight: bold;');
+    if (typeof window.applyTheme === "function") {
+      console.log(
+        `%c🔧 Using extension's applyTheme() helper for: ${themeFileName}`,
+        "color: #10b981; font-weight: bold;"
+      );
       const success = window.applyTheme(themeFileName);
       if (success) {
-        console.log(`%c✅ Theme CSS loaded from extension local resources`, 'color: #10b981; font-weight: bold;');
-        console.log(`  📍 Source: Extension local file (themes/${themeFileName}.css)`);
+        console.log(
+          `%c✅ Theme CSS loaded from extension local resources`,
+          "color: #10b981; font-weight: bold;"
+        );
+        console.log(
+          `  📍 Source: Extension local file (themes/${themeFileName}.css)`
+        );
         console.log(`  🚀 Performance: Instant load (no network request)`);
       } else {
-        console.warn(`%c⚠️ Extension theme loading failed, fallback to CSS classes only`, 'color: #f59e0b;');
+        console.warn(
+          `%c⚠️ Extension theme loading failed, fallback to CSS classes only`,
+          "color: #f59e0b;"
+        );
         console.log(`  🎨 Using CSS class: ${themeClass}`);
-        console.log(`  📝 Note: Theme variables may be limited without CSS file`);
+        console.log(
+          `  📝 Note: Theme variables may be limited without CSS file`
+        );
       }
     } else {
-      console.log(`%c📝 Extension applyTheme() not available, using CSS class only`, 'color: #f59e0b;');
+      console.log(
+        `%c📝 Extension applyTheme() not available, using CSS class only`,
+        "color: #f59e0b;"
+      );
       console.log(`  🎨 Using CSS class: ${themeClass}`);
-      console.log(`  ⚠️ Note: Full theme styling requires extension helper function`);
+      console.log(
+        `  ⚠️ Note: Full theme styling requires extension helper function`
+      );
     }
 
     // Also set CSS variables explicitly in case you want runtime overrides
@@ -383,46 +409,52 @@ localStorage.removeItem("lp");
     const setVar = (k, v) => {
       try {
         root.style.setProperty(k, v);
-      } catch { }
+      } catch {}
     };
 
-    setVar('--wplace-primary', theme.primary);
-    setVar('--wplace-secondary', theme.secondary);
-    setVar('--wplace-accent', theme.accent);
-    setVar('--wplace-text', theme.text);
-    setVar('--wplace-highlight', theme.highlight);
-    setVar('--wplace-success', theme.success);
-    setVar('--wplace-error', theme.error);
-    setVar('--wplace-warning', theme.warning);
+    setVar("--wplace-primary", theme.primary);
+    setVar("--wplace-secondary", theme.secondary);
+    setVar("--wplace-accent", theme.accent);
+    setVar("--wplace-text", theme.text);
+    setVar("--wplace-highlight", theme.highlight);
+    setVar("--wplace-success", theme.success);
+    setVar("--wplace-error", theme.error);
+    setVar("--wplace-warning", theme.warning);
 
     // Typography + look
-    setVar('--wplace-font', theme.fontFamily || "'Segoe UI', Roboto, sans-serif");
-    setVar('--wplace-radius', '' + (theme.borderRadius || '12px'));
-    setVar('--wplace-border-style', '' + (theme.borderStyle || 'solid'));
-    setVar('--wplace-border-width', '' + (theme.borderWidth || '1px'));
-    setVar('--wplace-backdrop', '' + (theme.backdropFilter || 'blur(10px)'));
-    setVar('--wplace-border-color', 'rgba(255,255,255,0.1)');
+    setVar(
+      "--wplace-font",
+      theme.fontFamily || "'Segoe UI', Roboto, sans-serif"
+    );
+    setVar("--wplace-radius", "" + (theme.borderRadius || "12px"));
+    setVar("--wplace-border-style", "" + (theme.borderStyle || "solid"));
+    setVar("--wplace-border-width", "" + (theme.borderWidth || "1px"));
+    setVar("--wplace-backdrop", "" + (theme.backdropFilter || "blur(10px)"));
+    setVar("--wplace-border-color", "rgba(255,255,255,0.1)");
 
-    console.log(`%c🎨 Theme application complete`, 'color: #8b5cf6; font-weight: bold;');
+    console.log(
+      `%c🎨 Theme application complete`,
+      "color: #8b5cf6; font-weight: bold;"
+    );
     console.groupEnd();
   }
 
   const saveThemePreference = () => {
     try {
-      localStorage.setItem('wplace-theme', CONFIG.currentTheme);
+      localStorage.setItem("wplace-theme", CONFIG.currentTheme);
     } catch (e) {
-      console.warn('Could not save theme preference:', e);
+      console.warn("Could not save theme preference:", e);
     }
   };
 
   const loadThemePreference = () => {
     try {
-      const saved = localStorage.getItem('wplace-theme');
+      const saved = localStorage.getItem("wplace-theme");
       if (saved && CONFIG.THEMES[saved]) {
         CONFIG.currentTheme = saved;
       }
     } catch (e) {
-      console.warn('Could not load theme preference:', e);
+      console.warn("Could not load theme preference:", e);
     }
   };
 
@@ -431,19 +463,19 @@ localStorage.removeItem("lp");
 
   // Available languages
   const AVAILABLE_LANGUAGES = [
-    'en',
-    'es',
-    'ru',
-    'pt',
-    'vi',
-    'fr',
-    'id',
-    'tr',
-    'zh-CN',
-    'zh-TW',
-    'ja',
-    'ko',
-    'uk',
+    "en",
+    "es",
+    "ru",
+    "pt",
+    "vi",
+    "fr",
+    "id",
+    "tr",
+    "zh-CN",
+    "zh-TW",
+    "ja",
+    "ko",
+    "uk",
   ];
 
   // Function to load translations from JSON file with retry mechanism
@@ -452,31 +484,51 @@ localStorage.removeItem("lp");
       return window.loadedTranslations[language];
     }
 
-    console.group(`%c🌍 Loading ${language.toUpperCase()} translations`, 'color: #06b6d4; font-weight: bold;');
+    console.group(
+      `%c🌍 Loading ${language.toUpperCase()} translations`,
+      "color: #06b6d4; font-weight: bold;"
+    );
 
     // First try: Check if extension has loaded local resources
-    if (window.AUTOBOT_LANGUAGES && Object.keys(window.AUTOBOT_LANGUAGES).length > 0) {
-      console.log(`%c🔍 Checking extension local resources...`, 'color: #06b6d4;');
+    if (
+      window.AUTOBOT_LANGUAGES &&
+      Object.keys(window.AUTOBOT_LANGUAGES).length > 0
+    ) {
+      console.log(
+        `%c🔍 Checking extension local resources...`,
+        "color: #06b6d4;"
+      );
 
       const langFile = `${language}.json`;
       const availableFiles = Object.keys(window.AUTOBOT_LANGUAGES || {});
-      const regionalMatch = availableFiles.find(file => file.toLowerCase().startsWith(`${language.toLowerCase()}-`));
-      const resolvedFile = window.AUTOBOT_LANGUAGES[langFile] ? langFile : regionalMatch;
+      const regionalMatch = availableFiles.find((file) =>
+        file.toLowerCase().startsWith(`${language.toLowerCase()}-`)
+      );
+      const resolvedFile = window.AUTOBOT_LANGUAGES[langFile]
+        ? langFile
+        : regionalMatch;
 
       if (resolvedFile && window.AUTOBOT_LANGUAGES[resolvedFile]) {
         const translations = window.AUTOBOT_LANGUAGES[resolvedFile];
 
         // Validate that translations is an object with keys
         if (
-          typeof translations === 'object' &&
+          typeof translations === "object" &&
           translations !== null &&
           Object.keys(translations).length > 0
         ) {
           window.loadedTranslations[language] = translations;
-          console.log(`%c✅ Loaded ${language} translations from EXTENSION LOCAL FILES`, 'color: #10b981; font-weight: bold;');
-          console.log(`  📍 Source: Extension local storage (chrome-extension://)`);
+          console.log(
+            `%c✅ Loaded ${language} translations from EXTENSION LOCAL FILES`,
+            "color: #10b981; font-weight: bold;"
+          );
+          console.log(
+            `  📍 Source: Extension local storage (chrome-extension://)`
+          );
           if (resolvedFile !== langFile) {
-            console.log(`  🔄 Resolved locale: ${resolvedFile.replace('.json', '')}`);
+            console.log(
+              `  🔄 Resolved locale: ${resolvedFile.replace(".json", "")}`
+            );
           }
           console.log(`  📏 Keys count: ${Object.keys(translations).length}`);
           console.log(`  🚀 Performance: Instant load (no network request)`);
@@ -484,38 +536,56 @@ localStorage.removeItem("lp");
           return translations;
         }
       } else {
-        console.log(`%c📝 ${langFile} not found in extension resources`, 'color: #f59e0b;');
-        console.log(`  📋 Available in extension: ${Object.keys(window.AUTOBOT_LANGUAGES).join(', ')}`);
+        console.log(
+          `%c📝 ${langFile} not found in extension resources`,
+          "color: #f59e0b;"
+        );
+        console.log(
+          `  📋 Available in extension: ${Object.keys(
+            window.AUTOBOT_LANGUAGES
+          ).join(", ")}`
+        );
       }
     } else {
-      console.log(`%c📝 No extension local resources available`, 'color: #f59e0b;');
-      console.log(`  🔍 window.AUTOBOT_LANGUAGES: ${typeof window.AUTOBOT_LANGUAGES}`);
+      console.log(
+        `%c📝 No extension local resources available`,
+        "color: #f59e0b;"
+      );
+      console.log(
+        `  🔍 window.AUTOBOT_LANGUAGES: ${typeof window.AUTOBOT_LANGUAGES}`
+      );
     }
 
     // Second try: Use helper function if available
-    if (typeof window.getLanguage === 'function') {
-      console.log(`%c🔧 Trying extension getLanguage() helper...`, 'color: #06b6d4;');
+    if (typeof window.getLanguage === "function") {
+      console.log(
+        `%c🔧 Trying extension getLanguage() helper...`,
+        "color: #06b6d4;"
+      );
       try {
         const translations = window.getLanguage(language);
         if (
-          typeof translations === 'object' &&
+          typeof translations === "object" &&
           translations !== null &&
           Object.keys(translations).length > 0
         ) {
           window.loadedTranslations[language] = translations;
-          console.log(`%c✅ Loaded ${language} translations via extension helper`, 'color: #10b981; font-weight: bold;');
+          console.log(
+            `%c✅ Loaded ${language} translations via extension helper`,
+            "color: #10b981; font-weight: bold;"
+          );
           console.log(`  📍 Source: Extension getLanguage() function`);
           console.log(`  📏 Keys count: ${Object.keys(translations).length}`);
           console.groupEnd();
           return translations;
         }
       } catch (error) {
-        console.warn(`%c⚠️ Extension helper failed:`, 'color: #f59e0b;', error);
+        console.warn(`%c⚠️ Extension helper failed:`, "color: #f59e0b;", error);
       }
     }
 
     // Fallback: Load from CDN (original behavior)
-    console.log(`%c🌐 Falling back to CDN loading...`, 'color: #8b5cf6;');
+    console.log(`%c🌐 Falling back to CDN loading...`, "color: #8b5cf6;");
     const url = `https://wplace-autobot.github.io/WPlace-AutoBOT/main/lang/${language}.json`;
     const maxRetries = 3;
     const baseDelay = 1000; // 1 second
@@ -525,7 +595,9 @@ localStorage.removeItem("lp");
         console.log(`🔄 Loading ${language} translations from CDN...`);
       } else {
         console.log(
-          `🔄 Retrying ${language} translations (attempt ${retryCount + 1}/${maxRetries + 1})...`
+          `🔄 Retrying ${language} translations (attempt ${retryCount + 1}/${
+            maxRetries + 1
+          })...`
         );
       }
 
@@ -535,13 +607,16 @@ localStorage.removeItem("lp");
 
         // Validate that translations is an object with keys
         if (
-          typeof translations === 'object' &&
+          typeof translations === "object" &&
           translations !== null &&
           Object.keys(translations).length > 0
         ) {
           window.loadedTranslations[language] = translations;
           console.log(
-            `%c📚 Loaded ${language} translations from CDN (${Object.keys(translations).length} keys)`, 'color: #f59e0b; font-weight: bold;'
+            `%c📚 Loaded ${language} translations from CDN (${
+              Object.keys(translations).length
+            } keys)`,
+            "color: #f59e0b; font-weight: bold;"
           );
           console.log(`  📍 Source: CDN (wplace-autobot.github.io)`);
           console.log(`  🌐 URL: ${url}`);
@@ -550,7 +625,7 @@ localStorage.removeItem("lp");
           return translations;
         } else {
           console.warn(`❌ Invalid translation format for ${language}`);
-          throw new Error('Invalid translation format');
+          throw new Error("Invalid translation format");
         }
       } else {
         console.warn(
@@ -560,7 +635,9 @@ localStorage.removeItem("lp");
       }
     } catch (error) {
       console.error(
-        `❌ Failed to load ${language} translations from CDN (attempt ${retryCount + 1}):`,
+        `❌ Failed to load ${language} translations from CDN (attempt ${
+          retryCount + 1
+        }):`,
         error
       );
 
@@ -574,17 +651,20 @@ localStorage.removeItem("lp");
       }
     }
 
-    console.error(`%c💥 All translation loading methods failed for ${language}`, 'color: #ef4444; font-weight: bold;');
+    console.error(
+      `%c💥 All translation loading methods failed for ${language}`,
+      "color: #ef4444; font-weight: bold;"
+    );
     console.groupEnd();
     return null;
   };
 
   const loadLanguagePreference = async () => {
-    const savedLanguage = localStorage.getItem('wplace_language');
+    const savedLanguage = localStorage.getItem("wplace_language");
     const browserLocale = navigator.language;
-    const browserLanguage = browserLocale.split('-')[0];
+    const browserLanguage = browserLocale.split("-")[0];
 
-    let selectedLanguage = 'en'; // Default fallback
+    let selectedLanguage = "en"; // Default fallback
 
     try {
       // Check if we have the saved language available
@@ -595,13 +675,13 @@ localStorage.removeItem("lp");
       // Try full locale match (e.g. "zh-CN", "zh-TW" etc)
       else if (AVAILABLE_LANGUAGES.includes(browserLocale)) {
         selectedLanguage = browserLocale;
-        localStorage.setItem('wplace_language', browserLocale);
+        localStorage.setItem("wplace_language", browserLocale);
         console.log(`🔄 Using browser locale: ${selectedLanguage}`);
       }
       // Try base language match (e.g. "en" for "en-US" or "en-GB" etc)
       else if (AVAILABLE_LANGUAGES.includes(browserLanguage)) {
         selectedLanguage = browserLanguage;
-        localStorage.setItem('wplace_language', browserLanguage);
+        localStorage.setItem("wplace_language", browserLanguage);
         console.log(`🔄 Using browser language: ${selectedLanguage}`);
       }
       // Use English as fallback
@@ -613,19 +693,22 @@ localStorage.removeItem("lp");
       state.language = selectedLanguage;
 
       // Only load translations if not already loaded and not English (which should already be loaded)
-      if (selectedLanguage !== 'en' && !window.loadedTranslations[selectedLanguage]) {
+      if (
+        selectedLanguage !== "en" &&
+        !window.loadedTranslations[selectedLanguage]
+      ) {
         const loaded = await loadTranslations(selectedLanguage);
         if (!loaded) {
           console.warn(
             `⚠️ Failed to load ${selectedLanguage} translations, falling back to English`
           );
-          state.language = 'en';
-          localStorage.setItem('wplace_language', 'en');
+          state.language = "en";
+          localStorage.setItem("wplace_language", "en");
         }
       }
     } catch (error) {
       console.error(`❌ Error in loadLanguagePreference:`, error);
-      state.language = 'en'; // Always ensure we have a valid language
+      state.language = "en"; // Always ensure we have a valid language
     }
   };
 
@@ -633,7 +716,7 @@ localStorage.removeItem("lp");
   const showTranslationWarning = (message) => {
     try {
       // Create a simple temporary notification banner
-      const warning = document.createElement('div');
+      const warning = document.createElement("div");
       warning.style.cssText = `
         position: fixed; top: 10px; right: 10px; z-index: 10001;
         background: rgba(255, 193, 7, 0.95); color: #212529; padding: 12px 16px;
@@ -652,73 +735,84 @@ localStorage.removeItem("lp");
       }, 8000);
     } catch (e) {
       // If DOM manipulation fails, just log
-      console.warn('Failed to show translation warning UI:', e);
+      console.warn("Failed to show translation warning UI:", e);
     }
   };
 
   // Initialize translations function
   const initializeTranslations = async () => {
     try {
-      console.log('🌐 Initializing translation system...');
+      console.log("🌐 Initializing translation system...");
 
       // Always ensure English is loaded as fallback first
-      if (!window.loadedTranslations['en']) {
-        const englishLoaded = await loadTranslations('en');
+      if (!window.loadedTranslations["en"]) {
+        const englishLoaded = await loadTranslations("en");
         if (!englishLoaded) {
-          console.warn('⚠️ Failed to load English translations from CDN, using fallback');
-          showTranslationWarning('⚠️ Translation loading failed, using basic fallbacks');
+          console.warn(
+            "⚠️ Failed to load English translations from CDN, using fallback"
+          );
+          showTranslationWarning(
+            "⚠️ Translation loading failed, using basic fallbacks"
+          );
         }
       }
 
       // Then load user's language preference
       await loadLanguagePreference();
 
-      console.log(`✅ Translation system initialized. Active language: ${state.language}`);
+      console.log(
+        `✅ Translation system initialized. Active language: ${state.language}`
+      );
     } catch (error) {
-      console.error('❌ Translation initialization failed:', error);
+      console.error("❌ Translation initialization failed:", error);
       // Ensure state has a valid language even if loading fails
       if (!state.language) {
-        state.language = 'en';
+        state.language = "en";
       }
-      console.warn('⚠️ Using fallback translations due to initialization failure');
-      showTranslationWarning('⚠️ Translation system error, using basic English');
+      console.warn(
+        "⚠️ Using fallback translations due to initialization failure"
+      );
+      showTranslationWarning(
+        "⚠️ Translation system error, using basic English"
+      );
     }
   };
 
   // Emergency fallback TEXT (minimal)
   const FALLBACK_TEXT = {
     en: {
-      title: 'WPlace Auto-Image',
-      toggleOverlay: 'Toggle Overlay',
-      scanColors: 'Scan Colors',
-      uploadImage: 'Upload Image',
-      resizeImage: 'Process/Edit Image',
-      processImageFirst: '⚠️ Process the image first via "Process/Edit Image" before placing!',
-      imageNeedsProcessing: 'Image needs processing',
-      selectPosition: 'Select Position',
-      startPainting: 'Start Painting',
-      stopPainting: 'Stop Painting',
-      progress: 'Progress',
-      pixels: 'Pixels',
-      charges: 'Charges',
-      batchSize: 'Batch Size',
-      paintingOrder: 'Painting Order',
-      paintingOrderSequential: 'Sequential (Top to Bottom)',
-      paintingOrderColorByColor: 'Color by Color',
-      currentlyPaintingColor: 'Currently painting: {colorName}',
-      colorProgress: '{painted} of {total} {colorName} pixels',
-      cooldownSettings: 'Cooldown Settings',
-      waitCharges: 'Wait for Charges',
-      settings: 'Settings',
-      showStats: 'Show Statistics',
-      compactMode: 'Compact Mode',
-      minimize: 'Minimize',
-      tokenCapturedSuccess: 'Token captured successfully',
-      turnstileInstructions: 'Complete the verification',
-      hideTurnstileBtn: 'Hide',
-      notificationsNotSupported: 'Notifications not supported',
-      chargesReadyMessage: 'Charges are ready',
-      chargesReadyNotification: 'WPlace AutoBot',
+      title: "WPlace Auto-Image",
+      toggleOverlay: "Toggle Overlay",
+      scanColors: "Scan Colors",
+      uploadImage: "Upload Image",
+      resizeImage: "Process/Edit Image",
+      processImageFirst:
+        '⚠️ Process the image first via "Process/Edit Image" before placing!',
+      imageNeedsProcessing: "Image needs processing",
+      selectPosition: "Select Position",
+      startPainting: "Start Painting",
+      stopPainting: "Stop Painting",
+      progress: "Progress",
+      pixels: "Pixels",
+      charges: "Charges",
+      batchSize: "Batch Size",
+      paintingOrder: "Painting Order",
+      paintingOrderSequential: "Sequential (Top to Bottom)",
+      paintingOrderColorByColor: "Color by Color",
+      currentlyPaintingColor: "Currently painting: {colorName}",
+      colorProgress: "{painted} of {total} {colorName} pixels",
+      cooldownSettings: "Cooldown Settings",
+      waitCharges: "Wait for Charges",
+      settings: "Settings",
+      showStats: "Show Statistics",
+      compactMode: "Compact Mode",
+      minimize: "Minimize",
+      tokenCapturedSuccess: "Token captured successfully",
+      turnstileInstructions: "Complete the verification",
+      hideTurnstileBtn: "Hide",
+      notificationsNotSupported: "Notifications not supported",
+      chargesReadyMessage: "Charges are ready",
+      chargesReadyNotification: "WPlace AutoBot",
       initMessage: "Click 'Upload Image' to begin",
     },
   };
@@ -729,13 +823,13 @@ localStorage.removeItem("lp");
     let text = window.loadedTranslations[state.language]?.[key];
 
     // Fallback to English translations
-    if (!text && state.language !== 'en') {
-      text = window.loadedTranslations['en']?.[key];
+    if (!text && state.language !== "en") {
+      text = window.loadedTranslations["en"]?.[key];
     }
 
     // Fallback to hardcoded English
     if (!text) {
-      text = FALLBACK_TEXT['en']?.[key];
+      text = FALLBACK_TEXT["en"]?.[key];
     }
 
     // Last resort - return the key itself
@@ -745,9 +839,12 @@ localStorage.removeItem("lp");
     }
 
     // Handle string replacements like {count}, {time}, etc.
-    return Object.entries(replacements).reduce((result, [placeholder, value]) => {
-      return result.replace(new RegExp(`\\{${placeholder}\\}`, 'g'), value);
-    }, text);
+    return Object.entries(replacements).reduce(
+      (result, [placeholder, value]) => {
+        return result.replace(new RegExp(`\\{${placeholder}\\}`, "g"), value);
+      },
+      text
+    );
   };
 
   // UNIFIED ACCOUNT MANAGER
@@ -765,8 +862,8 @@ localStorage.removeItem("lp");
 
         // Get account info from storage
         const infoAccountsResult = await new Promise((resolve) => {
-          if (typeof chrome !== 'undefined' && chrome.storage) {
-            chrome.storage.local.get('infoAccounts', (result) => {
+          if (typeof chrome !== "undefined" && chrome.storage) {
+            chrome.storage.local.get("infoAccounts", (result) => {
               resolve(result.infoAccounts || []);
             });
           } else {
@@ -778,44 +875,53 @@ localStorage.removeItem("lp");
         console.log(`📥 [ACCOUNT MANAGER] Loading ${tokens.length} accounts`);
 
         this.accounts = tokens.map((token, index) => {
-          const info = infoAccountsResult.find(acc => acc.token === token);
+          const info = infoAccountsResult.find((acc) => acc.token === token);
           return {
             token,
-            displayName: info?.displayName || info?.name || `Account ${index + 1}`,
+            displayName:
+              info?.displayName || info?.name || `Account ${index + 1}`,
             ID: info?.ID || null,
             Charges: info?.Charges || 0,
             Max: info?.Max || 0,
             Droplets: info?.Droplets || 0,
             isCurrent: info?.isCurrent || false,
             lastUsed: info?.lastUsed || null,
-            lastImported: info?.lastImported || null
+            lastImported: info?.lastImported || null,
           };
         });
 
         // Find current account index
-        this.currentIndex = this.accounts.findIndex(acc => acc.isCurrent);
+        this.currentIndex = this.accounts.findIndex((acc) => acc.isCurrent);
         if (this.currentIndex === -1) this.currentIndex = 0;
 
-        console.log(`✅ [ACCOUNT MANAGER] Loaded ${this.accounts.length} accounts, current index: ${this.currentIndex}`);
-        console.log(`🎯 [ACCOUNT MANAGER] Current account: ${this.getCurrentAccount()?.displayName || 'None'}`);
+        console.log(
+          `✅ [ACCOUNT MANAGER] Loaded ${this.accounts.length} accounts, current index: ${this.currentIndex}`
+        );
+        console.log(
+          `🎯 [ACCOUNT MANAGER] Current account: ${
+            this.getCurrentAccount()?.displayName || "None"
+          }`
+        );
 
         // Auto-refresh account statuses after loading
         if (this.accounts.length > 0) {
-          console.log('🔄 [ACCOUNT MANAGER] Auto-refreshing account statuses...');
+          console.log(
+            "🔄 [ACCOUNT MANAGER] Auto-refreshing account statuses..."
+          );
           // Use setTimeout to avoid blocking the load operation
           setTimeout(async () => {
             try {
               await fetchAllAccountDetails();
-              console.log('✅ [ACCOUNT MANAGER] Auto-refresh completed');
+              console.log("✅ [ACCOUNT MANAGER] Auto-refresh completed");
             } catch (error) {
-              console.warn('⚠️ [ACCOUNT MANAGER] Auto-refresh failed:', error);
+              console.warn("⚠️ [ACCOUNT MANAGER] Auto-refresh failed:", error);
             }
           }, 100);
         }
 
         return this.accounts;
       } catch (error) {
-        console.error('❌ [ACCOUNT MANAGER] Error loading accounts:', error);
+        console.error("❌ [ACCOUNT MANAGER] Error loading accounts:", error);
         this.accounts = [];
         this.currentIndex = 0;
         return [];
@@ -829,8 +935,14 @@ localStorage.removeItem("lp");
       const previousIndex = this.currentIndex;
       this.currentIndex = (this.currentIndex + 1) % this.accounts.length;
 
-      console.log(`🔄 [ACCOUNT MANAGER] Switching: ${previousIndex} → ${this.currentIndex}`);
-      console.log(`🎯 [ACCOUNT MANAGER] Target: ${this.accounts[this.currentIndex].displayName}`);
+      console.log(
+        `🔄 [ACCOUNT MANAGER] Switching: ${previousIndex} → ${this.currentIndex}`
+      );
+      console.log(
+        `🎯 [ACCOUNT MANAGER] Target: ${
+          this.accounts[this.currentIndex].displayName
+        }`
+      );
 
       // Update current flags
       this.accounts.forEach((acc, idx) => {
@@ -856,9 +968,11 @@ localStorage.removeItem("lp");
         // Called with (token, dataObject) format
         const token = tokenOrData;
         accountData = dataObject;
-        targetAccount = this.accounts.find(acc => acc.token === token);
+        targetAccount = this.accounts.find((acc) => acc.token === token);
         if (!targetAccount) {
-          console.warn(`⚠️ [ACCOUNT MANAGER] Account with token not found for update`);
+          console.warn(
+            `⚠️ [ACCOUNT MANAGER] Account with token not found for update`
+          );
           return;
         }
       } else {
@@ -869,31 +983,50 @@ localStorage.removeItem("lp");
 
       if (targetAccount && accountData) {
         // Update all provided properties
-        if (accountData.charges !== undefined || accountData.Charges !== undefined) {
-          targetAccount.Charges = Math.floor(accountData.charges || accountData.Charges || 0);
+        if (
+          accountData.charges !== undefined ||
+          accountData.Charges !== undefined
+        ) {
+          targetAccount.Charges = Math.floor(
+            accountData.charges || accountData.Charges || 0
+          );
         }
         if (accountData.max !== undefined || accountData.Max !== undefined) {
-          targetAccount.Max = Math.floor(accountData.max || accountData.Max || 0);
+          targetAccount.Max = Math.floor(
+            accountData.max || accountData.Max || 0
+          );
         }
-        if (accountData.droplets !== undefined || accountData.Droplets !== undefined) {
-          targetAccount.Droplets = Math.floor(accountData.droplets || accountData.Droplets || 0);
+        if (
+          accountData.droplets !== undefined ||
+          accountData.Droplets !== undefined
+        ) {
+          targetAccount.Droplets = Math.floor(
+            accountData.droplets || accountData.Droplets || 0
+          );
         }
         if (accountData.id !== undefined || accountData.ID !== undefined) {
-          targetAccount.ID = accountData.id || accountData.ID || targetAccount.ID;
+          targetAccount.ID =
+            accountData.id || accountData.ID || targetAccount.ID;
         }
         if (accountData.displayName !== undefined) {
           targetAccount.displayName = accountData.displayName;
         }
         if (accountData.isCurrent !== undefined) {
           // Clear isCurrent from all accounts first, then set for target
-          this.accounts.forEach(acc => acc.isCurrent = false);
+          this.accounts.forEach((acc) => (acc.isCurrent = false));
           targetAccount.isCurrent = accountData.isCurrent;
         }
         if (accountData.cooldown !== undefined) {
           targetAccount.cooldown = accountData.cooldown;
         }
 
-        console.log(`📊 [ACCOUNT MANAGER] Updated ${targetAccount.displayName}: ⚡${targetAccount.Charges}/${targetAccount.Max} 💧${targetAccount.Droplets}${targetAccount.isCurrent ? ' (CURRENT)' : ''}`);
+        console.log(
+          `📊 [ACCOUNT MANAGER] Updated ${targetAccount.displayName}: ⚡${
+            targetAccount.Charges
+          }/${targetAccount.Max} 💧${targetAccount.Droplets}${
+            targetAccount.isCurrent ? " (CURRENT)" : ""
+          }`
+        );
       }
     }
 
@@ -910,7 +1043,9 @@ localStorage.removeItem("lp");
         this.currentIndex = index;
         console.log(`🔄 [ACCOUNT MANAGER] Current index set to: ${index}`);
       } else {
-        console.warn(`⚠️ [ACCOUNT MANAGER] Invalid index ${index}, keeping current: ${this.currentIndex}`);
+        console.warn(
+          `⚠️ [ACCOUNT MANAGER] Invalid index ${index}, keeping current: ${this.currentIndex}`
+        );
       }
     }
 
@@ -935,11 +1070,15 @@ localStorage.removeItem("lp");
       }
       seedFromAccounts(accounts) {
         const now = Date.now();
-        (accounts || []).forEach(acc => {
+        (accounts || []).forEach((acc) => {
           if (!acc || !acc.token) return;
           const existing = this.map.get(acc.token) || {};
-          const charges = Number.isFinite(acc.Charges) ? Math.floor(acc.Charges) : (existing.charges || 0);
-          const max = Number.isFinite(acc.Max) ? Math.floor(acc.Max) : (existing.max || 1);
+          const charges = Number.isFinite(acc.Charges)
+            ? Math.floor(acc.Charges)
+            : existing.charges || 0;
+          const max = Number.isFinite(acc.Max)
+            ? Math.floor(acc.Max)
+            : existing.max || 1;
           this.map.set(acc.token, {
             charges: Math.max(0, Math.min(charges, max)),
             max: Math.max(1, max),
@@ -951,16 +1090,31 @@ localStorage.removeItem("lp");
       ensureToken(token) {
         if (!token) return null;
         if (!this.map.has(token)) {
-          this.map.set(token, { charges: 0, max: Math.max(1, state.maxCharges || 1), lastTickAt: Date.now(), lastSyncAt: 0 });
+          this.map.set(token, {
+            charges: 0,
+            max: Math.max(1, state.maxCharges || 1),
+            lastTickAt: Date.now(),
+            lastSyncAt: 0,
+          });
         }
         return this.map.get(token);
       }
-      get(token) { return this.ensureToken(token); }
-      getForCurrent() { return this.get(accountManager.getCurrentAccount()?.token); }
+      get(token) {
+        return this.ensureToken(token);
+      }
+      getForCurrent() {
+        return this.get(accountManager.getCurrentAccount()?.token);
+      }
       setFromServer(token, charges, max) {
         const node = this.ensureToken(token);
         if (!node) return;
-        node.charges = Math.max(0, Math.min(Math.floor(charges || 0), Math.max(1, Math.floor(max || node.max || 1))));
+        node.charges = Math.max(
+          0,
+          Math.min(
+            Math.floor(charges || 0),
+            Math.max(1, Math.floor(max || node.max || 1))
+          )
+        );
         node.max = Math.max(1, Math.floor(max || node.max || 1));
         node.lastSyncAt = Date.now();
       }
@@ -973,7 +1127,7 @@ localStorage.removeItem("lp");
       }
       incrementTickAll() {
         const now = Date.now();
-        accountManager.getAllAccounts().forEach(acc => {
+        accountManager.getAllAccounts().forEach((acc) => {
           if (!acc?.token) return;
           const node = this.ensureToken(acc.token);
           if (!node) return;
@@ -982,7 +1136,8 @@ localStorage.removeItem("lp");
           const ticks = Math.floor(elapsed / this.tickIntervalMs);
           if (ticks > 0) {
             node.charges = Math.min(node.max, node.charges + ticks);
-            node.lastTickAt = (node.lastTickAt || now) + ticks * this.tickIntervalMs;
+            node.lastTickAt =
+              (node.lastTickAt || now) + ticks * this.tickIntervalMs;
           }
         });
         // Mirror values into AccountManager and UI state
@@ -990,9 +1145,17 @@ localStorage.removeItem("lp");
       }
       start() {
         if (this.timer) return;
-        this.timer = setInterval(() => this.incrementTickAll(), this.tickIntervalMs);
+        this.timer = setInterval(
+          () => this.incrementTickAll(),
+          this.tickIntervalMs
+        );
       }
-      stop() { if (this.timer) { clearInterval(this.timer); this.timer = null; } }
+      stop() {
+        if (this.timer) {
+          clearInterval(this.timer);
+          this.timer = null;
+        }
+      }
       predictTimeToReach(token, target) {
         const node = this.get(token);
         if (!node) return Infinity;
@@ -1001,10 +1164,13 @@ localStorage.removeItem("lp");
       }
       syncToAccountManager() {
         const list = accountManager.getAllAccounts();
-        list.forEach(acc => {
+        list.forEach((acc) => {
           const node = this.map.get(acc.token);
           if (!node) return;
-          accountManager.updateAccountData(acc.token, { Charges: node.charges, Max: node.max });
+          accountManager.updateAccountData(acc.token, {
+            Charges: node.charges,
+            Max: node.max,
+          });
         });
         renderAccountsList();
       }
@@ -1042,7 +1208,7 @@ localStorage.removeItem("lp");
     lastPosition: { x: 0, y: 0 },
     lastPaintedPosition: { x: 0, y: 0 }, // Track last successfully painted coordinate
     estimatedTime: 0,
-    language: 'en',
+    language: "en",
     paintingSpeed: CONFIG.PAINTING_SPEED.DEFAULT, // pixels batch size
     batchMode: CONFIG.BATCH_MODE, // "normal" or "random"
     paintingOrder: CONFIG.PAINTING_ORDER, // "sequential" or "color-by-color"
@@ -1058,43 +1224,43 @@ localStorage.removeItem("lp");
     overlayOpacity: CONFIG.OVERLAY.OPACITY_DEFAULT,
     blueMarbleEnabled: CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT,
     ditheringEnabled: false,
-    ditheringMethod: 'floyd', // Dithering algorithm: floyd, bayer2, bayer4, bayer8, atkinson, etc.
+    ditheringMethod: "floyd", // Dithering algorithm: floyd, bayer2, bayer4, bayer8, atkinson, etc.
     ditheringStrength: 0.5, // Dithering strength (0-1) for ordered dithering methods
     posterizeLevels: 0, // Posterize levels (0 = disabled, 2-10 = quantize colors)
-    resamplingMethod: 'nearest', // 'nearest' | 'bilinear' | 'box' | 'median' | 'dominant'
+    resamplingMethod: "nearest", // 'nearest' | 'bilinear' | 'box' | 'median' | 'dominant'
     // Pre-processing filters (before downscale)
-    preBlurMode: 'none', // 'none' | 'box' | 'gaussian' | 'kuwahara'
+    preBlurMode: "none", // 'none' | 'box' | 'gaussian' | 'kuwahara'
     preBlurRadius: 0, // 0-20
     sharpenAmount: 0, // 0-300 (percentage)
     sharpenRadius: 0, // 0-20
     sharpenThreshold: 0, // 0-64
     // Advanced color matching settings
-    colorMatchingAlgorithm: 'rgb', // Default to Legacy (RGB)
+    colorMatchingAlgorithm: "rgb", // Default to Legacy (RGB)
     enableChromaPenalty: false, // Chroma penalty OFF by default
     chromaPenaltyWeight: 0.15,
     customTransparencyThreshold: CONFIG.TRANSPARENCY_THRESHOLD,
     customWhiteThreshold: CONFIG.WHITE_THRESHOLD,
     // Post-processing settings
     enableEdgeOverlay: false,
-    edgeDetectionAlgorithm: 'sobel', // 'sobel' | 'prewitt' | 'roberts' | 'laplacian'
-    edgeThreshold: 60,        // 0-255 (edge detection sensitivity)
-    edgeThickness: 1,         // 1-6 (edge line width in pixels)
-    edgeThin: false,          // boolean (thin edges to 1 pixel)
-    enableOutline: false,             // Toggle for outline effect
-    outlineThickness: 0,      // 0-10 pixels
-    enableSimplify: false,            // Toggle for simplify regions
-    simplifyArea: 0,          // 0-1000 pixels
-    enableErode: false,               // Toggle for erode edges
-    erodeAmount: 0,           // 0-20 pixels
-    enableModeFilter: false,          // Toggle for mode filter
-    modeFilterSize: 0,        // 0-21 (0 = off)
+    edgeDetectionAlgorithm: "sobel", // 'sobel' | 'prewitt' | 'roberts' | 'laplacian'
+    edgeThreshold: 60, // 0-255 (edge detection sensitivity)
+    edgeThickness: 1, // 1-6 (edge line width in pixels)
+    edgeThin: false, // boolean (thin edges to 1 pixel)
+    enableOutline: false, // Toggle for outline effect
+    outlineThickness: 0, // 0-10 pixels
+    enableSimplify: false, // Toggle for simplify regions
+    simplifyArea: 0, // 0-1000 pixels
+    enableErode: false, // Toggle for erode edges
+    erodeAmount: 0, // 0-20 pixels
+    enableModeFilter: false, // Toggle for mode filter
+    modeFilterSize: 0, // 0-21 (0 = off)
     // Color Correction settings
     enableColorCorrection: false,
-    brightness: 0,            // -100 to 100
-    contrast: 0,              // -100 to 100
-    saturation: 0,            // -100 to 100
-    hue: 0,                   // -180 to 180
-    gamma: 1.0,               // 0.5 to 3.0
+    brightness: 0, // -100 to 100
+    contrast: 0, // -100 to 100
+    saturation: 0, // -100 to 100
+    hue: 0, // -180 to 180
+    gamma: 1.0, // 0.5 to 3.0
     resizeSettings: null,
     originalImage: null,
     resizeIgnoreMask: null,
@@ -1123,13 +1289,13 @@ localStorage.removeItem("lp");
     accountIndex: 0, // Keep for backward compatibility with existing logic
     // Legacy state removed - now using accountManager instead
     isFetchingAllAccounts: false,
-    paintingMode: 'auto', // 'auto' or 'assist' - default to auto
+    paintingMode: "auto", // 'auto' or 'assist' - default to auto
   };
 
   // Expose state globally for the utils manager and other modules
   window.state = state;
 
-  let _updateResizePreview = () => { };
+  let _updateResizePreview = () => {};
   let _resizeDialogCleanup = null;
 
   // --- OVERLAY UPDATE: Optimized OverlayManager class with performance improvements ---
@@ -1138,8 +1304,10 @@ localStorage.removeItem("lp");
   // Overlay management is now handled by the OverlayManager module
   // Check for overlay manager availability
   if (!window.WPlaceOverlayManager) {
-    console.error('❌ WPlaceOverlayManager not available - please ensure overlay-manager.js is loaded first');
-    throw new Error('OverlayManager dependency not found');
+    console.error(
+      "❌ WPlaceOverlayManager not available - please ensure overlay-manager.js is loaded first"
+    );
+    throw new Error("OverlayManager dependency not found");
   }
 
   // Ensure we only have ONE overlay manager instance globally
@@ -1147,24 +1315,27 @@ localStorage.removeItem("lp");
   if (!window.autoImageOverlayManager) {
     overlayManager = new window.WPlaceOverlayManager();
     window.autoImageOverlayManager = overlayManager;
-    console.log('🎯 Created NEW overlay manager instance');
+    console.log("🎯 Created NEW overlay manager instance");
   } else {
     overlayManager = window.autoImageOverlayManager;
-    console.log('🎯 Using EXISTING overlay manager instance');
+    console.log("🎯 Using EXISTING overlay manager instance");
   }
 
   // Token management is now handled by the TokenManager module
   // Global references for backward compatibility
   if (!window.WPlaceTokenManager) {
-    console.error('❌ WPlaceTokenManager not available - please ensure token-manager.js is loaded first');
-    throw new Error('TokenManager dependency not found');
+    console.error(
+      "❌ WPlaceTokenManager not available - please ensure token-manager.js is loaded first"
+    );
+    throw new Error("TokenManager dependency not found");
   }
 
   const tokenManager = window.WPlaceTokenManager;
   const setTurnstileToken = (token) => tokenManager.setTurnstileToken(token);
   const isTokenValid = () => tokenManager.isTokenValid();
   const invalidateToken = () => tokenManager.invalidateToken();
-  const ensureToken = (forceRefresh = false) => tokenManager.ensureToken(forceRefresh);
+  const ensureToken = (forceRefresh = false) =>
+    tokenManager.ensureToken(forceRefresh);
 
   // Getter for the current token value
   const getTurnstileToken = () => tokenManager.turnstileToken;
@@ -1178,8 +1349,10 @@ localStorage.removeItem("lp");
 
   // Create global image processor instance for utility functions
   if (!window.WPlaceImageProcessor) {
-    console.error('❌ WPlaceImageProcessor not available - please ensure image-processor.js is loaded first');
-    throw new Error('ImageProcessor dependency not found');
+    console.error(
+      "❌ WPlaceImageProcessor not available - please ensure image-processor.js is loaded first"
+    );
+    throw new Error("ImageProcessor dependency not found");
   }
 
   const globalImageProcessor = new window.WPlaceImageProcessor();
@@ -1190,7 +1363,7 @@ localStorage.removeItem("lp");
   const MAX_BATCH_RETRIES = 10; // Maximum attempts for batch sending
 
   function inject(callback) {
-    const script = document.createElement('script');
+    const script = document.createElement("script");
     script.textContent = `(${callback})();`;
     document.documentElement?.appendChild(script);
     script.remove();
@@ -1199,11 +1372,11 @@ localStorage.removeItem("lp");
   inject(() => {
     const fetchedBlobQueue = new Map();
 
-    window.addEventListener('message', (event) => {
+    window.addEventListener("message", (event) => {
       const { source, blobID, blobData } = event.data;
-      if (source === 'auto-image-overlay' && blobID && blobData) {
+      if (source === "auto-image-overlay" && blobID && blobData) {
         const callback = fetchedBlobQueue.get(blobID);
-        if (typeof callback === 'function') {
+        if (typeof callback === "function") {
           callback(blobData);
         }
         fetchedBlobQueue.delete(blobID);
@@ -1220,8 +1393,8 @@ localStorage.removeItem("lp");
 
         const distance = Math.sqrt(
           Math.pow(r - colorData.rgb.r, 2) +
-          Math.pow(g - colorData.rgb.g, 2) +
-          Math.pow(b - colorData.rgb.b, 2)
+            Math.pow(g - colorData.rgb.g, 2) +
+            Math.pow(b - colorData.rgb.b, 2)
         );
 
         if (distance < minDistance) {
@@ -1235,7 +1408,7 @@ localStorage.removeItem("lp");
 
     const originalFetch = window.fetch;
     // Setup fetch interceptions
-    console.log('🚀 [Auto-Image] Fetch interception initialized');
+    console.log("🚀 [Auto-Image] Fetch interception initialized");
 
     // Expose state for debugging
     window.__WPLACE_AUTOBOT_STATE__ = state;
@@ -1245,7 +1418,7 @@ localStorage.removeItem("lp");
 
       // Parse URL if it's a string
       let urlObj = null;
-      if (typeof url === 'string') {
+      if (typeof url === "string") {
         try {
           urlObj = new URL(url);
         } catch (e) {
@@ -1254,27 +1427,52 @@ localStorage.removeItem("lp");
       }
 
       // ASSIST MODE: Intercept pixel placement requests
-      if (state.paintingMode === 'assist' && urlObj !== null && urlObj.pathname.startsWith('/s0/pixel')) {
-        console.log(`🎯 [Assist Mode] Intercepting pixel placement:`, urlObj.pathname);
-        console.log(`🔍 [Assist Mode] Check state - imageData:`, !!state.imageData, 'startPosition:', !!state.startPosition, 'body:', !!args[1]?.body);
+      if (
+        state.paintingMode === "assist" &&
+        urlObj !== null &&
+        urlObj.pathname.startsWith("/s0/pixel")
+      ) {
+        console.log(
+          `🎯 [Assist Mode] Intercepting pixel placement:`,
+          urlObj.pathname
+        );
+        console.log(
+          `🔍 [Assist Mode] Check state - imageData:`,
+          !!state.imageData,
+          "startPosition:",
+          !!state.startPosition,
+          "body:",
+          !!args[1]?.body
+        );
 
         // Check if we have overlay data
         if (state.imageData && state.startPosition && args[1]?.body) {
           try {
             // Parse region coordinates from URL path: /s0/pixel/{tileX}/{tileY}
-            const pathParts = urlObj.pathname.split('/');
+            const pathParts = urlObj.pathname.split("/");
             const regionX = parseInt(pathParts[3]);
             const regionY = parseInt(pathParts[4]);
 
-            console.log(`📦 [Assist Mode] Region coords: (${regionX}, ${regionY})`);
+            console.log(
+              `📦 [Assist Mode] Region coords: (${regionX}, ${regionY})`
+            );
 
             // Parse request body
-            const payload = typeof args[1].body === 'string' ? JSON.parse(args[1].body) : args[1].body;
-            console.log(`📝 [Assist Mode] Original payload:`, JSON.stringify(payload));
+            const payload =
+              typeof args[1].body === "string"
+                ? JSON.parse(args[1].body)
+                : args[1].body;
+            console.log(
+              `📝 [Assist Mode] Original payload:`,
+              JSON.stringify(payload)
+            );
 
             // Debug: Check what's in state.region
             console.log(`🔍 [Assist Mode] state.region:`, state.region);
-            console.log(`🔍 [Assist Mode] state.startPosition:`, state.startPosition);
+            console.log(
+              `🔍 [Assist Mode] state.startPosition:`,
+              state.startPosition
+            );
 
             // CRITICAL FIX: The issue is that startPosition is in TILE-LOCAL coordinates (0-999)
             // but we're clicking on a tile at (1732, 1014). We need to find which tile
@@ -1290,11 +1488,17 @@ localStorage.removeItem("lp");
             // state.region = TILE coordinates {x, y} (e.g., {x: 1732, y: 1014})
             // Absolute canvas coords = region.x * 1000 + startPosition.x
 
-            if (state.region && state.region.x !== undefined && state.region.y !== undefined) {
+            if (
+              state.region &&
+              state.region.x !== undefined &&
+              state.region.y !== undefined
+            ) {
               // Use saved region to reconstruct absolute coordinates
               startX = state.region.x * 1000 + state.startPosition.x;
               startY = state.region.y * 1000 + state.startPosition.y;
-              console.log(`[Assist Mode] Using saved region: tile=(${state.region.x},${state.region.y}) + local=(${state.startPosition.x},${state.startPosition.y}) = absolute (${startX},${startY})`);
+              console.log(
+                `[Assist Mode] Using saved region: tile=(${state.region.x},${state.region.y}) + local=(${state.startPosition.x},${state.startPosition.y}) = absolute (${startX},${startY})`
+              );
             } else {
               // Fallback: assume image is on the clicked tile (may be wrong!)
               // Since startPosition appears to be LOCAL coords within a tile,
@@ -1302,13 +1506,19 @@ localStorage.removeItem("lp");
               // The simplest approach: assume the image is on the tile being clicked!
               startX = regionX * 1000 + state.startPosition.x;
               startY = regionY * 1000 + state.startPosition.y;
-              console.log(`[Assist Mode] No saved region - assuming image on clicked tile (${regionX},${regionY}): absolute = (${startX},${startY})`);
+              console.log(
+                `[Assist Mode] No saved region - assuming image on clicked tile (${regionX},${regionY}): absolute = (${startX},${startY})`
+              );
             }
-            console.log(`� [Assist Mode] Assuming image is on clicked tile: absolute coords = (${startX},${startY})`);
+            console.log(
+              `� [Assist Mode] Assuming image is on clicked tile: absolute coords = (${startX},${startY})`
+            );
 
             const { width, height } = state.imageData;
 
-            console.log(`🖼️ [Assist Mode] Image bounds: start=(${startX},${startY}), size=${width}x${height}`);
+            console.log(
+              `🖼️ [Assist Mode] Image bounds: start=(${startX},${startY}), size=${width}x${height}`
+            );
 
             // Calculate which tiles the image spans
             // Note: startX/startY are ABSOLUTE canvas coordinates (e.g., 1732432 means tile 1732, pixel 432)
@@ -1317,13 +1527,22 @@ localStorage.removeItem("lp");
             const imageEndTileX = Math.floor((startX + width - 1) / 1000);
             const imageEndTileY = Math.floor((startY + height - 1) / 1000);
 
-            console.log(`🗺️ [Assist Mode] Image tiles: X[${imageStartTileX}-${imageEndTileX}], Y[${imageStartTileY}-${imageEndTileY}]`);
-            console.log(`🎯 [Assist Mode] Checking if region (${regionX},${regionY}) overlaps...`);
+            console.log(
+              `🗺️ [Assist Mode] Image tiles: X[${imageStartTileX}-${imageEndTileX}], Y[${imageStartTileY}-${imageEndTileY}]`
+            );
+            console.log(
+              `🎯 [Assist Mode] Checking if region (${regionX},${regionY}) overlaps...`
+            );
 
-            if (regionX >= imageStartTileX && regionX <= imageEndTileX &&
-                regionY >= imageStartTileY && regionY <= imageEndTileY) {
-
-              console.log(`✅ [Assist Mode] Region (${regionX},${regionY}) overlaps with image - modifying pixels`);
+            if (
+              regionX >= imageStartTileX &&
+              regionX <= imageEndTileX &&
+              regionY >= imageStartTileY &&
+              regionY <= imageEndTileY
+            ) {
+              console.log(
+                `✅ [Assist Mode] Region (${regionX},${regionY}) overlaps with image - modifying pixels`
+              );
 
               // Modify the colors array based on overlay data
               if (payload.coords && payload.colors) {
@@ -1338,15 +1557,22 @@ localStorage.removeItem("lp");
                   const imgX = absoluteX - startX;
                   const imgY = absoluteY - startY;
 
-                  console.log(`🎨 [Assist Mode] Pixel ${i/2}: absolute=(${absoluteX},${absoluteY}), relative=(${imgX},${imgY})`);
+                  console.log(
+                    `🎨 [Assist Mode] Pixel ${
+                      i / 2
+                    }: absolute=(${absoluteX},${absoluteY}), relative=(${imgX},${imgY})`
+                  );
 
                   // Check if pixel is within our image bounds
                   if (imgX >= 0 && imgX < width && imgY >= 0 && imgY < height) {
                     // Get color from processed image data
                     // Note: state.imageData uses 'pixels' property, not 'data'
-                    const pixelData = state.imageData.pixels || state.imageData.data;
+                    const pixelData =
+                      state.imageData.pixels || state.imageData.data;
                     if (!pixelData) {
-                      console.error(`❌ [Assist Mode] No pixel data available in state.imageData`);
+                      console.error(
+                        `❌ [Assist Mode] No pixel data available in state.imageData`
+                      );
                       continue;
                     }
 
@@ -1356,21 +1582,31 @@ localStorage.removeItem("lp");
                     const b = pixelData[pixelIndex + 2];
                     const a = pixelData[pixelIndex + 3];
 
-                    console.log(`🎨 [Assist Mode] Color at (${imgX},${imgY}): rgba(${r},${g},${b},${a}), original colorId: ${payload.colors[i/2]}`);
+                    console.log(
+                      `🎨 [Assist Mode] Color at (${imgX},${imgY}): rgba(${r},${g},${b},${a}), original colorId: ${
+                        payload.colors[i / 2]
+                      }`
+                    );
 
                     // Skip transparent pixels
                     if (a < CONFIG.TRANSPARENCY_THRESHOLD) {
-                      console.log(`⏭️ [Assist Mode] Skipping transparent pixel`);
+                      console.log(
+                        `⏭️ [Assist Mode] Skipping transparent pixel`
+                      );
                       continue;
                     }
 
                     // Find matching color from palette
                     const colorId = findClosestColorId(r, g, b);
-                    console.log(`🔍 [Assist Mode] Found closest colorId: ${colorId}`);
+                    console.log(
+                      `🔍 [Assist Mode] Found closest colorId: ${colorId}`
+                    );
                     if (colorId) {
                       const oldColorId = payload.colors[i / 2];
                       payload.colors[i / 2] = colorId;
-                      console.log(`✏️ [Assist Mode] Changed colorId from ${oldColorId} to ${colorId}`);
+                      console.log(
+                        `✏️ [Assist Mode] Changed colorId from ${oldColorId} to ${colorId}`
+                      );
                       modifiedCount++;
                     }
                   } else {
@@ -1381,23 +1617,40 @@ localStorage.removeItem("lp");
                 // Update request body with modified payload
                 args[1] = {
                   ...args[1],
-                  body: JSON.stringify(payload)
+                  body: JSON.stringify(payload),
                 };
 
-                console.log(`✅ [Assist Mode] Modified ${modifiedCount} pixel color(s)`);
-                console.log(`📝 [Assist Mode] Modified payload:`, JSON.stringify(payload));
+                console.log(
+                  `✅ [Assist Mode] Modified ${modifiedCount} pixel color(s)`
+                );
+                console.log(
+                  `📝 [Assist Mode] Modified payload:`,
+                  JSON.stringify(payload)
+                );
               } else {
-                console.warn(`⚠️ [Assist Mode] Payload missing coords or colors`);
+                console.warn(
+                  `⚠️ [Assist Mode] Payload missing coords or colors`
+                );
               }
             } else {
-              console.log(`⏭️ [Assist Mode] Region (${regionX},${regionY}) does NOT overlap with image`);
+              console.log(
+                `⏭️ [Assist Mode] Region (${regionX},${regionY}) does NOT overlap with image`
+              );
             }
           } catch (error) {
-            console.error('❌ [Assist Mode] Error intercepting pixel placement:', error);
+            console.error(
+              "❌ [Assist Mode] Error intercepting pixel placement:",
+              error
+            );
             console.error(error.stack);
           }
         } else {
-          console.warn('⚠️ [Assist Mode] No overlay data available - imageData:', !!state.imageData, 'startPosition:', !!state.startPosition);
+          console.warn(
+            "⚠️ [Assist Mode] No overlay data available - imageData:",
+            !!state.imageData,
+            "startPosition:",
+            !!state.startPosition
+          );
         }
       }
 
@@ -1405,30 +1658,34 @@ localStorage.removeItem("lp");
 
       // TILE REQUEST logging removed to reduce console spam
 
-      if (typeof url === 'string') {
-        if (url.includes('https://backend.wplace.live/s0/pixel/')) {
+      if (typeof url === "string") {
+        if (url.includes("https://backend.wplace.live/s0/pixel/")) {
           try {
             const payload = JSON.parse(args[1].body);
             if (payload.t) {
               console.log(
-                `🔍✅ Turnstile Token Captured - Type: ${typeof payload.t}, Value: ${payload.t
-                  ? typeof payload.t === 'string'
-                    ? payload.t.length > 50
-                      ? payload.t.substring(0, 50) + '...'
-                      : payload.t
-                    : JSON.stringify(payload.t)
-                  : 'null/undefined'
+                `🔍✅ Turnstile Token Captured - Type: ${typeof payload.t}, Value: ${
+                  payload.t
+                    ? typeof payload.t === "string"
+                      ? payload.t.length > 50
+                        ? payload.t.substring(0, 50) + "..."
+                        : payload.t
+                      : JSON.stringify(payload.t)
+                    : "null/undefined"
                 }, Length: ${payload.t?.length || 0}`
               );
-              window.postMessage({ source: 'turnstile-capture', token: payload.t }, '*');
+              window.postMessage(
+                { source: "turnstile-capture", token: payload.t },
+                "*"
+              );
             }
           } catch (_) {
             /* ignore */
           }
         }
 
-        const contentType = response.headers.get('content-type') || '';
-        if (contentType.includes('image/png') && url.includes('.png')) {
+        const contentType = response.headers.get("content-type") || "";
+        if (contentType.includes("image/png") && url.includes(".png")) {
           const cloned = response.clone();
           return new Promise(async (resolve) => {
             const blobUUID = crypto.randomUUID();
@@ -1446,12 +1703,12 @@ localStorage.removeItem("lp");
 
             window.postMessage(
               {
-                source: 'auto-image-tile',
+                source: "auto-image-tile",
                 endpoint: url,
                 blobID: blobUUID,
                 blobData: originalBlob,
               },
-              '*'
+              "*"
             );
           });
         }
@@ -1461,10 +1718,10 @@ localStorage.removeItem("lp");
     };
   });
 
-  window.addEventListener('message', (event) => {
+  window.addEventListener("message", (event) => {
     const { source, endpoint, blobID, blobData } = event.data;
 
-    if (source === 'auto-image-tile' && endpoint && blobID && blobData) {
+    if (source === "auto-image-tile" && endpoint && blobID && blobData) {
       overlayManager.processAndRespondToTileRequest(event.data);
     }
 
@@ -1474,49 +1731,126 @@ localStorage.removeItem("lp");
 
   async function detectLanguage() {
     try {
-      const response = await fetch('https://backend.wplace.live/me', {
-        credentials: 'include',
+      const response = await fetch("https://backend.wplace.live/me", {
+        credentials: "include",
       });
       const data = await response.json();
-      state.language = data.language === 'pt' ? 'pt' : 'en';
+      state.language = data.language === "pt" ? "pt" : "en";
     } catch {
-      state.language = navigator.language.startsWith('pt') ? 'pt' : 'en';
+      state.language = navigator.language.startsWith("pt") ? "pt" : "en";
     }
   }
 
   // UTILITY FUNCTIONS WRAPPER - Uses WPlaceUtilsManager for modular functionality
   const Utils = {
     // Basic utilities
-    sleep: (ms) => window.globalUtilsManager ? window.globalUtilsManager.sleep(ms) : new Promise(r => setTimeout(r, ms)),
-    dynamicSleep: (tickAndGetRemainingMs) => window.globalUtilsManager ? window.globalUtilsManager.dynamicSleep(tickAndGetRemainingMs) : Promise.resolve(),
-    waitForSelector: (selector, interval, timeout) => window.globalUtilsManager ? window.globalUtilsManager.waitForSelector(selector, interval, timeout) : Promise.resolve(null),
-    msToTimeText: (ms) => window.globalUtilsManager ? window.globalUtilsManager.msToTimeText(ms) : `${Math.ceil(ms / 1000)}s`,
-    createScrollToAdjust: (element, updateCallback, min, max, step) => window.globalUtilsManager ? window.globalUtilsManager.createScrollToAdjust(element, updateCallback, min, max, step) : () => { },
+    sleep: (ms) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.sleep(ms)
+        : new Promise((r) => setTimeout(r, ms)),
+    dynamicSleep: (tickAndGetRemainingMs) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.dynamicSleep(tickAndGetRemainingMs)
+        : Promise.resolve(),
+    waitForSelector: (selector, interval, timeout) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.waitForSelector(selector, interval, timeout)
+        : Promise.resolve(null),
+    msToTimeText: (ms) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.msToTimeText(ms)
+        : `${Math.ceil(ms / 1000)}s`,
+    createScrollToAdjust: (element, updateCallback, min, max, step) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.createScrollToAdjust(
+            element,
+            updateCallback,
+            min,
+            max,
+            step
+          )
+        : () => {},
 
     // Tile calculation
-    calculateTileRange: (startRegionX, startRegionY, startPixelX, startPixelY, width, height, tileSize) =>
-      window.globalUtilsManager ? window.globalUtilsManager.calculateTileRange(startRegionX, startRegionY, startPixelX, startPixelY, width, height, tileSize) : {},
+    calculateTileRange: (
+      startRegionX,
+      startRegionY,
+      startPixelX,
+      startPixelY,
+      width,
+      height,
+      tileSize
+    ) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.calculateTileRange(
+            startRegionX,
+            startRegionY,
+            startPixelX,
+            startPixelY,
+            width,
+            height,
+            tileSize
+          )
+        : {},
 
     // Token management
-    loadTurnstile: () => window.globalUtilsManager ? window.globalUtilsManager.loadTurnstile() : Promise.resolve(),
-    ensureTurnstileContainer: () => window.globalUtilsManager ? window.globalUtilsManager.ensureTurnstileContainer() : Promise.resolve(),
-    ensureTurnstileOverlayContainer: () => window.globalUtilsManager ? window.globalUtilsManager.ensureTurnstileOverlayContainer() : Promise.resolve(),
-    executeTurnstile: (sitekey, action) => window.globalUtilsManager ? window.globalUtilsManager.executeTurnstile(sitekey, action) : Promise.resolve(null),
-    createTurnstileWidget: (sitekey, action) => window.globalUtilsManager ? window.globalUtilsManager.createTurnstileWidget(sitekey, action) : Promise.resolve(),
-    createTurnstileWidgetInteractive: (sitekey, action) => window.globalUtilsManager ? window.globalUtilsManager.createTurnstileWidgetInteractive(sitekey, action) : Promise.resolve(),
-    cleanupTurnstile: () => window.globalUtilsManager ? window.globalUtilsManager.cleanupTurnstile() : Promise.resolve(),
-    obtainSitekeyAndToken: (fallback) => window.globalUtilsManager ? window.globalUtilsManager.obtainSitekeyAndToken(fallback) : Promise.resolve(fallback),
+    loadTurnstile: () =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.loadTurnstile()
+        : Promise.resolve(),
+    ensureTurnstileContainer: () =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.ensureTurnstileContainer()
+        : Promise.resolve(),
+    ensureTurnstileOverlayContainer: () =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.ensureTurnstileOverlayContainer()
+        : Promise.resolve(),
+    executeTurnstile: (sitekey, action) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.executeTurnstile(sitekey, action)
+        : Promise.resolve(null),
+    createTurnstileWidget: (sitekey, action) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.createTurnstileWidget(sitekey, action)
+        : Promise.resolve(),
+    createTurnstileWidgetInteractive: (sitekey, action) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.createTurnstileWidgetInteractive(
+            sitekey,
+            action
+          )
+        : Promise.resolve(),
+    cleanupTurnstile: () =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.cleanupTurnstile()
+        : Promise.resolve(),
+    obtainSitekeyAndToken: (fallback) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.obtainSitekeyAndToken(fallback)
+        : Promise.resolve(fallback),
 
     // DOM utilities
-    createElement: (tag, props, children) => window.globalUtilsManager ? window.globalUtilsManager.createElement(tag, props, children) : document.createElement(tag),
+    createElement: (tag, props, children) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.createElement(tag, props, children)
+        : document.createElement(tag),
     createButton: (id, text, icon, onClick, style) => {
       if (window.globalUtilsManager) {
-        return window.globalUtilsManager.createButton(id, text, icon, onClick, style);
+        return window.globalUtilsManager.createButton(
+          id,
+          text,
+          icon,
+          onClick,
+          style
+        );
       }
-      const btn = document.createElement('button');
+      const btn = document.createElement("button");
       btn.id = id;
-      btn.innerHTML = `${icon ? `<i class="${icon}"></i>` : ''}<span>${text}</span>`;
-      if (onClick) btn.addEventListener('click', onClick);
+      btn.innerHTML = `${
+        icon ? `<i class="${icon}"></i>` : ""
+      }<span>${text}</span>`;
+      if (onClick) btn.addEventListener("click", onClick);
       return btn;
     },
 
@@ -1532,28 +1866,28 @@ localStorage.removeItem("lp");
     openColorPalette: () => {
       try {
         // Check if color palette modal is already open
-        const paletteModal = document.querySelector('dialog[open]');
+        const paletteModal = document.querySelector("dialog[open]");
         if (paletteModal) {
-          console.log('✅ Color palette already open');
+          console.log("✅ Color palette already open");
           return true;
         }
 
         // Search for Paint/Pintar button (like Auto-Farm does)
-        const allButtons = Array.from(document.querySelectorAll('button'));
-        const paletteButton = allButtons.find(btn =>
+        const allButtons = Array.from(document.querySelectorAll("button"));
+        const paletteButton = allButtons.find((btn) =>
           /(Pintar|Paint)/i.test(btn.textContent.trim())
         );
 
         if (paletteButton) {
-          console.log('🎨 Opening color palette automatically...');
+          console.log("🎨 Opening color palette automatically...");
           paletteButton.click();
           return true;
         }
 
-        console.warn('⚠️ Color palette button not found');
+        console.warn("⚠️ Color palette button not found");
         return false;
       } catch (error) {
-        console.error('❌ Error opening color palette:', error);
+        console.error("❌ Error opening color palette:", error);
         return false;
       }
     },
@@ -1568,40 +1902,60 @@ localStorage.removeItem("lp");
 
     hideAlert: () => {
       // Remove existing alerts immediately with safety checks
-      const alerts = document.querySelectorAll('.wplace-alert-base');
-      alerts.forEach(alert => {
+      const alerts = document.querySelectorAll(".wplace-alert-base");
+      alerts.forEach((alert) => {
         try {
           if (alert && alert.parentNode) {
             alert.parentNode.removeChild(alert);
           }
         } catch (error) {
           // Ignore removeChild errors if element was already removed
-          console.debug('Alert already removed:', error);
+          console.debug("Alert already removed:", error);
         }
       });
     },
 
     // Color utilities
-    colorDistance: (a, b) => window.globalUtilsManager ? window.globalUtilsManager.colorDistance(a, b) : Math.sqrt(Math.pow(a[0] - b[0], 2) + Math.pow(a[1] - b[1], 2) + Math.pow(a[2] - b[2], 2)),
-    findClosestPaletteColor: (r, g, b, palette) => window.globalUtilsManager ? window.globalUtilsManager.findClosestPaletteColor(r, g, b, palette) : [r, g, b],
-    isWhitePixel: (r, g, b) => window.globalUtilsManager ? window.globalUtilsManager.isWhitePixel(r, g, b) : (r > 240 && g > 240 && b > 240),
-    resolveColor: (targetRgb, availableColors, exactMatch) => window.globalUtilsManager ? window.globalUtilsManager.resolveColor(targetRgb, availableColors, exactMatch) : targetRgb,
+    colorDistance: (a, b) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.colorDistance(a, b)
+        : Math.sqrt(
+            Math.pow(a[0] - b[0], 2) +
+              Math.pow(a[1] - b[1], 2) +
+              Math.pow(a[2] - b[2], 2)
+          ),
+    findClosestPaletteColor: (r, g, b, palette) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.findClosestPaletteColor(r, g, b, palette)
+        : [r, g, b],
+    isWhitePixel: (r, g, b) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.isWhitePixel(r, g, b)
+        : r > 240 && g > 240 && b > 240,
+    resolveColor: (targetRgb, availableColors, exactMatch) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.resolveColor(
+            targetRgb,
+            availableColors,
+            exactMatch
+          )
+        : targetRgb,
 
     // CRITICAL FUNCTIONS - Direct implementations to ensure they work
     createImageUploader: () => {
       return new Promise((resolve, reject) => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = 'image/*';
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = "image/*";
         input.onchange = (e) => {
           const file = e.target.files[0];
           if (file) {
             const reader = new FileReader();
             reader.onload = () => resolve(reader.result);
-            reader.onerror = () => reject(new Error('File reading error'));
+            reader.onerror = () => reject(new Error("File reading error"));
             reader.readAsDataURL(file);
           } else {
-            reject(new Error('No file selected'));
+            reject(new Error("No file selected"));
           }
         };
         input.click();
@@ -1610,9 +1964,9 @@ localStorage.removeItem("lp");
 
     createFileUploader: () => {
       return new Promise((resolve, reject) => {
-        const input = document.createElement('input');
-        input.type = 'file';
-        input.accept = '.json';
+        const input = document.createElement("input");
+        input.type = "file";
+        input.accept = ".json";
         input.onchange = (e) => {
           const file = e.target.files[0];
           if (file) {
@@ -1622,13 +1976,13 @@ localStorage.removeItem("lp");
                 const data = JSON.parse(reader.result);
                 resolve(data);
               } catch (error) {
-                reject(new Error('Invalid JSON file'));
+                reject(new Error("Invalid JSON file"));
               }
             };
-            reader.onerror = () => reject(new Error('File reading error'));
+            reader.onerror = () => reject(new Error("File reading error"));
             reader.readAsText(file);
           } else {
-            reject(new Error('No file selected'));
+            reject(new Error("No file selected"));
           }
         };
         input.click();
@@ -1636,9 +1990,9 @@ localStorage.removeItem("lp");
     },
 
     createFileDownloader: (data, filename) => {
-      const blob = new Blob([data], { type: 'application/json' });
+      const blob = new Blob([data], { type: "application/json" });
       const url = URL.createObjectURL(blob);
-      const a = document.createElement('a');
+      const a = document.createElement("a");
       a.href = url;
       a.download = filename;
       document.body.appendChild(a);
@@ -1649,11 +2003,11 @@ localStorage.removeItem("lp");
 
     loadProgress: () => {
       try {
-        const saved = localStorage.getItem('wplace-bot-progress');
+        const saved = localStorage.getItem("wplace-bot-progress");
         if (!saved) return null;
         return JSON.parse(saved);
       } catch (error) {
-        console.error('Error loading progress:', error);
+        console.error("Error loading progress:", error);
         return null;
       }
     },
@@ -1661,39 +2015,42 @@ localStorage.removeItem("lp");
     saveProgress: () => {
       try {
         // Use utils manager to build proper save structure like old version
-        const data = window.globalUtilsManager ?
-          window.globalUtilsManager.buildProgressData() :
-          {
-            timestamp: Date.now(),
-            version: '2.2',
-            state: {
-              totalPixels: window.state.totalPixels,
-              paintedPixels: window.state.paintedPixels,
-              lastPosition: window.state.lastPosition,
-              startPosition: window.state.startPosition,
-              region: window.state.region,
-              imageLoaded: window.state.imageLoaded,
-              colorsChecked: window.state.colorsChecked,
-              coordinateMode: window.state.coordinateMode,
-              coordinateDirection: window.state.coordinateDirection,
-              coordinateSnake: window.state.coordinateSnake,
-              blockWidth: window.state.blockWidth,
-              blockHeight: window.state.blockHeight,
-              availableColors: window.state.availableColors,
-            },
-            imageData: window.state.imageData ? {
-              width: window.state.imageData.width,
-              height: window.state.imageData.height,
-              pixels: Array.from(window.state.imageData.pixels),
-              totalPixels: window.state.imageData.totalPixels,
-            } : null,
-            paintedMapPacked: window.globalUtilsManager ?
-              window.globalUtilsManager.buildPaintedMapPacked() : null
-          };
+        const data = window.globalUtilsManager
+          ? window.globalUtilsManager.buildProgressData()
+          : {
+              timestamp: Date.now(),
+              version: "2.2",
+              state: {
+                totalPixels: window.state.totalPixels,
+                paintedPixels: window.state.paintedPixels,
+                lastPosition: window.state.lastPosition,
+                startPosition: window.state.startPosition,
+                region: window.state.region,
+                imageLoaded: window.state.imageLoaded,
+                colorsChecked: window.state.colorsChecked,
+                coordinateMode: window.state.coordinateMode,
+                coordinateDirection: window.state.coordinateDirection,
+                coordinateSnake: window.state.coordinateSnake,
+                blockWidth: window.state.blockWidth,
+                blockHeight: window.state.blockHeight,
+                availableColors: window.state.availableColors,
+              },
+              imageData: window.state.imageData
+                ? {
+                    width: window.state.imageData.width,
+                    height: window.state.imageData.height,
+                    pixels: Array.from(window.state.imageData.pixels),
+                    totalPixels: window.state.imageData.totalPixels,
+                  }
+                : null,
+              paintedMapPacked: window.globalUtilsManager
+                ? window.globalUtilsManager.buildPaintedMapPacked()
+                : null,
+            };
 
         // Attempt to save; if payload is too large (QuotaExceeded), retry without heavy pixel data
         try {
-          localStorage.setItem('wplace-bot-progress', JSON.stringify(data));
+          localStorage.setItem("wplace-bot-progress", JSON.stringify(data));
           return true;
         } catch (e) {
           // Fallback: strip image pixels to reduce size and retry
@@ -1705,17 +2062,27 @@ localStorage.removeItem("lp");
                 height: data.imageData.height,
                 totalPixels: data.imageData.totalPixels,
                 pixelsStripped: true,
-              }
+              },
             };
             try {
-              localStorage.setItem('wplace-bot-progress', JSON.stringify(slimData));
-              console.warn('Saved progress without raw pixel data due to storage quota limits.');
+              localStorage.setItem(
+                "wplace-bot-progress",
+                JSON.stringify(slimData)
+              );
+              console.warn(
+                "Saved progress without raw pixel data due to storage quota limits."
+              );
               return true;
             } catch (e2) {
               try {
                 // Last resort: try sessionStorage
-                sessionStorage.setItem('wplace-bot-progress', JSON.stringify(slimData));
-                console.warn('Saved progress to sessionStorage without pixel data due to storage quota limits.');
+                sessionStorage.setItem(
+                  "wplace-bot-progress",
+                  JSON.stringify(slimData)
+                );
+                console.warn(
+                  "Saved progress to sessionStorage without pixel data due to storage quota limits."
+                );
                 return true;
               } catch (e3) {
                 throw e2; // will be handled by outer catch
@@ -1725,14 +2092,14 @@ localStorage.removeItem("lp");
           throw e;
         }
       } catch (error) {
-        console.error('Error saving progress:', error);
+        console.error("Error saving progress:", error);
         return false;
       }
     },
 
     clearProgress: () => {
       try {
-        localStorage.removeItem('wplace-bot-progress');
+        localStorage.removeItem("wplace-bot-progress");
         if (window.state) {
           window.state.paintedMap = null;
           window.state._lastSavePixelCount = 0;
@@ -1740,62 +2107,90 @@ localStorage.removeItem("lp");
         }
         return true;
       } catch (error) {
-        console.error('Error clearing progress:', error);
+        console.error("Error clearing progress:", error);
         return false;
       }
     },
 
     restoreProgress: (savedData) => {
       try {
-        console.log('🔍 [DEBUG] RestoreProgress: Starting restoration...');
-        console.log('🔍 [DEBUG] SavedData exists:', !!savedData);
-        console.log('🔍 [DEBUG] SavedData.state exists:', !!savedData?.state);
+        console.log("🔍 [DEBUG] RestoreProgress: Starting restoration...");
+        console.log("🔍 [DEBUG] SavedData exists:", !!savedData);
+        console.log("🔍 [DEBUG] SavedData.state exists:", !!savedData?.state);
 
         if (!savedData || !savedData.state) {
-          console.error('❌ [DEBUG] RestoreProgress: Invalid savedData or missing state');
+          console.error(
+            "❌ [DEBUG] RestoreProgress: Invalid savedData or missing state"
+          );
           return false;
         }
 
-        console.log('🔍 [DEBUG] Current window.state keys before restore:', Object.keys(window.state || {}));
-        console.log('🔍 [DEBUG] SavedData.state keys:', Object.keys(savedData.state));
+        console.log(
+          "🔍 [DEBUG] Current window.state keys before restore:",
+          Object.keys(window.state || {})
+        );
+        console.log(
+          "🔍 [DEBUG] SavedData.state keys:",
+          Object.keys(savedData.state)
+        );
 
-        console.log('🔍 [DEBUG] Performing Object.assign...');
+        console.log("🔍 [DEBUG] Performing Object.assign...");
         Object.assign(window.state, savedData.state);
 
         // Reset session-specific flags when loading a new save file
         window.state.preFilteringDone = false;
         window.state.progressResetDone = false;
-        console.log('🔄 Reset session flags for new save file load');
+        console.log("🔄 Reset session flags for new save file load");
 
-        console.log('✅ [DEBUG] Object.assign completed successfully');
+        console.log("✅ [DEBUG] Object.assign completed successfully");
 
         // Restore available colors from old save files (backward compatibility)
-        if (savedData.state.availableColors && Array.isArray(savedData.state.availableColors)) {
-          console.log('🔍 [DEBUG] Restoring availableColors, count:', savedData.state.availableColors.length);
+        if (
+          savedData.state.availableColors &&
+          Array.isArray(savedData.state.availableColors)
+        ) {
+          console.log(
+            "🔍 [DEBUG] Restoring availableColors, count:",
+            savedData.state.availableColors.length
+          );
           window.state.availableColors = savedData.state.availableColors;
           window.state.colorsChecked = true; // Mark colors as checked
-          console.log('✅ [DEBUG] AvailableColors restored successfully');
+          console.log("✅ [DEBUG] AvailableColors restored successfully");
         } else {
-          console.log('⚠️ [DEBUG] No availableColors found in savedData or not an array');
+          console.log(
+            "⚠️ [DEBUG] No availableColors found in savedData or not an array"
+          );
         }
 
         // Track if we successfully restored image data
         let imageDataRestored = false;
 
         if (savedData.imageData && Array.isArray(savedData.imageData.pixels)) {
-          console.log('🔍 [DEBUG] Restoring imageData...');
-          console.log('🔍 [DEBUG] ImageData type check - pixels is array:', Array.isArray(savedData.imageData.pixels));
-          console.log('🔍 [DEBUG] ImageData pixels length:', savedData.imageData.pixels?.length);
+          console.log("🔍 [DEBUG] Restoring imageData...");
+          console.log(
+            "🔍 [DEBUG] ImageData type check - pixels is array:",
+            Array.isArray(savedData.imageData.pixels)
+          );
+          console.log(
+            "🔍 [DEBUG] ImageData pixels length:",
+            savedData.imageData.pixels?.length
+          );
 
           window.state.imageData = {
             ...savedData.imageData,
             pixels: new Uint8ClampedArray(savedData.imageData.pixels),
           };
           imageDataRestored = true; // ✅ Mark that we restored image data
-          console.log('✅ [DEBUG] ImageData restored successfully');
-          console.log('🔍 [DEBUG] Converted pixels to Uint8ClampedArray, length:', window.state.imageData.pixels.length);
+          console.log("✅ [DEBUG] ImageData restored successfully");
+          console.log(
+            "🔍 [DEBUG] Converted pixels to Uint8ClampedArray, length:",
+            window.state.imageData.pixels.length
+          );
         } else if (savedData.imageData && savedData.imageData.pixelsRef) {
-          console.warn('ℹ️ [DEBUG] Large image detected; loading pixels from IndexedDB via ref:', savedData.imageData.pixelsRef);
+          console.warn(
+            "ℹ️ [DEBUG] Large image detected; loading pixels from IndexedDB via ref:",
+            savedData.imageData.pixelsRef
+          );
           window.state.imageData = {
             width: savedData.imageData.width,
             height: savedData.imageData.height,
@@ -1804,31 +2199,49 @@ localStorage.removeItem("lp");
           };
           window.state.imageLoaded = false;
 
-          if (window.globalUtilsManager && typeof window.globalUtilsManager.loadPixelsFromIndexedDB === 'function') {
-            window.globalUtilsManager.loadPixelsFromIndexedDB(savedData.imageData.pixelsRef)
-              .then(payload => {
+          if (
+            window.globalUtilsManager &&
+            typeof window.globalUtilsManager.loadPixelsFromIndexedDB ===
+              "function"
+          ) {
+            window.globalUtilsManager
+              .loadPixelsFromIndexedDB(savedData.imageData.pixelsRef)
+              .then((payload) => {
                 if (!payload || !payload.pixels) {
-                  console.warn('⚠️ [DEBUG] Pixels not found in IDB. Ask user to reload image.');
+                  console.warn(
+                    "⚠️ [DEBUG] Pixels not found in IDB. Ask user to reload image."
+                  );
                   return;
                 }
-                window.state.imageData.pixels = new Uint8ClampedArray(payload.pixels);
+                window.state.imageData.pixels = new Uint8ClampedArray(
+                  payload.pixels
+                );
                 window.state.imageLoaded = true;
-                console.log('✅ [DEBUG] Pixels loaded from IDB');
+                console.log("✅ [DEBUG] Pixels loaded from IDB");
 
                 // ✅ CRITICAL FIX: Update data buttons after async IDB load completes
-                if (typeof window.updateDataButtons === 'function') {
+                if (typeof window.updateDataButtons === "function") {
                   window.updateDataButtons();
                 }
 
                 // Try to restore overlay immediately
-                if (typeof window.globalUtilsManager.restoreOverlayFromData === 'function') {
-                  window.globalUtilsManager.restoreOverlayFromData().catch(() => {});
+                if (
+                  typeof window.globalUtilsManager.restoreOverlayFromData ===
+                  "function"
+                ) {
+                  window.globalUtilsManager
+                    .restoreOverlayFromData()
+                    .catch(() => {});
                 }
               })
-              .catch(err => console.warn('❌ [DEBUG] Failed to load pixels from IDB:', err));
+              .catch((err) =>
+                console.warn("❌ [DEBUG] Failed to load pixels from IDB:", err)
+              );
           }
         } else if (savedData.imageData && savedData.imageData.pixelsStripped) {
-          console.warn('⚠️ [DEBUG] Saved progress did not include raw pixel data due to quota limits. Please reload the image file to resume.');
+          console.warn(
+            "⚠️ [DEBUG] Saved progress did not include raw pixel data due to quota limits. Please reload the image file to resume."
+          );
           // Preserve dimensions for UI, but mark image as not loaded
           window.state.imageData = {
             width: savedData.imageData.width,
@@ -1838,39 +2251,58 @@ localStorage.removeItem("lp");
           };
           window.state.imageLoaded = false;
         } else {
-          console.log('⚠️ [DEBUG] No imageData found in savedData');
+          console.log("⚠️ [DEBUG] No imageData found in savedData");
         }
 
         if (savedData.paintedMap) {
-          console.log('🔍 [DEBUG] Restoring paintedMap...');
-          window.state.paintedMap = savedData.paintedMap.map((row) => Array.from(row));
-          console.log('✅ [DEBUG] PaintedMap restored successfully');
+          console.log("🔍 [DEBUG] Restoring paintedMap...");
+          window.state.paintedMap = savedData.paintedMap.map((row) =>
+            Array.from(row)
+          );
+          console.log("✅ [DEBUG] PaintedMap restored successfully");
         } else {
-          console.log('🔍 [DEBUG] No paintedMap found in savedData (this is normal for extracted data)');
+          console.log(
+            "🔍 [DEBUG] No paintedMap found in savedData (this is normal for extracted data)"
+          );
         }
 
         // ✅ CRITICAL FIX: Set imageLoaded based on whether we actually have pixel data
         // This must be done AFTER Object.assign to override any stale value from savedData.state
         if (imageDataRestored) {
           window.state.imageLoaded = true;
-          console.log('✅ [DEBUG] Set window.state.imageLoaded = true (image data was successfully restored)');
+          console.log(
+            "✅ [DEBUG] Set window.state.imageLoaded = true (image data was successfully restored)"
+          );
         } else if (window.state.imageData && window.state.imageData.pixels) {
           window.state.imageLoaded = true;
-          console.log('✅ [DEBUG] Set window.state.imageLoaded = true (image data exists with pixels)');
+          console.log(
+            "✅ [DEBUG] Set window.state.imageLoaded = true (image data exists with pixels)"
+          );
         } else {
           window.state.imageLoaded = false;
-          console.log('⚠️ [DEBUG] Set window.state.imageLoaded = false (no valid image data)');
+          console.log(
+            "⚠️ [DEBUG] Set window.state.imageLoaded = false (no valid image data)"
+          );
         }
 
-        console.log('✅ [DEBUG] RestoreProgress completed successfully');
-        console.log('🔍 [DEBUG] Final window.state.imageLoaded:', window.state.imageLoaded);
-        console.log('🔍 [DEBUG] Final window.state.totalPixels:', window.state.totalPixels);
+        console.log("✅ [DEBUG] RestoreProgress completed successfully");
+        console.log(
+          "🔍 [DEBUG] Final window.state.imageLoaded:",
+          window.state.imageLoaded
+        );
+        console.log(
+          "🔍 [DEBUG] Final window.state.totalPixels:",
+          window.state.totalPixels
+        );
 
         return true;
       } catch (error) {
-        console.error('❌ [DEBUG] Error in restoreProgress:', error);
-        console.error('❌ [DEBUG] Error stack:', error.stack);
-        console.error('❌ [DEBUG] SavedData structure at error:', JSON.stringify(savedData, null, 2));
+        console.error("❌ [DEBUG] Error in restoreProgress:", error);
+        console.error("❌ [DEBUG] Error stack:", error.stack);
+        console.error(
+          "❌ [DEBUG] SavedData structure at error:",
+          JSON.stringify(savedData, null, 2)
+        );
         return false;
       }
     },
@@ -1881,7 +2313,7 @@ localStorage.removeItem("lp");
         // Files are portable and don't have access to IndexedDB
         const progressData = {
           timestamp: Date.now(),
-          version: '2.2',
+          version: "2.2",
           state: {
             totalPixels: window.state.totalPixels,
             paintedPixels: window.state.paintedPixels,
@@ -1897,102 +2329,129 @@ localStorage.removeItem("lp");
             blockHeight: window.state.blockHeight,
             availableColors: window.state.availableColors,
           },
-          imageData: window.state.imageData && window.state.imageData.pixels ? {
-            width: window.state.imageData.width,
-            height: window.state.imageData.height,
-            pixels: Array.from(window.state.imageData.pixels),
-            totalPixels: window.state.imageData.totalPixels,
-          } : null,
-          paintedMapPacked: window.globalUtilsManager ?
-            window.globalUtilsManager.buildPaintedMapPacked() : null
+          imageData:
+            window.state.imageData && window.state.imageData.pixels
+              ? {
+                  width: window.state.imageData.width,
+                  height: window.state.imageData.height,
+                  pixels: Array.from(window.state.imageData.pixels),
+                  totalPixels: window.state.imageData.totalPixels,
+                }
+              : null,
+          paintedMapPacked: window.globalUtilsManager
+            ? window.globalUtilsManager.buildPaintedMapPacked()
+            : null,
         };
 
         const filename = `wplace-bot-progress-${new Date()
           .toISOString()
           .slice(0, 19)
-          .replace(/:/g, '-')}.json`;
-        Utils.createFileDownloader(JSON.stringify(progressData, null, 2), filename);
+          .replace(/:/g, "-")}.json`;
+        Utils.createFileDownloader(
+          JSON.stringify(progressData, null, 2),
+          filename
+        );
         return true;
       } catch (error) {
-        console.error('Error saving to file:', error);
+        console.error("Error saving to file:", error);
         return false;
       }
     },
 
     loadProgressFromFile: async () => {
       try {
-        console.log('🔍 [DEBUG] Starting file upload process...');
+        console.log("🔍 [DEBUG] Starting file upload process...");
         const data = await Utils.createFileUploader();
 
-        console.log('🔍 [DEBUG] File upload completed. Data type:', typeof data);
-        console.log('🔍 [DEBUG] Data exists:', !!data);
+        console.log(
+          "🔍 [DEBUG] File upload completed. Data type:",
+          typeof data
+        );
+        console.log("🔍 [DEBUG] Data exists:", !!data);
 
         if (!data) {
-          console.error('❌ [DEBUG] No data received from file uploader');
-          throw new Error('No data received from file');
+          console.error("❌ [DEBUG] No data received from file uploader");
+          throw new Error("No data received from file");
         }
 
-        console.log('🔍 [DEBUG] Data keys:', Object.keys(data));
-        console.log('🔍 [DEBUG] Data.state exists:', !!data.state);
-        console.log('🔍 [DEBUG] Data.imageData exists:', !!data.imageData);
-        console.log('🔍 [DEBUG] Data.version:', data.version);
-        console.log('🔍 [DEBUG] Data.timestamp:', data.timestamp);
+        console.log("🔍 [DEBUG] Data keys:", Object.keys(data));
+        console.log("🔍 [DEBUG] Data.state exists:", !!data.state);
+        console.log("🔍 [DEBUG] Data.imageData exists:", !!data.imageData);
+        console.log("🔍 [DEBUG] Data.version:", data.version);
+        console.log("🔍 [DEBUG] Data.timestamp:", data.timestamp);
 
         if (!data.state) {
-          console.error('❌ [DEBUG] Missing state object in loaded data');
-          console.log('🔍 [DEBUG] Available top-level keys:', Object.keys(data));
-          throw new Error('Invalid file format - missing state object');
+          console.error("❌ [DEBUG] Missing state object in loaded data");
+          console.log(
+            "🔍 [DEBUG] Available top-level keys:",
+            Object.keys(data)
+          );
+          throw new Error("Invalid file format - missing state object");
         }
 
-        console.log('🔍 [DEBUG] State object keys:', Object.keys(data.state));
-        console.log('🔍 [DEBUG] State.imageLoaded:', data.state.imageLoaded);
-        console.log('🔍 [DEBUG] State.totalPixels:', data.state.totalPixels);
-        console.log('🔍 [DEBUG] State.startPosition:', data.state.startPosition);
-        console.log('🔍 [DEBUG] State.region:', data.state.region);
+        console.log("🔍 [DEBUG] State object keys:", Object.keys(data.state));
+        console.log("🔍 [DEBUG] State.imageLoaded:", data.state.imageLoaded);
+        console.log("🔍 [DEBUG] State.totalPixels:", data.state.totalPixels);
+        console.log(
+          "🔍 [DEBUG] State.startPosition:",
+          data.state.startPosition
+        );
+        console.log("🔍 [DEBUG] State.region:", data.state.region);
 
         if (data.imageData) {
-          console.log('🔍 [DEBUG] ImageData width:', data.imageData.width);
-          console.log('🔍 [DEBUG] ImageData height:', data.imageData.height);
-          console.log('🔍 [DEBUG] ImageData pixels length:', data.imageData.pixels?.length);
-          console.log('🔍 [DEBUG] ImageData totalPixels:', data.imageData.totalPixels);
+          console.log("🔍 [DEBUG] ImageData width:", data.imageData.width);
+          console.log("🔍 [DEBUG] ImageData height:", data.imageData.height);
+          console.log(
+            "🔍 [DEBUG] ImageData pixels length:",
+            data.imageData.pixels?.length
+          );
+          console.log(
+            "🔍 [DEBUG] ImageData totalPixels:",
+            data.imageData.totalPixels
+          );
         }
 
-        console.log('🔍 [DEBUG] Calling restoreProgress...');
+        console.log("🔍 [DEBUG] Calling restoreProgress...");
         const success = Utils.restoreProgress(data);
-        console.log('🔍 [DEBUG] RestoreProgress result:', success);
+        console.log("🔍 [DEBUG] RestoreProgress result:", success);
 
         return success;
       } catch (error) {
-        console.error('❌ [DEBUG] Error in loadProgressFromFile:', error);
-        console.error('❌ [DEBUG] Error stack:', error.stack);
+        console.error("❌ [DEBUG] Error in loadProgressFromFile:", error);
+        console.error("❌ [DEBUG] Error stack:", error.stack);
         return false;
       }
     },
 
     loadExtractedFileData: async () => {
       try {
-        console.log('🔍 [DEBUG] Starting Art-Extractor file upload process...');
+        console.log("🔍 [DEBUG] Starting Art-Extractor file upload process...");
         const data = await Utils.createFileUploader();
 
-        console.log('🔍 [DEBUG] File upload completed. Data type:', typeof data);
-        console.log('🔍 [DEBUG] Data exists:', !!data);
-        console.log('📖 Raw loaded data:', data);
+        console.log(
+          "🔍 [DEBUG] File upload completed. Data type:",
+          typeof data
+        );
+        console.log("🔍 [DEBUG] Data exists:", !!data);
+        console.log("📖 Raw loaded data:", data);
 
         if (!data) {
-          console.error('❌ [DEBUG] No data received from file uploader');
+          console.error("❌ [DEBUG] No data received from file uploader");
           return null;
         }
 
-        console.log('🔍 [DEBUG] Data keys:', Object.keys(data));
-        console.log('🔍 [DEBUG] Data.state exists:', !!data.state);
-        console.log('🔍 [DEBUG] Data.imageData exists:', !!data.imageData);
-        console.log('🔍 [DEBUG] Data.version:', data.version);
-        console.log('🔍 [DEBUG] Data.timestamp:', data.timestamp);
+        console.log("🔍 [DEBUG] Data keys:", Object.keys(data));
+        console.log("🔍 [DEBUG] Data.state exists:", !!data.state);
+        console.log("🔍 [DEBUG] Data.imageData exists:", !!data.imageData);
+        console.log("🔍 [DEBUG] Data.version:", data.version);
+        console.log("🔍 [DEBUG] Data.timestamp:", data.timestamp);
 
-        console.log('🔍 [DEBUG] Returning raw data object for Load Extracted feature');
+        console.log(
+          "🔍 [DEBUG] Returning raw data object for Load Extracted feature"
+        );
         return data;
       } catch (error) {
-        console.error('❌ [DEBUG] Error in loadExtractedFileData:', error);
+        console.error("❌ [DEBUG] Error in loadExtractedFileData:", error);
         return null;
       }
     },
@@ -2002,28 +2461,93 @@ localStorage.removeItem("lp");
       if (window.globalUtilsManager) {
         return window.globalUtilsManager.extractAvailableColors();
       } else if (window.globalImageProcessor) {
-        return window.globalImageProcessor.extractAvailableColors(window.CONFIG.COLOR_MAP);
+        return window.globalImageProcessor.extractAvailableColors(
+          window.CONFIG.COLOR_MAP
+        );
       } else {
         return [];
       }
     },
-    formatTime: (ms) => window.globalUtilsManager ? window.globalUtilsManager.formatTime(ms) : `${Math.floor(ms / 1000)}s`,
-    calculateEstimatedTime: (remainingPixels, charges, cooldown) => window.globalUtilsManager ? window.globalUtilsManager.calculateEstimatedTime(remainingPixels, charges, cooldown) : 0,
-    initializePaintedMap: (width, height) => window.globalUtilsManager ? window.globalUtilsManager.initializePaintedMap(width, height) : console.log('Painted map not available'),
-    markPixelPainted: (x, y, regionX, regionY) => window.globalUtilsManager ? window.globalUtilsManager.markPixelPainted(x, y, regionX, regionY) : false,
-    isPixelPainted: (x, y, regionX, regionY) => window.globalUtilsManager ? window.globalUtilsManager.isPixelPainted(x, y, regionX, regionY) : false,
-    shouldAutoSave: () => window.globalUtilsManager ? window.globalUtilsManager.shouldAutoSave() : false,
-    performSmartSave: () => window.globalUtilsManager ? window.globalUtilsManager.performSmartSave() : false,
-    packPaintedMapToBase64: (paintedMap, width, height) => window.globalUtilsManager ? window.globalUtilsManager.packPaintedMapToBase64(paintedMap, width, height) : null,
-    unpackPaintedMapFromBase64: (base64, width, height) => window.globalUtilsManager ? window.globalUtilsManager.unpackPaintedMapFromBase64(base64, width, height) : null,
-    migrateProgressToV2: (saved) => window.globalUtilsManager ? window.globalUtilsManager.migrateProgressToV2(saved) : saved,
-    migrateProgressToV21: (saved) => window.globalUtilsManager ? window.globalUtilsManager.migrateProgressToV21(saved) : saved,
-    migrateProgressToV22: (data) => window.globalUtilsManager ? window.globalUtilsManager.migrateProgressToV22(data) : data,
-    buildPaintedMapPacked: () => window.globalUtilsManager ? window.globalUtilsManager.buildPaintedMapPacked() : null,
-    buildProgressData: () => window.globalUtilsManager ? window.globalUtilsManager.buildProgressData() : {},
-    migrateProgress: (saved) => window.globalUtilsManager ? window.globalUtilsManager.migrateProgress(saved) : saved,
-    restoreOverlayFromData: () => window.globalUtilsManager ? window.globalUtilsManager.restoreOverlayFromData() : Promise.resolve(false),
-    updateCoordinateUI: (config) => window.globalUtilsManager ? window.globalUtilsManager.updateCoordinateUI(config) : console.log('Coordinate UI update not available'),
+    formatTime: (ms) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.formatTime(ms)
+        : `${Math.floor(ms / 1000)}s`,
+    calculateEstimatedTime: (remainingPixels, charges, cooldown) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.calculateEstimatedTime(
+            remainingPixels,
+            charges,
+            cooldown
+          )
+        : 0,
+    initializePaintedMap: (width, height) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.initializePaintedMap(width, height)
+        : console.log("Painted map not available"),
+    markPixelPainted: (x, y, regionX, regionY) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.markPixelPainted(x, y, regionX, regionY)
+        : false,
+    isPixelPainted: (x, y, regionX, regionY) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.isPixelPainted(x, y, regionX, regionY)
+        : false,
+    shouldAutoSave: () =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.shouldAutoSave()
+        : false,
+    performSmartSave: () =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.performSmartSave()
+        : false,
+    packPaintedMapToBase64: (paintedMap, width, height) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.packPaintedMapToBase64(
+            paintedMap,
+            width,
+            height
+          )
+        : null,
+    unpackPaintedMapFromBase64: (base64, width, height) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.unpackPaintedMapFromBase64(
+            base64,
+            width,
+            height
+          )
+        : null,
+    migrateProgressToV2: (saved) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.migrateProgressToV2(saved)
+        : saved,
+    migrateProgressToV21: (saved) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.migrateProgressToV21(saved)
+        : saved,
+    migrateProgressToV22: (data) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.migrateProgressToV22(data)
+        : data,
+    buildPaintedMapPacked: () =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.buildPaintedMapPacked()
+        : null,
+    buildProgressData: () =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.buildProgressData()
+        : {},
+    migrateProgress: (saved) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.migrateProgress(saved)
+        : saved,
+    restoreOverlayFromData: () =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.restoreOverlayFromData()
+        : Promise.resolve(false),
+    updateCoordinateUI: (config) =>
+      window.globalUtilsManager
+        ? window.globalUtilsManager.updateCoordinateUI(config)
+        : console.log("Coordinate UI update not available"),
   };
 
   // IMAGE PROCESSOR WRAPPER - Uses WPlaceImageProcessor for modular functionality
@@ -2084,7 +2608,7 @@ localStorage.removeItem("lp");
     async paintPixelInRegion(regionX, regionY, pixelX, pixelY, color) {
       try {
         await ensureToken();
-        if (!getTurnstileToken()) return 'token_error';
+        if (!getTurnstileToken()) return "token_error";
         const payload = {
           coords: [pixelX, pixelY],
           colors: [color],
@@ -2092,73 +2616,85 @@ localStorage.removeItem("lp");
           fp: fpStr32,
         };
         var token = await createWasmToken(regionX, regionY, payload);
-        const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
-          method: 'POST',
-          headers: { 'Content-Type': 'text/plain;charset=UTF-8', "x-pawtect-token": token },
-          credentials: 'include',
-          body: JSON.stringify(payload),
-        });
+        const res = await fetch(
+          `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
+          {
+            method: "POST",
+            headers: {
+              "Content-Type": "text/plain;charset=UTF-8",
+              "x-pawtect-token": token,
+            },
+            credentials: "include",
+            body: JSON.stringify(payload),
+          }
+        );
         if (res.status === 403) {
-          console.error('❌ 403 Forbidden. Turnstile token might be invalid or expired.');
+          console.error(
+            "❌ 403 Forbidden. Turnstile token might be invalid or expired."
+          );
           setTurnstileToken(null);
           createTokenPromise();
-          return 'token_error';
+          return "token_error";
         }
         const data = await res.json();
         return data?.painted === 1;
       } catch (e) {
-        console.error('Paint request failed:', e);
+        console.error("Paint request failed:", e);
         return false;
       }
     },
 
     async getCharges() {
       try {
-        const res = await fetch(`https://backend.wplace.live/me?_=${Date.now()}` , {
-          credentials: "include",
-          cache: 'no-store'
-        })
-        const data = await res.json()
+        const res = await fetch(
+          `https://backend.wplace.live/me?_=${Date.now()}`,
+          {
+            credentials: "include",
+            cache: "no-store",
+          }
+        );
+        const data = await res.json();
         return {
           id: data.id,
           charges: data.charges?.count || 0,
           max: data.charges?.max || 1,
           cooldown: data.charges?.next || CONFIG.COOLDOWN_DEFAULT,
           droplets: data.droplets || 0,
-        }
+        };
       } catch (e) {
-        console.error("Failed to get charges:", e)
+        console.error("Failed to get charges:", e);
         return {
           id: null,
           charges: 0,
           max: 1,
           cooldown: CONFIG.COOLDOWN_DEFAULT,
           droplets: 0,
-        }
+        };
       }
     },
 
     async fetchCheck() {
       try {
-        const res = await fetch(`https://backend.wplace.live/me?_=${Date.now()}` , {
-          credentials: "include",
-          cache: 'no-store'
-        })
-        const data = await res.json()
+        const res = await fetch(
+          `https://backend.wplace.live/me?_=${Date.now()}`,
+          {
+            credentials: "include",
+            cache: "no-store",
+          }
+        );
+        const data = await res.json();
         return {
           ID: data.id,
           Username: data.username || data.name || null,
           Charges: data.charges.count,
           Max: data.charges.max,
-          Droplets: data.droplets
-        }
+          Droplets: data.droplets,
+        };
       } catch (e) {
-        console.error("Failed to get ID:", e)
-        return {
-
-        }
+        console.error("Failed to get ID:", e);
+        return {};
       }
-    }
+    },
   };
 
   // Desktop Notification Manager
@@ -2167,14 +2703,14 @@ localStorage.removeItem("lp");
     pollIntervalMs: 60_000,
     icon() {
       const link = document.querySelector("link[rel~='icon']");
-      return link?.href || location.origin + '/favicon.ico';
+      return link?.href || location.origin + "/favicon.ico";
     },
     async requestPermission() {
-      if (!('Notification' in window)) {
-        Utils.showAlert(Utils.t('notificationsNotSupported'), 'warning');
-        return 'denied';
+      if (!("Notification" in window)) {
+        Utils.showAlert(Utils.t("notificationsNotSupported"), "warning");
+        return "denied";
       }
-      if (Notification.permission === 'granted') return 'granted';
+      if (Notification.permission === "granted") return "granted";
       try {
         const perm = await Notification.requestPermission();
         return perm;
@@ -2185,13 +2721,14 @@ localStorage.removeItem("lp");
     canNotify() {
       return (
         state.notificationsEnabled &&
-        typeof Notification !== 'undefined' &&
-        Notification.permission === 'granted'
+        typeof Notification !== "undefined" &&
+        Notification.permission === "granted"
       );
     },
-    notify(title, body, tag = 'wplace-charges', force = false) {
+    notify(title, body, tag = "wplace-charges", force = false) {
       if (!this.canNotify()) return false;
-      if (!force && state.notifyOnlyWhenUnfocused && document.hasFocus()) return false;
+      if (!force && state.notifyOnlyWhenUnfocused && document.hasFocus())
+        return false;
       try {
         new Notification(title, {
           body,
@@ -2204,29 +2741,36 @@ localStorage.removeItem("lp");
         return true;
       } catch {
         // Graceful fallback
-        Utils.showAlert(body, 'info');
+        Utils.showAlert(body, "info");
         return false;
       }
     },
     resetEdgeTracking() {
-      state._lastChargesBelow = state.displayCharges < state.cooldownChargeThreshold;
+      state._lastChargesBelow =
+        state.displayCharges < state.cooldownChargeThreshold;
       state._lastChargesNotifyAt = 0;
     },
     maybeNotifyChargesReached(force = false) {
       if (!state.notificationsEnabled || !state.notifyOnChargesReached) return;
       const reached = state.displayCharges >= state.cooldownChargeThreshold;
       const now = Date.now();
-      const repeatMs = Math.max(1, Number(state.notificationIntervalMinutes || 5)) * 60_000;
+      const repeatMs =
+        Math.max(1, Number(state.notificationIntervalMinutes || 5)) * 60_000;
       if (reached) {
         const shouldEdge = state._lastChargesBelow || force;
-        const shouldRepeat = now - (state._lastChargesNotifyAt || 0) >= repeatMs;
+        const shouldRepeat =
+          now - (state._lastChargesNotifyAt || 0) >= repeatMs;
         if (shouldEdge || shouldRepeat) {
-          const msg = Utils.t('chargesReadyMessage', {
+          const msg = Utils.t("chargesReadyMessage", {
             current: state.displayCharges,
             max: state.maxCharges,
             threshold: state.cooldownChargeThreshold,
           });
-          this.notify(Utils.t('chargesReadyNotification'), msg, 'wplace-notify-charges');
+          this.notify(
+            Utils.t("chargesReadyNotification"),
+            msg,
+            "wplace-notify-charges"
+          );
           state._lastChargesNotifyAt = now;
         }
         state._lastChargesBelow = false;
@@ -2258,7 +2802,8 @@ localStorage.removeItem("lp");
     },
     syncFromState() {
       this.resetEdgeTracking();
-      if (state.notificationsEnabled && state.notifyOnChargesReached) this.startPolling();
+      if (state.notificationsEnabled && state.notifyOnChargesReached)
+        this.startPolling();
       else this.stopPolling();
     },
   };
@@ -2267,37 +2812,41 @@ localStorage.removeItem("lp");
   const colorCache = new Map();
 
   // UI UPDATE FUNCTIONS (declared early to avoid reference errors)
-  let updateUI = () => { };
-  let updateStats = async () => { };
-  let updateDataButtons = () => { };
+  let updateUI = () => {};
+  let updateStats = async () => {};
+  let updateDataButtons = () => {};
 
   function updateActiveColorPalette() {
     state.activeColorPalette = [];
-    const activeSwatches = document.querySelectorAll('.wplace-color-swatch.active');
+    const activeSwatches = document.querySelectorAll(
+      ".wplace-color-swatch.active"
+    );
     if (activeSwatches) {
       activeSwatches.forEach((swatch) => {
-        const rgbStr = swatch.getAttribute('data-rgb');
+        const rgbStr = swatch.getAttribute("data-rgb");
         if (rgbStr) {
-          const rgb = rgbStr.split(',').map(Number);
+          const rgb = rgbStr.split(",").map(Number);
           state.activeColorPalette.push(rgb);
         }
       });
     }
-    if (document.querySelector('.resize-container')?.style.display === 'block') {
+    if (
+      document.querySelector(".resize-container")?.style.display === "block"
+    ) {
       _updateResizePreview();
     }
   }
 
   function toggleAllColors(select, showingUnavailable = false) {
-    const swatches = document.querySelectorAll('.wplace-color-swatch');
+    const swatches = document.querySelectorAll(".wplace-color-swatch");
     if (swatches) {
       swatches.forEach((swatch) => {
         // Only toggle colors that are available or if we're showing unavailable colors
-        const isUnavailable = swatch.classList.contains('unavailable');
+        const isUnavailable = swatch.classList.contains("unavailable");
         if (!isUnavailable || showingUnavailable) {
           // Don't try to select unavailable colors
           if (!isUnavailable) {
-            swatch.classList.toggle('active', select);
+            swatch.classList.toggle("active", select);
           }
         }
       });
@@ -2306,12 +2855,12 @@ localStorage.removeItem("lp");
   }
 
   function unselectAllPaidColors() {
-    const swatches = document.querySelectorAll('.wplace-color-swatch');
+    const swatches = document.querySelectorAll(".wplace-color-swatch");
     if (swatches) {
       swatches.forEach((swatch) => {
-        const colorId = parseInt(swatch.getAttribute('data-color-id'), 10);
+        const colorId = parseInt(swatch.getAttribute("data-color-id"), 10);
         if (!isNaN(colorId) && colorId >= 32) {
-          swatch.classList.toggle('active', false);
+          swatch.classList.toggle("active", false);
         }
       });
     }
@@ -2319,8 +2868,8 @@ localStorage.removeItem("lp");
   }
 
   function initializeColorPalette(container) {
-    const colorsContainer = container.querySelector('#colors-container');
-    const showAllToggle = container.querySelector('#showAllColorsToggle');
+    const colorsContainer = container.querySelector("#colors-container");
+    const showAllToggle = container.querySelector("#showAllColorsToggle");
     if (!colorsContainer) return;
 
     // Use already captured colors from state (captured during upload)
@@ -2328,18 +2877,20 @@ localStorage.removeItem("lp");
     if (!state.availableColors || state.availableColors.length === 0) {
       // If no colors have been captured yet, show message
       colorsContainer.innerHTML = `<div class="wplace-colors-placeholder">${Utils.t(
-        'uploadImageFirst'
+        "uploadImageFirst"
       )}</div>`;
       return;
     }
 
     function populateColors(showUnavailable = false) {
-      colorsContainer.innerHTML = '';
+      colorsContainer.innerHTML = "";
       let availableCount = 0;
       let totalCount = 0;
 
       // Convert COLOR_MAP to array and filter out transparent
-      const allColors = Object.values(CONFIG.COLOR_MAP).filter((color) => color.rgb !== null);
+      const allColors = Object.values(CONFIG.COLOR_MAP).filter(
+        (color) => color.rgb !== null
+      );
 
       allColors.forEach((colorData) => {
         const { id, name, rgb } = colorData;
@@ -2358,40 +2909,40 @@ localStorage.removeItem("lp");
 
         if (isAvailable) availableCount++;
 
-        const colorItem = Utils.createElement('div', {
-          className: 'wplace-color-item',
+        const colorItem = Utils.createElement("div", {
+          className: "wplace-color-item",
         });
-        const swatch = Utils.createElement('button', {
-          className: `wplace-color-swatch ${!isAvailable ? 'unavailable' : ''}`,
-          title: `${name} (ID: ${id})${!isAvailable ? ' (Unavailable)' : ''}`,
-          'data-rgb': rgbKey,
-          'data-color-id': id,
+        const swatch = Utils.createElement("button", {
+          className: `wplace-color-swatch ${!isAvailable ? "unavailable" : ""}`,
+          title: `${name} (ID: ${id})${!isAvailable ? " (Unavailable)" : ""}`,
+          "data-rgb": rgbKey,
+          "data-color-id": id,
         });
         swatch.style.backgroundColor = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
 
         // Make unavailable colors visually distinct
         if (!isAvailable) {
-          swatch.style.opacity = '0.4';
-          swatch.style.filter = 'grayscale(50%)';
+          swatch.style.opacity = "0.4";
+          swatch.style.filter = "grayscale(50%)";
           swatch.disabled = true;
         } else {
           // Select available colors by default
-          swatch.classList.add('active');
+          swatch.classList.add("active");
         }
 
         const nameLabel = Utils.createElement(
-          'span',
+          "span",
           {
-            className: 'wplace-color-item-name',
-            style: !isAvailable ? 'color: #888; font-style: italic;' : '',
+            className: "wplace-color-item-name",
+            style: !isAvailable ? "color: #888; font-style: italic;" : "",
           },
-          name + (!isAvailable ? ' (N/A)' : '')
+          name + (!isAvailable ? " (N/A)" : "")
         );
 
         // Only add click listener for available colors
         if (isAvailable) {
-          swatch.addEventListener('click', () => {
-            swatch.classList.toggle('active');
+          swatch.addEventListener("click", () => {
+            swatch.classList.toggle("active");
             updateActiveColorPalette();
           });
         }
@@ -2409,30 +2960,36 @@ localStorage.removeItem("lp");
 
     // Add toggle functionality
     if (showAllToggle) {
-      showAllToggle.addEventListener('change', (e) => {
+      showAllToggle.addEventListener("change", (e) => {
         populateColors(e.target.checked);
       });
     }
 
     container
-      .querySelector('#selectAllBtn')
-      ?.addEventListener('click', () => toggleAllColors(true, showAllToggle?.checked));
+      .querySelector("#selectAllBtn")
+      ?.addEventListener("click", () =>
+        toggleAllColors(true, showAllToggle?.checked)
+      );
     container
-      .querySelector('#unselectAllBtn')
-      ?.addEventListener('click', () => toggleAllColors(false, showAllToggle?.checked));
+      .querySelector("#unselectAllBtn")
+      ?.addEventListener("click", () =>
+        toggleAllColors(false, showAllToggle?.checked)
+      );
     container
-      .querySelector('#unselectPaidBtn')
-      ?.addEventListener('click', () => unselectAllPaidColors());
+      .querySelector("#unselectPaidBtn")
+      ?.addEventListener("click", () => unselectAllPaidColors());
   }
 
   async function handleCaptcha(allowGeneration = true) {
     const startTime = performance.now();
 
     // Check user's token source preference
-    if (state.tokenSource === 'manual') {
-      console.log('🎯 Manual token source selected - using pixel placement automation');
+    if (state.tokenSource === "manual") {
+      console.log(
+        "🎯 Manual token source selected - using pixel placement automation"
+      );
       if (!allowGeneration) {
-        console.log('❌ Token generation disabled during processing');
+        console.log("❌ Token generation disabled during processing");
         return null;
       }
       return await tokenManager.handleCaptchaFallback();
@@ -2441,17 +2998,18 @@ localStorage.removeItem("lp");
     // Generator mode (pure) or Hybrid mode - try generator first
     try {
       // Use optimized token generation with automatic sitekey detection
-      const { sitekey, token: preGeneratedToken } = await Utils.obtainSitekeyAndToken();
+      const { sitekey, token: preGeneratedToken } =
+        await Utils.obtainSitekeyAndToken();
 
       if (!sitekey) {
-        throw new Error('No valid sitekey found');
+        throw new Error("No valid sitekey found");
       }
 
-      console.log('🔑 Generating Turnstile token for sitekey:', sitekey);
+      console.log("🔑 Generating Turnstile token for sitekey:", sitekey);
       console.log(
-        '🧭 UA:',
-        navigator.userAgent.substring(0, 50) + '...',
-        'Platform:',
+        "🧭 UA:",
+        navigator.userAgent.substring(0, 50) + "...",
+        "Platform:",
         navigator.platform
       );
 
@@ -2465,45 +3023,54 @@ localStorage.removeItem("lp");
       // ✅ Reuse pre-generated token if available and valid
       if (
         preGeneratedToken &&
-        typeof preGeneratedToken === 'string' &&
+        typeof preGeneratedToken === "string" &&
         preGeneratedToken.length > 20
       ) {
-        console.log('♻️ Reusing pre-generated token from sitekey detection phase');
+        console.log(
+          "♻️ Reusing pre-generated token from sitekey detection phase"
+        );
         token = preGeneratedToken;
       }
       // ✅ Or use globally cached token if still valid
       else if (isTokenValid()) {
-        console.log('♻️ Using existing cached token (from previous operation)');
+        console.log("♻️ Using existing cached token (from previous operation)");
         token = getTurnstileToken();
       }
       // ✅ Otherwise generate a new one (only if allowed)
       else {
         if (!allowGeneration) {
-          console.log('❌ Token expired/missing but generation disabled during processing');
+          console.log(
+            "❌ Token expired/missing but generation disabled during processing"
+          );
           return null;
         }
-        console.log('🔐 No valid pre-generated or cached token, creating new one...');
-        token = await Utils.executeTurnstile(sitekey, 'paint');
+        console.log(
+          "🔐 No valid pre-generated or cached token, creating new one..."
+        );
+        token = await Utils.executeTurnstile(sitekey, "paint");
         if (token) {
           setTurnstileToken(token);
         }
       }
 
       console.log(
-        `🔍 Token received - Type: ${typeof token}, Value: ${token
-          ? typeof token === 'string'
-            ? token.length > 50
-              ? token.substring(0, 50) + '...'
-              : token
-            : JSON.stringify(token)
-          : 'null/undefined'
+        `🔍 Token received - Type: ${typeof token}, Value: ${
+          token
+            ? typeof token === "string"
+              ? token.length > 50
+                ? token.substring(0, 50) + "..."
+                : token
+              : JSON.stringify(token)
+            : "null/undefined"
         }, Length: ${token?.length || 0}`
       );
 
       // ✅ Final validation
-      if (typeof token === 'string' && token.length > 20) {
+      if (typeof token === "string" && token.length > 20) {
         const duration = Math.round(performance.now() - startTime);
-        console.log(`✅ Turnstile token generated successfully in ${duration}ms`);
+        console.log(
+          `✅ Turnstile token generated successfully in ${duration}ms`
+        );
         return token;
       } else {
         throw new Error(
@@ -2514,12 +3081,15 @@ localStorage.removeItem("lp");
       }
     } catch (error) {
       const duration = Math.round(performance.now() - startTime);
-      console.error(`❌ Turnstile token generation failed after ${duration}ms:`, error);
+      console.error(
+        `❌ Turnstile token generation failed after ${duration}ms:`,
+        error
+      );
 
       // Fallback to manual pixel placement for hybrid mode
-      if (state.tokenSource === 'hybrid') {
+      if (state.tokenSource === "hybrid") {
         console.log(
-          '🔄 Hybrid mode: Generator failed, automatically switching to manual pixel placement...'
+          "🔄 Hybrid mode: Generator failed, automatically switching to manual pixel placement..."
         );
         const fbToken = await tokenManager.handleCaptchaFallback();
         return fbToken;
@@ -2533,11 +3103,15 @@ localStorage.removeItem("lp");
   async function createUI() {
     await detectLanguage();
 
-    const existingContainer = document.getElementById('wplace-image-bot-container');
-    const existingStats = document.getElementById('wplace-stats-container');
-    const existingSettings = document.getElementById('wplace-settings-container');
-    const existingResizeContainer = document.querySelector('.resize-container');
-    const existingResizeOverlay = document.querySelector('.resize-overlay');
+    const existingContainer = document.getElementById(
+      "wplace-image-bot-container"
+    );
+    const existingStats = document.getElementById("wplace-stats-container");
+    const existingSettings = document.getElementById(
+      "wplace-settings-container"
+    );
+    const existingResizeContainer = document.querySelector(".resize-container");
+    const existingResizeOverlay = document.querySelector(".resize-overlay");
 
     if (existingContainer) existingContainer.remove();
     if (existingStats) existingStats.remove();
@@ -2553,14 +3127,14 @@ localStorage.removeItem("lp");
 
     function appendLinkOnce(href, attributes = {}) {
       // Check if a link with the same href already exists in the document head
-      const exists = Array.from(document.head.querySelectorAll('link')).some(
+      const exists = Array.from(document.head.querySelectorAll("link")).some(
         (link) => link.href === href
       );
       if (exists) return;
 
       // Create a new link element
-      const link = document.createElement('link');
-      link.rel = 'stylesheet';
+      const link = document.createElement("link");
+      link.rel = "stylesheet";
       link.href = href;
 
       // Add any additional attributes (e.g., data-* attributes)
@@ -2572,121 +3146,183 @@ localStorage.removeItem("lp");
       document.head.appendChild(link);
     }
 
-    appendLinkOnce('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css');
+    appendLinkOnce(
+      "https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    );
 
-    if (theme.fontFamily.includes('Press Start 2P')) {
-      appendLinkOnce('https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap');
+    if (theme.fontFamily.includes("Press Start 2P")) {
+      appendLinkOnce(
+        "https://fonts.googleapis.com/css2?family=Press+Start+2P&display=swap"
+      );
     }
 
     // Load auto-image-styles.css - prioritize extension local resources
-    console.group('%c🎨 Loading Auto-Image Styles', 'color: #8b5cf6; font-weight: bold;');
+    console.group(
+      "%c🎨 Loading Auto-Image Styles",
+      "color: #8b5cf6; font-weight: bold;"
+    );
 
     let stylesLoaded = false;
 
     // First try: Check if extension has loaded local CSS resources
-    if (window.AUTOBOT_THEMES && window.AUTOBOT_THEMES['auto-image-styles.css']) {
-      console.log('%c🔍 Found auto-image-styles.css in extension local resources!', 'color: #10b981; font-weight: bold;');
+    if (
+      window.AUTOBOT_THEMES &&
+      window.AUTOBOT_THEMES["auto-image-styles.css"]
+    ) {
+      console.log(
+        "%c🔍 Found auto-image-styles.css in extension local resources!",
+        "color: #10b981; font-weight: bold;"
+      );
 
       // Check if it's already injected by the extension
-      const existingStyle = document.getElementById('autobot-auto-image-styles');
+      const existingStyle = document.getElementById(
+        "autobot-auto-image-styles"
+      );
       if (existingStyle) {
-        console.log('%c✅ Styles already injected by extension - using local version', 'color: #10b981; font-weight: bold;');
-        console.log('  📍 Source: Extension local file (already in DOM)');
-        console.log('  🆔 Element ID: autobot-auto-image-styles');
+        console.log(
+          "%c✅ Styles already injected by extension - using local version",
+          "color: #10b981; font-weight: bold;"
+        );
+        console.log("  📍 Source: Extension local file (already in DOM)");
+        console.log("  🆔 Element ID: autobot-auto-image-styles");
         stylesLoaded = true;
       } else {
         // Inject it ourselves
-        const styleElement = document.createElement('style');
-        styleElement.id = 'autobot-auto-image-styles-script';
-        styleElement.setAttribute('data-wplace-theme', 'true');
-        styleElement.textContent = window.AUTOBOT_THEMES['auto-image-styles.css'];
+        const styleElement = document.createElement("style");
+        styleElement.id = "autobot-auto-image-styles-script";
+        styleElement.setAttribute("data-wplace-theme", "true");
+        styleElement.textContent =
+          window.AUTOBOT_THEMES["auto-image-styles.css"];
         document.head.appendChild(styleElement);
 
-        console.log('%c✅ Injected auto-image-styles.css from extension local resources', 'color: #10b981; font-weight: bold;');
-        console.log('  📍 Source: Extension local file');
-        console.log('  📏 Size: ' + window.AUTOBOT_THEMES['auto-image-styles.css'].length + ' characters');
-        console.log('  🆔 Element ID: autobot-auto-image-styles-script');
+        console.log(
+          "%c✅ Injected auto-image-styles.css from extension local resources",
+          "color: #10b981; font-weight: bold;"
+        );
+        console.log("  📍 Source: Extension local file");
+        console.log(
+          "  📏 Size: " +
+            window.AUTOBOT_THEMES["auto-image-styles.css"].length +
+            " characters"
+        );
+        console.log("  🆔 Element ID: autobot-auto-image-styles-script");
         stylesLoaded = true;
       }
     } else {
-      console.log('%c📝 auto-image-styles.css not found in extension resources', 'color: #f59e0b;');
-      console.log('  🔍 window.AUTOBOT_THEMES:', typeof window.AUTOBOT_THEMES);
+      console.log(
+        "%c📝 auto-image-styles.css not found in extension resources",
+        "color: #f59e0b;"
+      );
+      console.log("  🔍 window.AUTOBOT_THEMES:", typeof window.AUTOBOT_THEMES);
       if (window.AUTOBOT_THEMES) {
-        console.log('  📋 Available themes:', Object.keys(window.AUTOBOT_THEMES));
+        console.log(
+          "  📋 Available themes:",
+          Object.keys(window.AUTOBOT_THEMES)
+        );
       }
     }
 
     // Fallback: Load from CDN if local resources not available
     if (!stylesLoaded) {
-      console.log('%c🌐 Falling back to CDN loading...', 'color: #8b5cf6;');
+      console.log("%c🌐 Falling back to CDN loading...", "color: #8b5cf6;");
       appendLinkOnce(
-        'https://wplace-autobot.github.io/WPlace-AutoBOT/main/auto-image-styles.css',
-        { 'data-wplace-theme': 'true' }
+        "https://wplace-autobot.github.io/WPlace-AutoBOT/main/auto-image-styles.css",
+        { "data-wplace-theme": "true" }
       );
-      console.log('%c📚 Loaded auto-image-styles.css from CDN (fallback)', 'color: #f59e0b; font-weight: bold;');
-      console.log('  📍 Source: CDN (wplace-autobot.github.io)');
-      console.log('  🌐 URL: https://wplace-autobot.github.io/WPlace-AutoBOT/main/auto-image-styles.css');
-      console.log('  ⚠️ Performance: Network request required');
+      console.log(
+        "%c📚 Loaded auto-image-styles.css from CDN (fallback)",
+        "color: #f59e0b; font-weight: bold;"
+      );
+      console.log("  📍 Source: CDN (wplace-autobot.github.io)");
+      console.log(
+        "  🌐 URL: https://wplace-autobot.github.io/WPlace-AutoBOT/main/auto-image-styles.css"
+      );
+      console.log("  ⚠️ Performance: Network request required");
     }
 
     console.groupEnd();
 
     // Ensure default theme is loaded from extension resources
-    if (window.applyTheme && typeof window.applyTheme === 'function') {
-      console.group('%c🎨 Loading Default Theme from Extension', 'color: #8b5cf6; font-weight: bold;');
+    if (window.applyTheme && typeof window.applyTheme === "function") {
+      console.group(
+        "%c🎨 Loading Default Theme from Extension",
+        "color: #8b5cf6; font-weight: bold;"
+      );
 
       // Determine the current theme file name
-      let defaultTheme = 'classic'; // fallback
-      if (CONFIG.currentTheme === 'Neon Retro') {
-        defaultTheme = 'neon';
-      } else if (CONFIG.currentTheme === 'Neon Retro Cyan') {
-        defaultTheme = 'neon-cyan';
-      } else if (CONFIG.currentTheme === 'Neon Retro Light') {
-        defaultTheme = 'neon-light';
-      } else if (CONFIG.currentTheme === 'Classic Light') {
-        defaultTheme = 'classic-light';
-      } else if (CONFIG.currentTheme === 'Acrylic') {
-        defaultTheme = 'acrylic';
+      let defaultTheme = "classic"; // fallback
+      if (CONFIG.currentTheme === "Neon Retro") {
+        defaultTheme = "neon";
+      } else if (CONFIG.currentTheme === "Neon Retro Cyan") {
+        defaultTheme = "neon-cyan";
+      } else if (CONFIG.currentTheme === "Neon Retro Light") {
+        defaultTheme = "neon-light";
+      } else if (CONFIG.currentTheme === "Classic Light") {
+        defaultTheme = "classic-light";
+      } else if (CONFIG.currentTheme === "Acrylic") {
+        defaultTheme = "acrylic";
       }
 
-      console.log(`%c🎯 Loading theme: ${defaultTheme} (${CONFIG.currentTheme})`, 'color: #8b5cf6;');
+      console.log(
+        `%c🎯 Loading theme: ${defaultTheme} (${CONFIG.currentTheme})`,
+        "color: #8b5cf6;"
+      );
       const success = window.applyTheme(defaultTheme);
 
       if (success) {
-        console.log(`%c✅ Default theme loaded from extension local resources`, 'color: #10b981; font-weight: bold;');
-        console.log(`  📍 Source: Extension local file (themes/${defaultTheme}.css)`);
+        console.log(
+          `%c✅ Default theme loaded from extension local resources`,
+          "color: #10b981; font-weight: bold;"
+        );
+        console.log(
+          `  📍 Source: Extension local file (themes/${defaultTheme}.css)`
+        );
         console.log(`  🚀 Performance: Instant load (no CDN request)`);
         console.log(`  🎨 Theme: ${CONFIG.currentTheme}`);
       } else {
-        console.warn(`%c⚠️ Failed to load theme ${defaultTheme} from extension`, 'color: #f59e0b;');
+        console.warn(
+          `%c⚠️ Failed to load theme ${defaultTheme} from extension`,
+          "color: #f59e0b;"
+        );
         console.log(`  📝 Note: Theme CSS classes will still work`);
       }
 
       console.groupEnd();
     } else {
-      console.warn(`%c⚠️ Extension applyTheme() function not available`, 'color: #f59e0b; font-weight: bold;');
+      console.warn(
+        `%c⚠️ Extension applyTheme() function not available`,
+        "color: #f59e0b; font-weight: bold;"
+      );
       console.log(`  📝 Themes will be limited to CSS classes only`);
     }
 
-    const container = document.createElement('div');
-    container.id = 'wplace-image-bot-container';
+    const container = document.createElement("div");
+    container.id = "wplace-image-bot-container";
     container.innerHTML = `
       <div class="wplace-header">
         <div class="wplace-header-title">
           <i class="fas fa-image"></i>
-          <span>${Utils.t('title')}</span>
+          <span>${Utils.t("title")}</span>
         </div>
         <div class="wplace-header-controls">
-          <button id="settingsBtn" class="wplace-header-btn" title="${Utils.t('settings')}">
+          <button id="settingsBtn" class="wplace-header-btn" title="${Utils.t(
+            "settings"
+          )}">
             <i class="fas fa-cog"></i>
           </button>
-          <button id="statsBtn" class="wplace-header-btn" title="${Utils.t('showStats')}">
+          <button id="statsBtn" class="wplace-header-btn" title="${Utils.t(
+            "showStats"
+          )}">
             <i class="fas fa-chart-bar"></i>
           </button>
-          <button id="compactBtn" class="wplace-header-btn" title="${Utils.t('compactMode')}">
+          <button id="compactBtn" class="wplace-header-btn" title="${Utils.t(
+            "compactMode"
+          )}">
             <i class="fas fa-compress"></i>
           </button>
-          <button id="minimizeBtn" class="wplace-header-btn" title="${Utils.t('minimize')}">
+          <button id="minimizeBtn" class="wplace-header-btn" title="${Utils.t(
+            "minimize"
+          )}">
             <i class="fas fa-minus"></i>
           </button>
         </div>
@@ -2695,7 +3331,7 @@ localStorage.removeItem("lp");
         <!-- Status Section - Always visible -->
         <div class="wplace-status-section">
           <div id="statusText" class="wplace-status status-default">
-            ${Utils.t('initMessage')}
+            ${Utils.t("initMessage")}
           </div>
           <div class="wplace-progress">
             <div id="progressBar" class="wplace-progress-bar" style="width: 0%"></div>
@@ -2708,10 +3344,10 @@ localStorage.removeItem("lp");
           <div class="wplace-controls">
             <div class="wplace-row">
               <button id="uploadBtn" class="wplace-btn wplace-btn-upload" disabled title="${Utils.t(
-      'waitingSetupComplete'
-    )}">
+                "waitingSetupComplete"
+              )}">
                 <i class="fas fa-upload"></i>
-                <span>${Utils.t('uploadImage')}</span>
+                <span>${Utils.t("uploadImage")}</span>
               </button>
               <button id="loadExtractedBtn" class="wplace-btn wplace-btn-secondary" disabled title="Load artwork extracted from Art-Extractor">
                 <i class="fas fa-file-import"></i>
@@ -2721,7 +3357,7 @@ localStorage.removeItem("lp");
             <div class="wplace-row">
               <button id="resizeBtn" class="wplace-btn wplace-btn-primary" disabled>
                 <i class="fas fa-expand"></i>
-                <span>${Utils.t('resizeImage')}</span>
+                <span>${Utils.t("resizeImage")}</span>
               </button>
               <button id="moveArtworkBtn" class="wplace-btn wplace-btn-primary" disabled>
                 <i class="fas fa-arrows-alt"></i>
@@ -2731,7 +3367,7 @@ localStorage.removeItem("lp");
             <div class="wplace-row single">
               <button id="selectPosBtn" class="wplace-btn wplace-btn-select" disabled>
                 <i class="fas fa-crosshairs"></i>
-                <span>${Utils.t('selectPosition')}</span>
+                <span>${Utils.t("selectPosition")}</span>
               </button>
             </div>
           </div>
@@ -2744,17 +3380,17 @@ localStorage.removeItem("lp");
             <div class="wplace-row">
               <button id="startBtn" class="wplace-btn wplace-btn-start" disabled>
                 <i class="fas fa-play"></i>
-                <span>${Utils.t('startPainting')}</span>
+                <span>${Utils.t("startPainting")}</span>
               </button>
               <button id="stopBtn" class="wplace-btn wplace-btn-stop" disabled>
                 <i class="fas fa-stop"></i>
-                <span>${Utils.t('stopPainting')}</span>
+                <span>${Utils.t("stopPainting")}</span>
               </button>
             </div>
       <div class="wplace-row" style="display: flex; gap: 8px; align-items: center;">
         <button id="toggleOverlayBtn" class="wplace-btn wplace-btn-overlay" disabled style="flex: 1;">
           <i class="fas fa-eye"></i>
-          <span>${Utils.t('toggleOverlay')}</span>
+          <span>${Utils.t("toggleOverlay")}</span>
         </button>
         <label class="wplace-mode-toggle">
           <input type="checkbox" id="paintingModeToggle" aria-label="Toggle painting mode">
@@ -2769,18 +3405,26 @@ localStorage.removeItem("lp");
 
         <!-- Cooldown Section -->
         <div class="wplace-section">
-            <div class="wplace-section-title">⏱️ ${Utils.t('cooldownSettings')}</div>
+            <div class="wplace-section-title">⏱️ ${Utils.t(
+              "cooldownSettings"
+            )}</div>
             <div class="wplace-cooldown-control">
-                <label id="cooldownLabel">${Utils.t('waitCharges')}:</label>
+                <label id="cooldownLabel">${Utils.t("waitCharges")}:</label>
                 <div class="wplace-dual-control-compact">
                     <div class="wplace-slider-container-compact">
-                        <input type="range" id="cooldownSlider" class="wplace-overlay-opacity-slider" min="1" max="1" value="${state.cooldownChargeThreshold}">
+                        <input type="range" id="cooldownSlider" class="wplace-overlay-opacity-slider" min="1" max="1" value="${
+                          state.cooldownChargeThreshold
+                        }">
                     </div>
                     <div class="wplace-input-group-compact">
                         <button id="cooldownDecrease" class="wplace-input-btn-compact" type="button">-</button>
-                        <input type="number" id="cooldownInput" class="wplace-number-input-compact" min="1" max="999" value="${state.cooldownChargeThreshold}">
+                        <input type="number" id="cooldownInput" class="wplace-number-input-compact" min="1" max="999" value="${
+                          state.cooldownChargeThreshold
+                        }">
                         <button id="cooldownIncrease" class="wplace-input-btn-compact" type="button">+</button>
-                        <span id="cooldownValue" class="wplace-input-label-compact">${Utils.t('charges')}</span>
+                        <span id="cooldownValue" class="wplace-input-label-compact">${Utils.t(
+                          "charges"
+                        )}</span>
                         <button id="skipCooldownBtn" class="wplace-btn wplace-btn-warning" style="margin-left: 8px; font-size: 11px; padding: 4px 8px;" disabled title="Skip current cooldown (only available during cooldown)">
                             <i class="fas fa-fast-forward"></i> Skip
                         </button>
@@ -2796,25 +3440,25 @@ localStorage.removeItem("lp");
             <div class="wplace-row">
               <button id="saveBtn" class="wplace-btn wplace-btn-primary" disabled>
                 <i class="fas fa-save"></i>
-                <span>${Utils.t('saveData')}</span>
+                <span>${Utils.t("saveData")}</span>
               </button>
               <button id="loadBtn" class="wplace-btn wplace-btn-primary" disabled title="${Utils.t(
-      'waitingTokenGenerator'
-    )}">
+                "waitingTokenGenerator"
+              )}">
                 <i class="fas fa-folder-open"></i>
-                <span>${Utils.t('loadData')}</span>
+                <span>${Utils.t("loadData")}</span>
               </button>
             </div>
             <div class="wplace-row">
               <button id="saveToFileBtn" class="wplace-btn wplace-btn-file" disabled>
                 <i class="fas fa-download"></i>
-                <span>${Utils.t('saveToFile')}</span>
+                <span>${Utils.t("saveToFile")}</span>
               </button>
               <button id="loadFromFileBtn" class="wplace-btn wplace-btn-file" disabled title="${Utils.t(
-      'waitingTokenGenerator'
-    )}">
+                "waitingTokenGenerator"
+              )}">
                 <i class="fas fa-upload"></i>
-                <span>${Utils.t('loadFromFile')}</span>
+                <span>${Utils.t("loadFromFile")}</span>
               </button>
             </div>
           </div>
@@ -2822,20 +3466,24 @@ localStorage.removeItem("lp");
       </div>
     `;
 
-    const statsContainer = document.createElement('div');
-    statsContainer.id = 'wplace-stats-container';
-    statsContainer.style.display = 'none';
+    const statsContainer = document.createElement("div");
+    statsContainer.id = "wplace-stats-container";
+    statsContainer.style.display = "none";
     statsContainer.innerHTML = `
     <div class="wplace-header">
       <div class="wplace-header-title">
         <i class="fas fa-chart-bar"></i>
-        <span>${Utils.t('paintingStats')}</span>
+        <span>${Utils.t("paintingStats")}</span>
       </div>
       <div class="wplace-header-controls">
-        <button id="refreshChargesBtn" class="wplace-header-btn" title="${Utils.t('refreshCharges')}">
+        <button id="refreshChargesBtn" class="wplace-header-btn" title="${Utils.t(
+          "refreshCharges"
+        )}">
           <i class="fas fa-sync"></i>
         </button>
-        <button id="closeStatsBtn" class="wplace-header-btn" title="${Utils.t('closeStats')}">
+        <button id="closeStatsBtn" class="wplace-header-btn" title="${Utils.t(
+          "closeStats"
+        )}">
           <i class="fas fa-times"></i>
         </button>
       </div>
@@ -2844,7 +3492,9 @@ localStorage.removeItem("lp");
       <div class="wplace-stats">
         <div id="statsArea">
           <div class="wplace-stat-item">
-            <div class="wplace-stat-label"><i class="fas fa-info-circle"></i> ${Utils.t('initMessage')}</div>
+            <div class="wplace-stat-label"><i class="fas fa-info-circle"></i> ${Utils.t(
+              "initMessage"
+            )}</div>
           </div>
         </div>
       </div>
@@ -2904,11 +3554,10 @@ localStorage.removeItem("lp");
           btn.classList.add("active");
 
           CONFIG.autoBuy = btn.dataset.mode;
-          if (CONFIG.autoBuy === 'none') {
+          if (CONFIG.autoBuy === "none") {
             console.log("AutoBuy disabled");
             CONFIG.autoBuyToggle = false;
-          }
-          else {
+          } else {
             CONFIG.autoBuyToggle = true;
             console.log("AutoBuy enabled");
           }
@@ -2921,34 +3570,41 @@ localStorage.removeItem("lp");
 
     // Modern Settings Container with Theme Support
     // Use the theme variable already declared at the top of createUI function
-    const settingsContainer = document.createElement('div');
-    settingsContainer.id = 'wplace-settings-container';
+    const settingsContainer = document.createElement("div");
+    settingsContainer.id = "wplace-settings-container";
 
     // Apply theme-based styling
     const themeBackground = theme.primary
-      ? `linear-gradient(135deg, ${theme.primary} 0%, ${theme.secondary || theme.primary} 100%)`
+      ? `linear-gradient(135deg, ${theme.primary} 0%, ${
+          theme.secondary || theme.primary
+        } 100%)`
       : `linear-gradient(135deg, #667eea 0%, #764ba2 100%)`;
 
-    settingsContainer.className = 'wplace-settings-container-base';
+    settingsContainer.className = "wplace-settings-container-base";
     // Apply theme-specific background
     settingsContainer.style.background = themeBackground;
     settingsContainer.style.cssText += `
       min-width: 420px;
       max-width: 480px;
       z-index: 99999;
-      color: ${theme.text || 'white'};
-      font-family: ${theme.fontFamily || "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"};
-      box-shadow: ${theme.boxShadow || '0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1)'
+      color: ${theme.text || "white"};
+      font-family: ${
+        theme.fontFamily || "'Segoe UI', Tahoma, Geneva, Verdana, sans-serif"
       };
-      backdrop-filter: ${theme.backdropFilter || 'blur(10px)'};
+      box-shadow: ${
+        theme.boxShadow ||
+        "0 20px 40px rgba(0,0,0,0.3), 0 0 0 1px rgba(255,255,255,0.1)"
+      };
+      backdrop-filter: ${theme.backdropFilter || "blur(10px)"};
       overflow: hidden;
       animation: settings-slide-in 0.4s ease-out;
-      ${theme.animations?.glow
-        ? `
-        box-shadow: ${theme.boxShadow || '0 20px 40px rgba(0,0,0,0.3)'}, 
-                   0 0 30px ${theme.highlight || theme.neon || '#00ffff'};
+      ${
+        theme.animations?.glow
+          ? `
+        box-shadow: ${theme.boxShadow || "0 20px 40px rgba(0,0,0,0.3)"}, 
+                   0 0 30px ${theme.highlight || theme.neon || "#00ffff"};
       `
-        : ''
+          : ""
       }
     `;
 
@@ -2958,7 +3614,7 @@ localStorage.removeItem("lp");
         <div class="wplace-settings-title-wrapper">
           <h3 class="wplace-settings-title">
             <i class="fas fa-cog wplace-settings-icon"></i>
-            ${Utils.t('settings')}
+            ${Utils.t("settings")}
           </h3>
           <button id="closeSettingsBtn" class="wplace-settings-close-btn">✕</button>
         </div>
@@ -2974,12 +3630,15 @@ localStorage.removeItem("lp");
           </label>
           <div class="wplace-settings-section-wrapper">
             <select id="tokenSourceSelect" class="wplace-settings-select">
-              <option value="generator" ${state.tokenSource === 'generator' ? 'selected' : ''
-      } class="wplace-settings-option">🤖 Automatic Token Generator (Recommended)</option>
-              <option value="hybrid" ${state.tokenSource === 'hybrid' ? 'selected' : ''
-      } class="wplace-settings-option">🔄 Generator + Auto Fallback</option>
-              <option value="manual" ${state.tokenSource === 'manual' ? 'selected' : ''
-      } class="wplace-settings-option">🎯 Manual Pixel Placement</option>
+              <option value="generator" ${
+                state.tokenSource === "generator" ? "selected" : ""
+              } class="wplace-settings-option">🤖 Automatic Token Generator (Recommended)</option>
+              <option value="hybrid" ${
+                state.tokenSource === "hybrid" ? "selected" : ""
+              } class="wplace-settings-option">🔄 Generator + Auto Fallback</option>
+              <option value="manual" ${
+                state.tokenSource === "manual" ? "selected" : ""
+              } class="wplace-settings-option">🎯 Manual Pixel Placement</option>
             </select>
             <p class="wplace-settings-description">
               Generator mode creates tokens automatically. Hybrid mode falls back to manual when generator fails. Manual mode only uses pixel placement.
@@ -2991,61 +3650,76 @@ localStorage.removeItem("lp");
         <div class="wplace-settings-section">
           <label class="wplace-settings-section-label">
             <i class="fas fa-robot wplace-icon-robot"></i>
-            ${Utils.t('automation')}
+            ${Utils.t("automation")}
           </label>
           <!-- Token generator is always enabled - settings moved to Token Source above -->
         </div>
 
         <!-- Overlay Settings Section -->
         <div class="wplace-settings-section">
-          <label class="wplace-settings-section-label" style="color: ${theme.text || 'white'};">
-            <i class="fas fa-eye wplace-icon-eye" style="color: ${theme.highlight || '#48dbfb'
-      };"></i>
+          <label class="wplace-settings-section-label" style="color: ${
+            theme.text || "white"
+          };">
+            <i class="fas fa-eye wplace-icon-eye" style="color: ${
+              theme.highlight || "#48dbfb"
+            };"></i>
             Overlay Settings
           </label>
           <div class="wplace-settings-section-wrapper wplace-overlay-wrapper" style="
-            background: ${theme.accent ? `${theme.accent}20` : 'rgba(255,255,255,0.1)'}; 
-            border-radius: ${theme.borderRadius || '12px'}; 
+            background: ${
+              theme.accent ? `${theme.accent}20` : "rgba(255,255,255,0.1)"
+            }; 
+            border-radius: ${theme.borderRadius || "12px"}; 
             padding: 18px; 
-            border: 1px solid ${theme.accent || 'rgba(255,255,255,0.1)'};
-            ${theme.animations?.glow
-        ? `
-              box-shadow: 0 0 15px ${theme.accent || 'rgba(255,255,255,0.1)'}33;
+            border: 1px solid ${theme.accent || "rgba(255,255,255,0.1)"};
+            ${
+              theme.animations?.glow
+                ? `
+              box-shadow: 0 0 15px ${theme.accent || "rgba(255,255,255,0.1)"}33;
             `
-        : ''
-      }
+                : ""
+            }
           ">
               <!-- Opacity Slider -->
               <div class="wplace-overlay-opacity-control">
                 <div class="wplace-overlay-opacity-header">
-                   <span class="wplace-overlay-opacity-label" style="color: ${theme.text || 'white'
-      };">Overlay Opacity</span>
+                   <span class="wplace-overlay-opacity-label" style="color: ${
+                     theme.text || "white"
+                   };">Overlay Opacity</span>
                    <div id="overlayOpacityValue" class="wplace-overlay-opacity-value" style="
-                     background: ${theme.secondary || 'rgba(0,0,0,0.2)'}; 
-                     color: ${theme.text || 'white'};
+                     background: ${theme.secondary || "rgba(0,0,0,0.2)"}; 
+                     color: ${theme.text || "white"};
                      padding: 4px 8px; 
-                     border-radius: ${theme.borderRadius === '0' ? '0' : '6px'}; 
+                     border-radius: ${
+                       theme.borderRadius === "0" ? "0" : "6px"
+                     }; 
                      font-size: 12px;
-                     border: 1px solid ${theme.accent || 'transparent'};
+                     border: 1px solid ${theme.accent || "transparent"};
                    ">${Math.round(state.overlayOpacity * 100)}%</div>
                 </div>
-                <input type="range" id="overlayOpacitySlider" min="0.1" max="1" step="0.05" value="${state.overlayOpacity}" class="wplace-overlay-opacity-slider" style="
-                  background: linear-gradient(to right, ${theme.highlight || '#48dbfb'
-      } 0%, ${theme.purple || theme.neon || '#d3a4ff'} 100%); 
-                  border-radius: ${theme.borderRadius === '0' ? '0' : '4px'}; 
+                <input type="range" id="overlayOpacitySlider" min="0.1" max="1" step="0.05" value="${
+                  state.overlayOpacity
+                }" class="wplace-overlay-opacity-slider" style="
+                  background: linear-gradient(to right, ${
+                    theme.highlight || "#48dbfb"
+                  } 0%, ${theme.purple || theme.neon || "#d3a4ff"} 100%); 
+                  border-radius: ${theme.borderRadius === "0" ? "0" : "4px"}; 
                 ">
               </div>
               <!-- Blue Marble Toggle -->
               <label for="enableBlueMarbleToggle" class="wplace-settings-toggle">
                   <div>
-                      <span class="wplace-settings-toggle-title" style="color: ${theme.text || 'white'
-      };">Blue Marble Effect</span>
-                      <p class="wplace-settings-toggle-description" style="color: ${theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'
-      };">Renders a dithered "shredded" overlay.</p>
+                      <span class="wplace-settings-toggle-title" style="color: ${
+                        theme.text || "white"
+                      };">Blue Marble Effect</span>
+                      <p class="wplace-settings-toggle-description" style="color: ${
+                        theme.text ? `${theme.text}BB` : "rgba(255,255,255,0.7)"
+                      };">Renders a dithered "shredded" overlay.</p>
                   </div>
-                  <input type="checkbox" id="enableBlueMarbleToggle" ${state.blueMarbleEnabled ? 'checked' : ''
-      } class="wplace-settings-checkbox" style="
-                    accent-color: ${theme.highlight || '#48dbfb'};
+                  <input type="checkbox" id="enableBlueMarbleToggle" ${
+                    state.blueMarbleEnabled ? "checked" : ""
+                  } class="wplace-settings-checkbox" style="
+                    accent-color: ${theme.highlight || "#48dbfb"};
                   "/>
               </label>
           </div>
@@ -3055,38 +3729,46 @@ localStorage.removeItem("lp");
         <div class="wplace-settings-section">
           <label class="wplace-settings-section-label">
             <i class="fas fa-paint-brush wplace-icon-paint"></i>
-            ${Utils.t('paintOptions')}
+            ${Utils.t("paintOptions")}
           </label>
           <!-- Pixel Filter Toggles -->
           <div id="pixelFilterControls" class="wplace-settings-section-wrapper wplace-pixel-filter-controls">
             <!-- Paint White Pixels -->
             <label class="wplace-settings-toggle">
               <div>
-                <span class="wplace-settings-toggle-title" style="color: ${theme.text || 'white'};">
-                  ${Utils.t('paintWhitePixels')}
+                <span class="wplace-settings-toggle-title" style="color: ${
+                  theme.text || "white"
+                };">
+                  ${Utils.t("paintWhitePixels")}
                 </span>
-                <p class="wplace-settings-toggle-description" style="color: ${theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'
-      };">
-                  ${Utils.t('paintWhitePixelsDescription')}
+                <p class="wplace-settings-toggle-description" style="color: ${
+                  theme.text ? `${theme.text}BB` : "rgba(255,255,255,0.7)"
+                };">
+                  ${Utils.t("paintWhitePixelsDescription")}
                 </p>
               </div>
-              <input type="checkbox" id="settingsPaintWhiteToggle" ${state.paintWhitePixels ? 'checked' : ''} 
+              <input type="checkbox" id="settingsPaintWhiteToggle" ${
+                state.paintWhitePixels ? "checked" : ""
+              } 
                 class="wplace-settings-checkbox"
-                style="accent-color: ${theme.highlight || '#48dbfb'};"/>
+                style="accent-color: ${theme.highlight || "#48dbfb"};"/>
             </label>
             
             <!-- Paint Transparent toggle removed - use the one in Processing panel instead -->
             
             <label class="wplace-settings-toggle">
               <div>
-                <span class="wplace-settings-toggle-title" style="color: ${theme.text || 'white'
-      };">${Utils.t('paintUnavailablePixels')}</span>
-                <p class="wplace-settings-toggle-description" style="color: ${theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'
-      };">${Utils.t('paintUnavailablePixelsDescription')}</p>
+                <span class="wplace-settings-toggle-title" style="color: ${
+                  theme.text || "white"
+                };">${Utils.t("paintUnavailablePixels")}</span>
+                <p class="wplace-settings-toggle-description" style="color: ${
+                  theme.text ? `${theme.text}BB` : "rgba(255,255,255,0.7)"
+                };">${Utils.t("paintUnavailablePixelsDescription")}</p>
               </div>
-              <input type="checkbox" id="paintUnavailablePixelsToggle" ${state.paintUnavailablePixels ? 'checked' : ''
-      } class="wplace-settings-checkbox" style="
-                    accent-color: ${theme.highlight || '#48dbfb'};
+              <input type="checkbox" id="paintUnavailablePixelsToggle" ${
+                state.paintUnavailablePixels ? "checked" : ""
+              } class="wplace-settings-checkbox" style="
+                    accent-color: ${theme.highlight || "#48dbfb"};
                   "/>
             </label>
           </div>
@@ -3096,7 +3778,7 @@ localStorage.removeItem("lp");
         <div class="wplace-settings-section">
           <label class="wplace-settings-section-label">
             <i class="fas fa-palette wplace-icon-palette"></i>
-            ${Utils.t('paintingOrder')}
+            ${Utils.t("paintingOrder")}
           </label>
           
           <!-- Painting Order Selection -->
@@ -3154,14 +3836,17 @@ localStorage.removeItem("lp");
           <div id="snakeControls" class="wplace-snake-pattern-controls wplace-settings-section-wrapper">
             <label class="wplace-settings-toggle">
               <div>
-                <span class="wplace-settings-toggle-title" style="color: ${theme.text || 'white'
-      };">Snake Pattern</span>
-                <p class="wplace-settings-toggle-description" style="color: ${theme.text ? `${theme.text}BB` : 'rgba(255,255,255,0.7)'
-      };">Alternate direction for each row/column (zigzag pattern)</p>
+                <span class="wplace-settings-toggle-title" style="color: ${
+                  theme.text || "white"
+                };">Snake Pattern</span>
+                <p class="wplace-settings-toggle-description" style="color: ${
+                  theme.text ? `${theme.text}BB` : "rgba(255,255,255,0.7)"
+                };">Alternate direction for each row/column (zigzag pattern)</p>
               </div>
-              <input type="checkbox" id="coordinateSnakeToggle" ${state.coordinateSnake ? 'checked' : ''
-      } class="wplace-settings-checkbox" style="
-                    accent-color: ${theme.highlight || '#48dbfb'};
+              <input type="checkbox" id="coordinateSnakeToggle" ${
+                state.coordinateSnake ? "checked" : ""
+              } class="wplace-settings-checkbox" style="
+                    accent-color: ${theme.highlight || "#48dbfb"};
                   "/>
             </label>
           </div>
@@ -3198,32 +3883,37 @@ localStorage.removeItem("lp");
           </label>
           <div class="wplace-settings-section-wrapper wplace-notifications-wrapper">
             <label class="wplace-notification-toggle">
-              <span>${Utils.t('enableNotifications')}</span>
-              <input type="checkbox" id="notifEnabledToggle" ${state.notificationsEnabled ? 'checked' : ''
-      } class="wplace-notification-checkbox" />
+              <span>${Utils.t("enableNotifications")}</span>
+              <input type="checkbox" id="notifEnabledToggle" ${
+                state.notificationsEnabled ? "checked" : ""
+              } class="wplace-notification-checkbox" />
             </label>
             <label class="wplace-notification-toggle">
-              <span>${Utils.t('notifyOnChargesThreshold')}</span>
-              <input type="checkbox" id="notifOnChargesToggle" ${state.notifyOnChargesReached ? 'checked' : ''
-      } class="wplace-notification-checkbox" />
+              <span>${Utils.t("notifyOnChargesThreshold")}</span>
+              <input type="checkbox" id="notifOnChargesToggle" ${
+                state.notifyOnChargesReached ? "checked" : ""
+              } class="wplace-notification-checkbox" />
             </label>
             <label class="wplace-notification-toggle">
-              <span>${Utils.t('onlyWhenNotFocused')}</span>
-              <input type="checkbox" id="notifOnlyUnfocusedToggle" ${state.notifyOnlyWhenUnfocused ? 'checked' : ''
-      } class="wplace-notification-checkbox" />
+              <span>${Utils.t("onlyWhenNotFocused")}</span>
+              <input type="checkbox" id="notifOnlyUnfocusedToggle" ${
+                state.notifyOnlyWhenUnfocused ? "checked" : ""
+              } class="wplace-notification-checkbox" />
             </label>
             <div class="wplace-notification-interval">
-              <span>${Utils.t('repeatEvery')}</span>
-              <input type="number" id="notifIntervalInput" min="1" max="60" value="${state.notificationIntervalMinutes}" class="wplace-notification-interval-input" />
-              <span>${Utils.t('minutesPl')}</span>
+              <span>${Utils.t("repeatEvery")}</span>
+              <input type="number" id="notifIntervalInput" min="1" max="60" value="${
+                state.notificationIntervalMinutes
+              }" class="wplace-notification-interval-input" />
+              <span>${Utils.t("minutesPl")}</span>
             </div>
             <div class="wplace-notification-buttons">
               <button id="notifRequestPermBtn" class="wplace-btn wplace-btn-secondary wplace-notification-perm-btn"><i class="fas fa-unlock"></i><span>${Utils.t(
-        'grantPermission'
-      )}</span></button>
+                "grantPermission"
+              )}</span></button>
               <button id="notifTestBtn" class="wplace-btn wplace-notification-test-btn"><i class="fas fa-bell"></i><span>${Utils.t(
-        'test'
-      )}</span></button>
+                "test"
+              )}</span></button>
             </div>
           </div>
         </div>
@@ -3232,17 +3922,18 @@ localStorage.removeItem("lp");
         <div class="wplace-settings-section">
           <label class="wplace-settings-section-label">
             <i class="fas fa-palette wplace-icon-palette"></i>
-            ${Utils.t('themeSettings')}
+            ${Utils.t("themeSettings")}
           </label>
           <div class="wplace-settings-section-wrapper">
             <select id="themeSelect" class="wplace-settings-select">
               ${Object.keys(CONFIG.THEMES)
-        .map(
-          (themeName) =>
-            `<option value="${themeName}" ${CONFIG.currentTheme === themeName ? 'selected' : ''
-            } class="wplace-settings-option">${themeName}</option>`
-        )
-        .join('')}
+                .map(
+                  (themeName) =>
+                    `<option value="${themeName}" ${
+                      CONFIG.currentTheme === themeName ? "selected" : ""
+                    } class="wplace-settings-option">${themeName}</option>`
+                )
+                .join("")}
             </select>
           </div>
         </div>
@@ -3251,23 +3942,49 @@ localStorage.removeItem("lp");
         <div class="wplace-settings-section">
           <label class="wplace-settings-section-label">
             <i class="fas fa-globe wplace-icon-globe"></i>
-            ${Utils.t('language')}
+            ${Utils.t("language")}
           </label>
           <div class="wplace-settings-section-wrapper">
             <select id="languageSelect" class="wplace-settings-select">
-              <option value="vi" ${state.language === 'vi' ? 'selected' : ''} class="wplace-settings-option">🇻🇳 Tiếng Việt</option>
-              <option value="id" ${state.language === 'id' ? 'selected' : ''} class="wplace-settings-option">🇮🇩 Bahasa Indonesia</option>
-              <option value="ru" ${state.language === 'ru' ? 'selected' : ''} class="wplace-settings-option">🇷🇺 Русский</option>
-              <option value="uk" ${state.language === 'uk' ? 'selected' : ''} class="wplace-settings-option">🇺🇦 Українська</option>
-              <option value="en" ${state.language === 'en' ? 'selected' : ''} class="wplace-settings-option">🇺🇸 English</option>
-              <option value="es" ${state.language === 'es' ? 'selected' : ''} class="wplace-settings-option">🇪🇸 Español</option>
-              <option value="pt" ${state.language === 'pt' ? 'selected' : ''} class="wplace-settings-option">🇧🇷 Português</option>
-              <option value="fr" ${state.language === 'fr' ? 'selected' : ''} class="wplace-settings-option">🇫🇷 Français</option>
-              <option value="tr" ${state.language === 'tr' ? 'selected' : ''} class="wplace-settings-option">🇹🇷 Türkçe</option>
-              <option value="zh-CN" ${state.language === 'zh-CN' ? 'selected' : ''} class="wplace-settings-option">🇨🇳 简体中文</option>
-              <option value="zh-TW" ${state.language === 'zh-TW' ? 'selected' : ''} class="wplace-settings-option">🇹🇼 繁體中文</option>
-              <option value="ja" ${state.language === 'ja' ? 'selected' : ''} class="wplace-settings-option">🇯🇵 日本語</option>
-              <option value="ko" ${state.language === 'ko' ? 'selected' : ''} class="wplace-settings-option">🇰🇷 한국어</option>
+              <option value="vi" ${
+                state.language === "vi" ? "selected" : ""
+              } class="wplace-settings-option">🇻🇳 Tiếng Việt</option>
+              <option value="id" ${
+                state.language === "id" ? "selected" : ""
+              } class="wplace-settings-option">🇮🇩 Bahasa Indonesia</option>
+              <option value="ru" ${
+                state.language === "ru" ? "selected" : ""
+              } class="wplace-settings-option">🇷🇺 Русский</option>
+              <option value="uk" ${
+                state.language === "uk" ? "selected" : ""
+              } class="wplace-settings-option">🇺🇦 Українська</option>
+              <option value="en" ${
+                state.language === "en" ? "selected" : ""
+              } class="wplace-settings-option">🇺🇸 English</option>
+              <option value="es" ${
+                state.language === "es" ? "selected" : ""
+              } class="wplace-settings-option">🇪🇸 Español</option>
+              <option value="pt" ${
+                state.language === "pt" ? "selected" : ""
+              } class="wplace-settings-option">🇧🇷 Português</option>
+              <option value="fr" ${
+                state.language === "fr" ? "selected" : ""
+              } class="wplace-settings-option">🇫🇷 Français</option>
+              <option value="tr" ${
+                state.language === "tr" ? "selected" : ""
+              } class="wplace-settings-option">🇹🇷 Türkçe</option>
+              <option value="zh-CN" ${
+                state.language === "zh-CN" ? "selected" : ""
+              } class="wplace-settings-option">🇨🇳 简体中文</option>
+              <option value="zh-TW" ${
+                state.language === "zh-TW" ? "selected" : ""
+              } class="wplace-settings-option">🇹🇼 繁體中文</option>
+              <option value="ja" ${
+                state.language === "ja" ? "selected" : ""
+              } class="wplace-settings-option">🇯🇵 日本語</option>
+              <option value="ko" ${
+                state.language === "ko" ? "selected" : ""
+              } class="wplace-settings-option">🇰🇷 한국어</option>
               </select>
           </div>
         </div>
@@ -3275,7 +3992,7 @@ localStorage.removeItem("lp");
 
         <div class="wplace-settings-footer">
              <button id="applySettingsBtn" class="wplace-settings-apply-btn">
-                 <i class="fas fa-check"></i> ${Utils.t('applySettings')}
+                 <i class="fas fa-check"></i> ${Utils.t("applySettings")}
           </button>
         </div>
 
@@ -3466,10 +4183,12 @@ localStorage.removeItem("lp");
       </style>
     `;
 
-    const resizeContainer = document.createElement('div');
-    resizeContainer.className = 'resize-container resize-container-v2';
+    const resizeContainer = document.createElement("div");
+    resizeContainer.className = "resize-container resize-container-v2";
     resizeContainer.innerHTML = `
-      <h3 class="resize-dialog-title" style="color: ${theme.text}">${Utils.t('resizeImage')}</h3>
+      <h3 class="resize-dialog-title" style="color: ${theme.text}">${Utils.t(
+      "resizeImage"
+    )}</h3>
       
       <!-- Two-column layout: Left = Configurations (scrollable), Right = Preview (fixed) -->
       <div class="resize-two-column-layout">
@@ -3523,15 +4242,15 @@ localStorage.removeItem("lp");
               
               <label class="resize-checkbox-label">
                 <input type="checkbox" id="keepAspect" checked>
-                ${Utils.t('keepAspectRatio')}
+                ${Utils.t("keepAspectRatio")}
               </label>
               <label class="resize-checkbox-label">
                   <input type="checkbox" id="paintWhiteToggle" checked>
-                  ${Utils.t('paintWhitePixels')}
+                  ${Utils.t("paintWhitePixels")}
               </label>
               <label class="resize-checkbox-label">
                   <input type="checkbox" id="paintTransparentToggle" checked>
-                  ${Utils.t('paintTransparentPixels')}
+                  ${Utils.t("paintTransparentPixels")}
               </label>
             </div>
 
@@ -3577,7 +4296,7 @@ localStorage.removeItem("lp");
                     <div class="wplace-row single">
                         <label class="resize-color-toggle-label">
                             <input type="checkbox" id="showAllColorsToggle" class="resize-color-checkbox">
-                            <span>${Utils.t('showAllColorsIncluding')}</span>
+                            <span>${Utils.t("showAllColorsIncluding")}</span>
                         </label>
                     </div>
                     <div class="wplace-row" style="display: flex;">
@@ -3678,11 +4397,15 @@ localStorage.removeItem("lp");
                       Apply error diffusion or ordered dithering to smooth color transitions
                     </div>
                   </div>
-                  <input type="checkbox" id="enableDitheringToggle" ${state.ditheringEnabled ? 'checked' : ''} class="resize-advanced-checkbox" />
+                  <input type="checkbox" id="enableDitheringToggle" ${
+                    state.ditheringEnabled ? "checked" : ""
+                  } class="resize-advanced-checkbox" />
                 </label>
                 
                 <!-- Dithering Method -->
-                <div id="ditheringMethodControl" style="display: ${state.ditheringEnabled ? 'block' : 'none'}; margin-bottom: 15px;">
+                <div id="ditheringMethodControl" style="display: ${
+                  state.ditheringEnabled ? "block" : "none"
+                }; margin-bottom: 15px;">
                   <label class="resize-advanced-label" style="margin-bottom: 8px; display: block;">
                     <span class="resize-advanced-label-text" style="font-size: 13px;">Dithering Method</span>
                   </label>
@@ -3724,7 +4447,9 @@ localStorage.removeItem("lp");
                 </div>
                 
                 <!-- Posterize Levels -->
-                <div id="posterizeLevelsControl" style="display: ${state.ditheringEnabled ? 'block' : 'none'}; margin-bottom: 15px;">
+                <div id="posterizeLevelsControl" style="display: ${
+                  state.ditheringEnabled ? "block" : "none"
+                }; margin-bottom: 15px;">
                   <label class="resize-slider-label" style="font-size: 13px; margin-bottom: 5px; display: flex; justify-content: space-between;">
                     <span><i class="fas fa-layer-group"></i> Posterize Levels</span>
                     <span id="posterizeLevelsValue" class="resize-slider-value">Disabled</span>
@@ -3938,24 +4663,33 @@ localStorage.removeItem("lp");
                 <label class="resize-advanced-label">
                   <span class="resize-advanced-label-text">Algorithm</span>
                   <select id="colorAlgorithmSelect" class="resize-advanced-select">
-                    <option value="lab" ${state.colorMatchingAlgorithm === 'lab' ? 'selected' : ''
-      }>Perceptual (Lab)</option>
-                  <option value="legacy" ${state.colorMatchingAlgorithm === 'legacy' ? 'selected' : ''
-      }>Legacy (RGB)</option>
-                  <option value="hsv" ${state.colorMatchingAlgorithm === 'hsv' ? 'selected' : ''
-      }>HSV (Hue-Saturation-Value)</option>
-                  <option value="hsl" ${state.colorMatchingAlgorithm === 'hsl' ? 'selected' : ''
-      }>HSL (Hue-Saturation-Lightness)</option>
-                  <option value="xyz" ${state.colorMatchingAlgorithm === 'xyz' ? 'selected' : ''
-      }>XYZ (CIE Color Space)</option>
-                  <option value="luv" ${state.colorMatchingAlgorithm === 'luv' ? 'selected' : ''
-      }>LUV (CIE L*u*v*)</option>
-                  <option value="yuv" ${state.colorMatchingAlgorithm === 'yuv' ? 'selected' : ''
-      }>YUV (Luma-Chroma)</option>
-                  <option value="oklab" ${state.colorMatchingAlgorithm === 'oklab' ? 'selected' : ''
-      }>Oklab (Perceptual Uniform)</option>
-                  <option value="lch" ${state.colorMatchingAlgorithm === 'lch' ? 'selected' : ''
-      }>LCH (Lightness-Chroma-Hue)</option>
+                    <option value="lab" ${
+                      state.colorMatchingAlgorithm === "lab" ? "selected" : ""
+                    }>Perceptual (Lab)</option>
+                  <option value="legacy" ${
+                    state.colorMatchingAlgorithm === "legacy" ? "selected" : ""
+                  }>Legacy (RGB)</option>
+                  <option value="hsv" ${
+                    state.colorMatchingAlgorithm === "hsv" ? "selected" : ""
+                  }>HSV (Hue-Saturation-Value)</option>
+                  <option value="hsl" ${
+                    state.colorMatchingAlgorithm === "hsl" ? "selected" : ""
+                  }>HSL (Hue-Saturation-Lightness)</option>
+                  <option value="xyz" ${
+                    state.colorMatchingAlgorithm === "xyz" ? "selected" : ""
+                  }>XYZ (CIE Color Space)</option>
+                  <option value="luv" ${
+                    state.colorMatchingAlgorithm === "luv" ? "selected" : ""
+                  }>LUV (CIE L*u*v*)</option>
+                  <option value="yuv" ${
+                    state.colorMatchingAlgorithm === "yuv" ? "selected" : ""
+                  }>YUV (Luma-Chroma)</option>
+                  <option value="oklab" ${
+                    state.colorMatchingAlgorithm === "oklab" ? "selected" : ""
+                  }>Oklab (Perceptual Uniform)</option>
+                  <option value="lch" ${
+                    state.colorMatchingAlgorithm === "lch" ? "selected" : ""
+                  }>LCH (Lightness-Chroma-Hue)</option>
                   </select>
                 </label>
                 <label class="resize-advanced-toggle">
@@ -3963,25 +4697,34 @@ localStorage.removeItem("lp");
                     <span class="resize-advanced-label-text">Chroma Penalty</span>
                     <div class="resize-advanced-description">Preserve vivid colors (Lab only)</div>
                   </div>
-                  <input type="checkbox" id="enableChromaPenaltyToggle" ${state.enableChromaPenalty ? 'checked' : ''
-      } class="resize-advanced-checkbox" />
+                  <input type="checkbox" id="enableChromaPenaltyToggle" ${
+                    state.enableChromaPenalty ? "checked" : ""
+                  } class="resize-advanced-checkbox" />
                 </label>
                 <div class="resize-chroma-weight-control">
                   <div class="resize-chroma-weight-header">
-                    <span>${Utils.t('chromaWeight')}</span>
-                    <span id="chromaWeightValue" class="resize-chroma-weight-value">${state.chromaPenaltyWeight}</span>
+                    <span>${Utils.t("chromaWeight")}</span>
+                    <span id="chromaWeightValue" class="resize-chroma-weight-value">${
+                      state.chromaPenaltyWeight
+                    }</span>
                   </div>
-                  <input type="range" id="chromaPenaltyWeightSlider" min="0" max="0.5" step="0.01" value="${state.chromaPenaltyWeight}" class="resize-chroma-weight-slider" />
+                  <input type="range" id="chromaPenaltyWeightSlider" min="0" max="0.5" step="0.01" value="${
+                    state.chromaPenaltyWeight
+                  }" class="resize-chroma-weight-slider" />
                 </div>
                 
                 <div class="resize-threshold-controls">
                   <label class="resize-threshold-label">
                     <span class="resize-advanced-label-text">Transparency</span>
-                    <input type="number" id="transparencyThresholdInput" min="0" max="255" value="${state.customTransparencyThreshold}" class="resize-threshold-input" />
+                    <input type="number" id="transparencyThresholdInput" min="0" max="255" value="${
+                      state.customTransparencyThreshold
+                    }" class="resize-threshold-input" />
                   </label>
                   <label class="resize-threshold-label">
                     <span class="resize-advanced-label-text">White Thresh</span>
-                    <input type="number" id="whiteThresholdInput" min="200" max="255" value="${state.customWhiteThreshold}" class="resize-threshold-input" />
+                    <input type="number" id="whiteThresholdInput" min="200" max="255" value="${
+                      state.customWhiteThreshold
+                    }" class="resize-threshold-input" />
                   </label>
                 </div>
                 <button id="resetAdvancedColorBtn" class="wplace-btn resize-reset-advanced-btn">Reset Advanced</button>
@@ -3992,15 +4735,15 @@ localStorage.removeItem("lp");
             <div class="resize-buttons">
               <button id="downloadPreviewBtn" class="wplace-btn wplace-btn-primary">
                 <i class="fas fa-download"></i>
-                <span>${Utils.t('downloadPreview')}</span>
+                <span>${Utils.t("downloadPreview")}</span>
               </button>
               <button id="confirmResize" class="wplace-btn wplace-btn-start">
                 <i class="fas fa-check"></i>
-                <span>${Utils.t('apply')}</span>
+                <span>${Utils.t("apply")}</span>
               </button>
               <button id="cancelResize" class="wplace-btn wplace-btn-stop">
                 <i class="fas fa-times"></i>
-                <span>${Utils.t('cancel')}</span>
+                <span>${Utils.t("cancel")}</span>
               </button>
             </div>
             
@@ -4015,19 +4758,21 @@ localStorage.removeItem("lp");
               <i class="fas fa-paint-brush"></i> Edit Artwork✨🎨
             </button>
             <button id="zoomOutBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t(
-      'zoomOut'
-    )}"><i class="fas fa-search-minus"></i></button>
+              "zoomOut"
+            )}"><i class="fas fa-search-minus"></i></button>
             <input type="range" id="zoomSlider" class="resize-slider resize-zoom-slider" min="0.1" max="20" value="1" step="0.05">
             <button id="zoomInBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t(
-      'zoomIn'
-    )}"><i class="fas fa-search-plus"></i></button>
+              "zoomIn"
+            )}"><i class="fas fa-search-plus"></i></button>
             <button id="zoomFitBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t(
-      'fitToView'
-    )}">${Utils.t('fit')}</button>
+              "fitToView"
+            )}">${Utils.t("fit")}</button>
             <button id="zoomActualBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t(
-      'actualSize'
-    )}">${Utils.t('hundred')}</button>
-            <button id="panModeBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t('panMode')}">
+              "actualSize"
+            )}">${Utils.t("hundred")}</button>
+            <button id="panModeBtn" class="wplace-btn resize-zoom-btn" title="${Utils.t(
+              "panMode"
+            )}">
               <i class="fas fa-hand-paper"></i>
             </button>
             <span id="zoomValue" class="resize-zoom-value">100%</span>
@@ -4052,8 +4797,8 @@ localStorage.removeItem("lp");
       </div>
     `;
 
-    const resizeOverlay = document.createElement('div');
-    resizeOverlay.className = 'resize-overlay';
+    const resizeOverlay = document.createElement("div");
+    resizeOverlay.className = "resize-overlay";
 
     document.body.appendChild(container);
     document.body.appendChild(resizeOverlay);
@@ -4062,30 +4807,30 @@ localStorage.removeItem("lp");
     document.body.appendChild(settingsContainer);
 
     // Show the main container after all elements are appended
-    container.style.display = 'block';
+    container.style.display = "block";
 
-    const uploadBtn = container.querySelector('#uploadBtn');
-    const resizeBtn = container.querySelector('#resizeBtn');
-    const selectPosBtn = container.querySelector('#selectPosBtn');
-    const startBtn = container.querySelector('#startBtn');
-    const stopBtn = container.querySelector('#stopBtn');
-    const saveBtn = container.querySelector('#saveBtn');
-    const loadBtn = container.querySelector('#loadBtn');
-    const saveToFileBtn = container.querySelector('#saveToFileBtn');
-    const loadFromFileBtn = container.querySelector('#loadFromFileBtn');
+    const uploadBtn = container.querySelector("#uploadBtn");
+    const resizeBtn = container.querySelector("#resizeBtn");
+    const selectPosBtn = container.querySelector("#selectPosBtn");
+    const startBtn = container.querySelector("#startBtn");
+    const stopBtn = container.querySelector("#stopBtn");
+    const saveBtn = container.querySelector("#saveBtn");
+    const loadBtn = container.querySelector("#loadBtn");
+    const saveToFileBtn = container.querySelector("#saveToFileBtn");
+    const loadFromFileBtn = container.querySelector("#loadFromFileBtn");
 
-    container.querySelectorAll('.wplace-section-title').forEach((title) => {
+    container.querySelectorAll(".wplace-section-title").forEach((title) => {
       // Add a right-side arrow if it doesn't exist
-      if (!title.querySelector('i.arrow')) {
-        const arrow = document.createElement('i');
-        arrow.className = 'fas fa-chevron-down arrow'; // FontAwesome down arrow
+      if (!title.querySelector("i.arrow")) {
+        const arrow = document.createElement("i");
+        arrow.className = "fas fa-chevron-down arrow"; // FontAwesome down arrow
         title.appendChild(arrow);
       }
 
       // Click event to toggle collapse/expand of the section
-      title.addEventListener('click', () => {
+      title.addEventListener("click", () => {
         const section = title.parentElement;
-        section.classList.toggle('collapsed');
+        section.classList.toggle("collapsed");
       });
     });
 
@@ -4093,40 +4838,41 @@ localStorage.removeItem("lp");
     if (loadBtn) {
       loadBtn.disabled = !state.initialSetupComplete;
       loadBtn.title = state.initialSetupComplete
-        ? ''
-        : '🔄 Waiting for initial setup to complete...';
+        ? ""
+        : "🔄 Waiting for initial setup to complete...";
     }
     if (loadFromFileBtn) {
       loadFromFileBtn.disabled = !state.initialSetupComplete;
       loadFromFileBtn.title = state.initialSetupComplete
-        ? ''
-        : '🔄 Waiting for initial setup to complete...';
+        ? ""
+        : "🔄 Waiting for initial setup to complete...";
     }
     if (uploadBtn) {
       uploadBtn.disabled = !state.initialSetupComplete;
       uploadBtn.title = state.initialSetupComplete
-        ? ''
-        : '🔄 Waiting for initial setup to complete...';
+        ? ""
+        : "🔄 Waiting for initial setup to complete...";
     }
 
-    const minimizeBtn = container.querySelector('#minimizeBtn');
-    const compactBtn = container.querySelector('#compactBtn');
-    const statsBtn = container.querySelector('#statsBtn');
-    const toggleOverlayBtn = container.querySelector('#toggleOverlayBtn');
-    const statusText = container.querySelector('#statusText');
-    const progressBar = container.querySelector('#progressBar');
-    const statsArea = statsContainer.querySelector('#statsArea');
-    const content = container.querySelector('.wplace-content');
-    const closeStatsBtn = statsContainer.querySelector('#closeStatsBtn');
-    const refreshChargesBtn = statsContainer.querySelector('#refreshChargesBtn');
-    const cooldownSlider = container.querySelector('#cooldownSlider');
-    const cooldownInput = container.querySelector('#cooldownInput');
-    const cooldownDecrease = container.querySelector('#cooldownDecrease');
-    const cooldownIncrease = container.querySelector('#cooldownIncrease');
-    const cooldownValue = container.querySelector('#cooldownValue');
+    const minimizeBtn = container.querySelector("#minimizeBtn");
+    const compactBtn = container.querySelector("#compactBtn");
+    const statsBtn = container.querySelector("#statsBtn");
+    const toggleOverlayBtn = container.querySelector("#toggleOverlayBtn");
+    const statusText = container.querySelector("#statusText");
+    const progressBar = container.querySelector("#progressBar");
+    const statsArea = statsContainer.querySelector("#statsArea");
+    const content = container.querySelector(".wplace-content");
+    const closeStatsBtn = statsContainer.querySelector("#closeStatsBtn");
+    const refreshChargesBtn =
+      statsContainer.querySelector("#refreshChargesBtn");
+    const cooldownSlider = container.querySelector("#cooldownSlider");
+    const cooldownInput = container.querySelector("#cooldownInput");
+    const cooldownDecrease = container.querySelector("#cooldownDecrease");
+    const cooldownIncrease = container.querySelector("#cooldownIncrease");
+    const cooldownValue = container.querySelector("#cooldownValue");
 
     if (!uploadBtn || !selectPosBtn || !startBtn || !stopBtn) {
-      console.error('Some UI elements not found:', {
+      console.error("Some UI elements not found:", {
         uploadBtn: !!uploadBtn,
         selectPosBtn: !!selectPosBtn,
         startBtn: !!startBtn,
@@ -4138,7 +4884,7 @@ localStorage.removeItem("lp");
       // Note: base CSS now aligns with this layout: main panel at left:20px (width 280), stats at left:330px.
     }
 
-    const header = container.querySelector('.wplace-header');
+    const header = container.querySelector(".wplace-header");
 
     makeDraggable(container);
 
@@ -4149,34 +4895,39 @@ localStorage.removeItem("lp");
         pos4 = 0;
       let isDragging = false;
       const header =
-        element.querySelector('.wplace-header') || element.querySelector('.wplace-settings-header');
+        element.querySelector(".wplace-header") ||
+        element.querySelector(".wplace-settings-header");
 
       if (!header) {
-        console.warn('No draggable header found for element:', element);
+        console.warn("No draggable header found for element:", element);
         return;
       }
 
       header.onmousedown = dragMouseDown;
 
       function dragMouseDown(e) {
-        if (e.target.closest('.wplace-header-btn') || e.target.closest('button')) return;
+        if (
+          e.target.closest(".wplace-header-btn") ||
+          e.target.closest("button")
+        )
+          return;
 
         e.preventDefault();
         isDragging = true;
 
         const rect = element.getBoundingClientRect();
 
-        element.style.transform = 'none';
-        element.style.top = rect.top + 'px';
-        element.style.left = rect.left + 'px';
+        element.style.transform = "none";
+        element.style.top = rect.top + "px";
+        element.style.left = rect.left + "px";
 
         pos3 = e.clientX;
         pos4 = e.clientY;
-        element.classList.add('wplace-dragging');
+        element.classList.add("wplace-dragging");
         document.onmouseup = closeDragElement;
         document.onmousemove = elementDrag;
 
-        document.body.style.userSelect = 'none';
+        document.body.style.userSelect = "none";
       }
 
       function elementDrag(e) {
@@ -4198,16 +4949,16 @@ localStorage.removeItem("lp");
         newTop = Math.max(0, Math.min(newTop, maxTop));
         newLeft = Math.max(0, Math.min(newLeft, maxLeft));
 
-        element.style.top = newTop + 'px';
-        element.style.left = newLeft + 'px';
+        element.style.top = newTop + "px";
+        element.style.left = newLeft + "px";
       }
 
       function closeDragElement() {
         isDragging = false;
-        element.classList.remove('wplace-dragging');
+        element.classList.remove("wplace-dragging");
         document.onmouseup = null;
         document.onmousemove = null;
-        document.body.style.userSelect = '';
+        document.body.style.userSelect = "";
       }
     }
 
@@ -4215,35 +4966,36 @@ localStorage.removeItem("lp");
     makeDraggable(container);
 
     if (statsBtn && closeStatsBtn) {
-      statsBtn.addEventListener('click', () => {
-        const isVisible = statsContainer.style.display !== 'none';
+      statsBtn.addEventListener("click", () => {
+        const isVisible = statsContainer.style.display !== "none";
         if (isVisible) {
-          statsContainer.style.display = 'none';
+          statsContainer.style.display = "none";
           statsBtn.innerHTML = '<i class="fas fa-chart-bar"></i>';
-          statsBtn.title = Utils.t('showStats');
+          statsBtn.title = Utils.t("showStats");
         } else {
-          statsContainer.style.display = 'block';
+          statsContainer.style.display = "block";
           statsBtn.innerHTML = '<i class="fas fa-chart-line"></i>';
-          statsBtn.title = Utils.t('hideStats');
+          statsBtn.title = Utils.t("hideStats");
         }
       });
 
-      closeStatsBtn.addEventListener('click', () => {
-        statsContainer.style.display = 'none';
+      closeStatsBtn.addEventListener("click", () => {
+        statsContainer.style.display = "none";
         statsBtn.innerHTML = '<i class="fas fa-chart-bar"></i>';
-        statsBtn.title = Utils.t('showStats');
+        statsBtn.title = Utils.t("showStats");
       });
 
       if (refreshChargesBtn) {
-        refreshChargesBtn.addEventListener('click', async () => {
-          refreshChargesBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+        refreshChargesBtn.addEventListener("click", async () => {
+          refreshChargesBtn.innerHTML =
+            '<i class="fas fa-spinner fa-spin"></i>';
           refreshChargesBtn.disabled = true;
 
           try {
             await updateStats();
             await updateCurrentAccountInList();
           } catch (error) {
-            console.error('Error refreshing charges:', error);
+            console.error("Error refreshing charges:", error);
           } finally {
             refreshChargesBtn.innerHTML = '<i class="fas fa-sync"></i>';
             refreshChargesBtn.disabled = false;
@@ -4252,17 +5004,21 @@ localStorage.removeItem("lp");
       }
 
       // Account-related event handlers
-      const autoSwapToggle = statsContainer.querySelector('#autoSwapToggle');
-      const refreshAllAccountsBtn = statsContainer.querySelector('#refreshAllAccountsBtn');
+      const autoSwapToggle = statsContainer.querySelector("#autoSwapToggle");
+      const refreshAllAccountsBtn = statsContainer.querySelector(
+        "#refreshAllAccountsBtn"
+      );
 
       if (autoSwapToggle) {
         autoSwapToggle.checked = CONFIG.autoSwap;
-        autoSwapToggle.addEventListener('change', (e) => {
+        autoSwapToggle.addEventListener("change", (e) => {
           CONFIG.autoSwap = e.target.checked;
-          console.log(`🔄 Auto-swap ${CONFIG.autoSwap ? 'enabled' : 'disabled'}`);
+          console.log(
+            `🔄 Auto-swap ${CONFIG.autoSwap ? "enabled" : "disabled"}`
+          );
 
           // Handle autoBuy toggle dependency
-          const autoBuyToggle = statsContainer.querySelector('#autoBuyToggle');
+          const autoBuyToggle = statsContainer.querySelector("#autoBuyToggle");
           if (autoBuyToggle) {
             if (!CONFIG.autoSwap) {
               // If autoSwap is disabled, disable and uncheck autoBuy
@@ -4279,77 +5035,96 @@ localStorage.removeItem("lp");
       }
 
       // Auto Buy toggle logic
-      const autoBuyToggle = statsContainer.querySelector('#autoBuyToggle');
+      const autoBuyToggle = statsContainer.querySelector("#autoBuyToggle");
       if (autoBuyToggle) {
         autoBuyToggle.checked = CONFIG.autoBuyToggle;
         autoBuyToggle.disabled = !CONFIG.autoSwap; // Disable if autoSwap is off
 
-        autoBuyToggle.addEventListener('change', (e) => {
+        autoBuyToggle.addEventListener("change", (e) => {
           CONFIG.autoBuyToggle = e.target.checked;
-          console.log(`💰 Auto-buy ${CONFIG.autoBuyToggle ? 'enabled' : 'disabled'}`);
+          console.log(
+            `💰 Auto-buy ${CONFIG.autoBuyToggle ? "enabled" : "disabled"}`
+          );
         });
       }
 
       if (refreshAllAccountsBtn) {
-        refreshAllAccountsBtn.addEventListener('click', fetchAllAccountDetails);
+        refreshAllAccountsBtn.addEventListener("click", fetchAllAccountDetails);
       }
     }
     if (statsContainer && statsBtn) {
       // Stats container starts visible by default - user clicks button to hide
-      statsContainer.style.display = 'block';
+      statsContainer.style.display = "block";
       statsBtn.innerHTML = '<i class="fas fa-chart-line"></i>';
-      statsBtn.title = Utils.t('hideStats');
+      statsBtn.title = Utils.t("hideStats");
     }
 
-    const settingsBtn = container.querySelector('#settingsBtn');
-    const closeSettingsBtn = settingsContainer.querySelector('#closeSettingsBtn');
-    const applySettingsBtn = settingsContainer.querySelector('#applySettingsBtn');
+    const settingsBtn = container.querySelector("#settingsBtn");
+    const closeSettingsBtn =
+      settingsContainer.querySelector("#closeSettingsBtn");
+    const applySettingsBtn =
+      settingsContainer.querySelector("#applySettingsBtn");
 
     if (settingsBtn && closeSettingsBtn && applySettingsBtn) {
-      settingsBtn.addEventListener('click', () => {
-        const isVisible = settingsContainer.classList.contains('show');
+      settingsBtn.addEventListener("click", () => {
+        const isVisible = settingsContainer.classList.contains("show");
         if (isVisible) {
-          settingsContainer.style.animation = 'settings-fade-out 0.3s ease-out forwards';
-          settingsContainer.classList.remove('show');
+          settingsContainer.style.animation =
+            "settings-fade-out 0.3s ease-out forwards";
+          settingsContainer.classList.remove("show");
           setTimeout(() => {
-            settingsContainer.style.animation = '';
+            settingsContainer.style.animation = "";
           }, 300);
         } else {
-          settingsContainer.style.top = '50%';
-          settingsContainer.style.left = '50%';
-          settingsContainer.style.transform = 'translate(-50%, -50%)';
-          settingsContainer.classList.add('show');
-          settingsContainer.style.animation = 'settings-slide-in 0.4s ease-out';
+          settingsContainer.style.top = "50%";
+          settingsContainer.style.left = "50%";
+          settingsContainer.style.transform = "translate(-50%, -50%)";
+          settingsContainer.classList.add("show");
+          settingsContainer.style.animation = "settings-slide-in 0.4s ease-out";
         }
       });
 
-      closeSettingsBtn.addEventListener('click', () => {
-        settingsContainer.style.animation = 'settings-fade-out 0.3s ease-out forwards';
-        settingsContainer.classList.remove('show');
+      closeSettingsBtn.addEventListener("click", () => {
+        settingsContainer.style.animation =
+          "settings-fade-out 0.3s ease-out forwards";
+        settingsContainer.classList.remove("show");
         setTimeout(() => {
-          settingsContainer.style.animation = '';
-          settingsContainer.style.top = '50%';
-          settingsContainer.style.left = '50%';
-          settingsContainer.style.transform = 'translate(-50%, -50%)';
+          settingsContainer.style.animation = "";
+          settingsContainer.style.top = "50%";
+          settingsContainer.style.left = "50%";
+          settingsContainer.style.transform = "translate(-50%, -50%)";
         }, 300);
       });
 
-      applySettingsBtn.addEventListener('click', () => {
+      applySettingsBtn.addEventListener("click", () => {
         // Sync advanced settings before save
-        const colorAlgorithmSelect = document.getElementById('colorAlgorithmSelect');
-        if (colorAlgorithmSelect) state.colorMatchingAlgorithm = colorAlgorithmSelect.value;
-        const enableChromaPenaltyToggle = document.getElementById('enableChromaPenaltyToggle');
+        const colorAlgorithmSelect = document.getElementById(
+          "colorAlgorithmSelect"
+        );
+        if (colorAlgorithmSelect)
+          state.colorMatchingAlgorithm = colorAlgorithmSelect.value;
+        const enableChromaPenaltyToggle = document.getElementById(
+          "enableChromaPenaltyToggle"
+        );
         if (enableChromaPenaltyToggle)
           state.enableChromaPenalty = enableChromaPenaltyToggle.checked;
-        const chromaPenaltyWeightSlider = document.getElementById('chromaPenaltyWeightSlider');
+        const chromaPenaltyWeightSlider = document.getElementById(
+          "chromaPenaltyWeightSlider"
+        );
         if (chromaPenaltyWeightSlider)
-          state.chromaPenaltyWeight = parseFloat(chromaPenaltyWeightSlider.value) || 0.15;
-        const transparencyThresholdInput = document.getElementById('transparencyThresholdInput');
+          state.chromaPenaltyWeight =
+            parseFloat(chromaPenaltyWeightSlider.value) || 0.15;
+        const transparencyThresholdInput = document.getElementById(
+          "transparencyThresholdInput"
+        );
         if (transparencyThresholdInput) {
           const v = parseInt(transparencyThresholdInput.value, 10);
-          if (!isNaN(v) && v >= 0 && v <= 255) state.customTransparencyThreshold = v;
+          if (!isNaN(v) && v >= 0 && v <= 255)
+            state.customTransparencyThreshold = v;
         }
-        const whiteThresholdInput = document.getElementById('whiteThresholdInput');
+        const whiteThresholdInput = document.getElementById(
+          "whiteThresholdInput"
+        );
         if (whiteThresholdInput) {
           const v = parseInt(whiteThresholdInput.value, 10);
           if (!isNaN(v) && v >= 200 && v <= 255) state.customWhiteThreshold = v;
@@ -4358,93 +5133,115 @@ localStorage.removeItem("lp");
         CONFIG.TRANSPARENCY_THRESHOLD = state.customTransparencyThreshold;
         CONFIG.WHITE_THRESHOLD = state.customWhiteThreshold;
         // Notifications
-        const notifEnabledToggle = document.getElementById('notifEnabledToggle');
-        const notifOnChargesToggle = document.getElementById('notifOnChargesToggle');
-        const notifOnlyUnfocusedToggle = document.getElementById('notifOnlyUnfocusedToggle');
-        const notifIntervalInput = document.getElementById('notifIntervalInput');
-        if (notifEnabledToggle) state.notificationsEnabled = !!notifEnabledToggle.checked;
-        if (notifOnChargesToggle) state.notifyOnChargesReached = !!notifOnChargesToggle.checked;
+        const notifEnabledToggle =
+          document.getElementById("notifEnabledToggle");
+        const notifOnChargesToggle = document.getElementById(
+          "notifOnChargesToggle"
+        );
+        const notifOnlyUnfocusedToggle = document.getElementById(
+          "notifOnlyUnfocusedToggle"
+        );
+        const notifIntervalInput =
+          document.getElementById("notifIntervalInput");
+        if (notifEnabledToggle)
+          state.notificationsEnabled = !!notifEnabledToggle.checked;
+        if (notifOnChargesToggle)
+          state.notifyOnChargesReached = !!notifOnChargesToggle.checked;
         if (notifOnlyUnfocusedToggle)
           state.notifyOnlyWhenUnfocused = !!notifOnlyUnfocusedToggle.checked;
         if (notifIntervalInput) {
           const v = parseInt(notifIntervalInput.value, 10);
-          if (!isNaN(v) && v >= 1 && v <= 60) state.notificationIntervalMinutes = v;
+          if (!isNaN(v) && v >= 1 && v <= 60)
+            state.notificationIntervalMinutes = v;
         }
         saveBotSettings();
-        Utils.showAlert(Utils.t('settingsSaved'), 'success');
+        Utils.showAlert(Utils.t("settingsSaved"), "success");
         closeSettingsBtn.click();
         NotificationManager.syncFromState();
       });
 
       makeDraggable(settingsContainer);
 
-      const tokenSourceSelect = settingsContainer.querySelector('#tokenSourceSelect');
+      const tokenSourceSelect =
+        settingsContainer.querySelector("#tokenSourceSelect");
       if (tokenSourceSelect) {
-        tokenSourceSelect.addEventListener('change', (e) => {
+        tokenSourceSelect.addEventListener("change", (e) => {
           state.tokenSource = e.target.value;
           saveBotSettings();
           console.log(`🔑 Token source changed to: ${state.tokenSource}`);
           const sourceNames = {
-            generator: 'Automatic Generator',
-            hybrid: 'Generator + Auto Fallback',
-            manual: 'Manual Pixel Placement',
+            generator: "Automatic Generator",
+            hybrid: "Generator + Auto Fallback",
+            manual: "Manual Pixel Placement",
           };
           Utils.showAlert(
-            Utils.t('tokenSourceSet', { source: sourceNames[state.tokenSource] }),
-            'success'
+            Utils.t("tokenSourceSet", {
+              source: sourceNames[state.tokenSource],
+            }),
+            "success"
           );
         });
       }
 
       // Painting order controls
-      const paintingOrderSelect = settingsContainer.querySelector('#paintingOrderSelect');
+      const paintingOrderSelect = settingsContainer.querySelector(
+        "#paintingOrderSelect"
+      );
       if (paintingOrderSelect) {
-        paintingOrderSelect.addEventListener('change', (e) => {
+        paintingOrderSelect.addEventListener("change", (e) => {
           state.paintingOrder = e.target.value;
           saveBotSettings();
           console.log(`🎨 Painting order changed to: ${state.paintingOrder}`);
           const orderNames = {
-            sequential: Utils.t('paintingOrderSequential'),
-            'color-by-color': Utils.t('paintingOrderColorByColor'),
+            sequential: Utils.t("paintingOrderSequential"),
+            "color-by-color": Utils.t("paintingOrderColorByColor"),
           };
           Utils.showAlert(
             `Painting order set to: ${orderNames[state.paintingOrder]}`,
-            'success'
+            "success"
           );
         });
       }
 
       // Batch controls removed - bot now uses all available charges automatically
 
-      const languageSelect = settingsContainer.querySelector('#languageSelect');
+      const languageSelect = settingsContainer.querySelector("#languageSelect");
       if (languageSelect) {
-        languageSelect.addEventListener('change', async (e) => {
+        languageSelect.addEventListener("change", async (e) => {
           const newLanguage = e.target.value;
           state.language = newLanguage;
-          localStorage.setItem('wplace_language', newLanguage);
+          localStorage.setItem("wplace_language", newLanguage);
 
           // Load the new language translations
           await loadTranslations(newLanguage);
 
           setTimeout(() => {
-            settingsContainer.style.display = 'none';
+            settingsContainer.style.display = "none";
             createUI();
           }, 100);
         });
       }
 
-      const themeSelect = settingsContainer.querySelector('#themeSelect');
+      const themeSelect = settingsContainer.querySelector("#themeSelect");
       if (themeSelect) {
-        themeSelect.addEventListener('change', (e) => {
+        themeSelect.addEventListener("change", (e) => {
           const newTheme = e.target.value;
           switchTheme(newTheme);
         });
       }
 
-      const overlayOpacitySlider = settingsContainer.querySelector('#overlayOpacitySlider');
-      const overlayOpacityValue = settingsContainer.querySelector('#overlayOpacityValue');
-      const enableBlueMarbleToggle = settingsContainer.querySelector('#enableBlueMarbleToggle');
-      const settingsPaintWhiteToggle = settingsContainer.querySelector('#settingsPaintWhiteToggle');
+      const overlayOpacitySlider = settingsContainer.querySelector(
+        "#overlayOpacitySlider"
+      );
+      const overlayOpacityValue = settingsContainer.querySelector(
+        "#overlayOpacityValue"
+      );
+      const enableBlueMarbleToggle = settingsContainer.querySelector(
+        "#enableBlueMarbleToggle"
+      );
+      const settingsPaintWhiteToggle = settingsContainer.querySelector(
+        "#settingsPaintWhiteToggle"
+      );
       // settingsPaintTransparentToggle removed - use the one in Processing panel instead
 
       if (overlayOpacitySlider && overlayOpacityValue) {
@@ -4455,24 +5252,32 @@ localStorage.removeItem("lp");
           overlayOpacityValue.textContent = `${Math.round(opacity * 100)}%`;
         };
 
-        overlayOpacitySlider.addEventListener('input', (e) => {
+        overlayOpacitySlider.addEventListener("input", (e) => {
           updateOpacity(e.target.value);
         });
 
         // Add scroll-to-adjust for overlay opacity slider
-        Utils.createScrollToAdjust(overlayOpacitySlider, updateOpacity, 0, 1, 0.05);
+        Utils.createScrollToAdjust(
+          overlayOpacitySlider,
+          updateOpacity,
+          0,
+          1,
+          0.05
+        );
       }
 
       if (settingsPaintWhiteToggle) {
         settingsPaintWhiteToggle.checked = state.paintWhitePixels;
-        settingsPaintWhiteToggle.addEventListener('change', (e) => {
+        settingsPaintWhiteToggle.addEventListener("change", (e) => {
           state.paintWhitePixels = e.target.checked;
           saveBotSettings();
-          console.log(`🎨 Paint white pixels: ${state.paintWhitePixels ? 'ON' : 'OFF'}`);
+          console.log(
+            `🎨 Paint white pixels: ${state.paintWhitePixels ? "ON" : "OFF"}`
+          );
           const statusText = state.paintWhitePixels
-            ? 'White pixels in the template will be painted'
-            : 'White pixels will be skipped';
-          Utils.showAlert(statusText, 'success');
+            ? "White pixels in the template will be painted"
+            : "White pixels will be skipped";
+          Utils.showAlert(statusText, "success");
         });
       }
 
@@ -4482,12 +5287,12 @@ localStorage.removeItem("lp");
       // Speed controls removed - bot now uses all available charges automatically
 
       if (enableBlueMarbleToggle) {
-        enableBlueMarbleToggle.addEventListener('click', async () => {
+        enableBlueMarbleToggle.addEventListener("click", async () => {
           state.blueMarbleEnabled = enableBlueMarbleToggle.checked;
           if (state.imageLoaded && overlayManager.imageBitmap) {
-            Utils.showAlert(Utils.t('reprocessingOverlay'), 'info');
+            Utils.showAlert(Utils.t("reprocessingOverlay"), "info");
             await overlayManager.processImageIntoChunks();
-            Utils.showAlert(Utils.t('overlayUpdated'), 'success');
+            Utils.showAlert(Utils.t("overlayUpdated"), "success");
           }
         });
       }
@@ -4497,78 +5302,111 @@ localStorage.removeItem("lp");
       // (Advanced color listeners moved outside to work with resize dialog)
       // (Advanced color listeners moved outside to work with resize dialog)
       // Notifications listeners
-      const notifPermBtn = settingsContainer.querySelector('#notifRequestPermBtn');
-      const notifTestBtn = settingsContainer.querySelector('#notifTestBtn');
+      const notifPermBtn = settingsContainer.querySelector(
+        "#notifRequestPermBtn"
+      );
+      const notifTestBtn = settingsContainer.querySelector("#notifTestBtn");
       if (notifPermBtn) {
-        notifPermBtn.addEventListener('click', async () => {
+        notifPermBtn.addEventListener("click", async () => {
           const perm = await NotificationManager.requestPermission();
-          if (perm === 'granted') Utils.showAlert(Utils.t('notificationsEnabled'), 'success');
-          else Utils.showAlert(Utils.t('notificationsPermissionDenied'), 'warning');
+          if (perm === "granted")
+            Utils.showAlert(Utils.t("notificationsEnabled"), "success");
+          else
+            Utils.showAlert(
+              Utils.t("notificationsPermissionDenied"),
+              "warning"
+            );
         });
       }
       if (notifTestBtn) {
-        notifTestBtn.addEventListener('click', () => {
+        notifTestBtn.addEventListener("click", () => {
           NotificationManager.notify(
-            Utils.t('testNotificationTitle'),
-            Utils.t('testNotificationMessage'),
-            'wplace-notify-test',
+            Utils.t("testNotificationTitle"),
+            Utils.t("testNotificationMessage"),
+            "wplace-notify-test",
             true
           );
         });
       }
     }
 
-    const widthSlider = resizeContainer.querySelector('#widthSlider');
-    const heightSlider = resizeContainer.querySelector('#heightSlider');
-    const widthValue = resizeContainer.querySelector('#widthValue');
-    const heightValue = resizeContainer.querySelector('#heightValue');
-    const keepAspect = resizeContainer.querySelector('#keepAspect');
-    const paintWhiteToggle = resizeContainer.querySelector('#paintWhiteToggle');
-    const paintTransparentToggle = resizeContainer.querySelector('#paintTransparentToggle');
-    const resamplingMethodSelect = resizeContainer.querySelector('#resamplingMethodSelect');
-    const zoomSlider = resizeContainer.querySelector('#zoomSlider');
-    const zoomValue = resizeContainer.querySelector('#zoomValue');
-    const zoomInBtn = resizeContainer.querySelector('#zoomInBtn');
-    const zoomOutBtn = resizeContainer.querySelector('#zoomOutBtn');
-    const zoomFitBtn = resizeContainer.querySelector('#zoomFitBtn');
-    const zoomActualBtn = resizeContainer.querySelector('#zoomActualBtn');
-    const panModeBtn = resizeContainer.querySelector('#panModeBtn');
-    const panStage = resizeContainer.querySelector('#resizePanStage');
-    const canvasStack = resizeContainer.querySelector('#resizeCanvasStack');
-    const baseCanvas = resizeContainer.querySelector('#resizeCanvas');
-    const maskCanvas = resizeContainer.querySelector('#maskCanvas');
-    const baseCtx = baseCanvas.getContext('2d');
-    const maskCtx = maskCanvas.getContext('2d');
-    const confirmResize = resizeContainer.querySelector('#confirmResize');
-    const cancelResize = resizeContainer.querySelector('#cancelResize');
-    const editImageBtn = resizeContainer.querySelector('#editImageBtn');
-    const downloadPreviewBtn = resizeContainer.querySelector('#downloadPreviewBtn');
-    const clearIgnoredBtn = resizeContainer.querySelector('#clearIgnoredBtn');
-    
+    const widthSlider = resizeContainer.querySelector("#widthSlider");
+    const heightSlider = resizeContainer.querySelector("#heightSlider");
+    const widthValue = resizeContainer.querySelector("#widthValue");
+    const heightValue = resizeContainer.querySelector("#heightValue");
+    const keepAspect = resizeContainer.querySelector("#keepAspect");
+    const paintWhiteToggle = resizeContainer.querySelector("#paintWhiteToggle");
+    const paintTransparentToggle = resizeContainer.querySelector(
+      "#paintTransparentToggle"
+    );
+    const resamplingMethodSelect = resizeContainer.querySelector(
+      "#resamplingMethodSelect"
+    );
+    const zoomSlider = resizeContainer.querySelector("#zoomSlider");
+    const zoomValue = resizeContainer.querySelector("#zoomValue");
+    const zoomInBtn = resizeContainer.querySelector("#zoomInBtn");
+    const zoomOutBtn = resizeContainer.querySelector("#zoomOutBtn");
+    const zoomFitBtn = resizeContainer.querySelector("#zoomFitBtn");
+    const zoomActualBtn = resizeContainer.querySelector("#zoomActualBtn");
+    const panModeBtn = resizeContainer.querySelector("#panModeBtn");
+    const panStage = resizeContainer.querySelector("#resizePanStage");
+    const canvasStack = resizeContainer.querySelector("#resizeCanvasStack");
+    const baseCanvas = resizeContainer.querySelector("#resizeCanvas");
+    const maskCanvas = resizeContainer.querySelector("#maskCanvas");
+    const baseCtx = baseCanvas.getContext("2d");
+    const maskCtx = maskCanvas.getContext("2d");
+    const confirmResize = resizeContainer.querySelector("#confirmResize");
+    const cancelResize = resizeContainer.querySelector("#cancelResize");
+    const editImageBtn = resizeContainer.querySelector("#editImageBtn");
+    const downloadPreviewBtn = resizeContainer.querySelector(
+      "#downloadPreviewBtn"
+    );
+    const clearIgnoredBtn = resizeContainer.querySelector("#clearIgnoredBtn");
+
     // Pre-processing controls
-    const preBlurModeSelect = resizeContainer.querySelector('#preBlurModeSelect');
-    const preBlurRadiusSlider = resizeContainer.querySelector('#preBlurRadiusSlider');
-    const blurRadiusValue = resizeContainer.querySelector('#blurRadiusValue');
-    const blurRadiusControl = resizeContainer.querySelector('#blurRadiusControl');
-    const sharpenAmountSlider = resizeContainer.querySelector('#sharpenAmountSlider');
-    const sharpenAmountValue = resizeContainer.querySelector('#sharpenAmountValue');
-    const sharpenRadiusSlider = resizeContainer.querySelector('#sharpenRadiusSlider');
-    const sharpenRadiusValue = resizeContainer.querySelector('#sharpenRadiusValue');
-    const sharpenRadiusControl = resizeContainer.querySelector('#sharpenRadiusControl');
-    const sharpenThresholdSlider = resizeContainer.querySelector('#sharpenThresholdSlider');
-    const sharpenThresholdValue = resizeContainer.querySelector('#sharpenThresholdValue');
-    const sharpenThresholdControl = resizeContainer.querySelector('#sharpenThresholdControl');
-    
+    const preBlurModeSelect =
+      resizeContainer.querySelector("#preBlurModeSelect");
+    const preBlurRadiusSlider = resizeContainer.querySelector(
+      "#preBlurRadiusSlider"
+    );
+    const blurRadiusValue = resizeContainer.querySelector("#blurRadiusValue");
+    const blurRadiusControl =
+      resizeContainer.querySelector("#blurRadiusControl");
+    const sharpenAmountSlider = resizeContainer.querySelector(
+      "#sharpenAmountSlider"
+    );
+    const sharpenAmountValue = resizeContainer.querySelector(
+      "#sharpenAmountValue"
+    );
+    const sharpenRadiusSlider = resizeContainer.querySelector(
+      "#sharpenRadiusSlider"
+    );
+    const sharpenRadiusValue = resizeContainer.querySelector(
+      "#sharpenRadiusValue"
+    );
+    const sharpenRadiusControl = resizeContainer.querySelector(
+      "#sharpenRadiusControl"
+    );
+    const sharpenThresholdSlider = resizeContainer.querySelector(
+      "#sharpenThresholdSlider"
+    );
+    const sharpenThresholdValue = resizeContainer.querySelector(
+      "#sharpenThresholdValue"
+    );
+    const sharpenThresholdControl = resizeContainer.querySelector(
+      "#sharpenThresholdControl"
+    );
+
     // Set initial resampling method value
     if (resamplingMethodSelect) {
       resamplingMethodSelect.value = state.resamplingMethod;
     }
-    
+
     // Set initial pre-processing values
     if (preBlurModeSelect) {
       preBlurModeSelect.value = state.preBlurMode;
-      if (state.preBlurMode !== 'none' && blurRadiusControl) {
-        blurRadiusControl.style.display = 'block';
+      if (state.preBlurMode !== "none" && blurRadiusControl) {
+        blurRadiusControl.style.display = "block";
       }
     }
     if (preBlurRadiusSlider && blurRadiusValue) {
@@ -4579,8 +5417,9 @@ localStorage.removeItem("lp");
       sharpenAmountSlider.value = state.sharpenAmount;
       sharpenAmountValue.textContent = state.sharpenAmount;
       if (state.sharpenAmount > 0) {
-        if (sharpenRadiusControl) sharpenRadiusControl.style.display = 'block';
-        if (sharpenThresholdControl) sharpenThresholdControl.style.display = 'block';
+        if (sharpenRadiusControl) sharpenRadiusControl.style.display = "block";
+        if (sharpenThresholdControl)
+          sharpenThresholdControl.style.display = "block";
       }
     }
     if (sharpenRadiusSlider && sharpenRadiusValue) {
@@ -4593,33 +5432,45 @@ localStorage.removeItem("lp");
     }
 
     // Coordinate generation controls with smart visibility
-    const coordinateModeSelect = settingsContainer.querySelector('#coordinateModeSelect');
-    const coordinateDirectionSelect = settingsContainer.querySelector('#coordinateDirectionSelect');
-    const coordinateSnakeToggle = settingsContainer.querySelector('#coordinateSnakeToggle');
-    const directionControls = settingsContainer.querySelector('#directionControls');
-    const snakeControls = settingsContainer.querySelector('#snakeControls');
-    const blockControls = settingsContainer.querySelector('#blockControls');
-    const blockWidthInput = settingsContainer.querySelector('#blockWidthInput');
-    const blockHeightInput = settingsContainer.querySelector('#blockHeightInput');
+    const coordinateModeSelect = settingsContainer.querySelector(
+      "#coordinateModeSelect"
+    );
+    const coordinateDirectionSelect = settingsContainer.querySelector(
+      "#coordinateDirectionSelect"
+    );
+    const coordinateSnakeToggle = settingsContainer.querySelector(
+      "#coordinateSnakeToggle"
+    );
+    const directionControls =
+      settingsContainer.querySelector("#directionControls");
+    const snakeControls = settingsContainer.querySelector("#snakeControls");
+    const blockControls = settingsContainer.querySelector("#blockControls");
+    const blockWidthInput = settingsContainer.querySelector("#blockWidthInput");
+    const blockHeightInput =
+      settingsContainer.querySelector("#blockHeightInput");
     const paintUnavailablePixelsToggle = settingsContainer.querySelector(
-      '#paintUnavailablePixelsToggle'
+      "#paintUnavailablePixelsToggle"
     );
 
     if (paintUnavailablePixelsToggle) {
       paintUnavailablePixelsToggle.checked = state.paintUnavailablePixels;
-      paintUnavailablePixelsToggle.addEventListener('change', (e) => {
+      paintUnavailablePixelsToggle.addEventListener("change", (e) => {
         state.paintUnavailablePixels = e.target.checked;
         saveBotSettings();
-        console.log(`🎨 Paint unavailable colors: ${state.paintUnavailablePixels ? 'ON' : 'OFF'}`);
+        console.log(
+          `🎨 Paint unavailable colors: ${
+            state.paintUnavailablePixels ? "ON" : "OFF"
+          }`
+        );
         const statusText = state.paintUnavailablePixels
-          ? 'Unavailable template colors will be painted with the closest available color'
-          : 'Unavailable template colors will be skipped';
-        Utils.showAlert(statusText, 'success');
+          ? "Unavailable template colors will be painted with the closest available color"
+          : "Unavailable template colors will be skipped";
+        Utils.showAlert(statusText, "success");
       });
     }
     if (coordinateModeSelect) {
       coordinateModeSelect.value = state.coordinateMode;
-      coordinateModeSelect.addEventListener('change', (e) => {
+      coordinateModeSelect.addEventListener("change", (e) => {
         state.coordinateMode = e.target.value;
         Utils.updateCoordinateUI({
           mode: state.coordinateMode,
@@ -4629,36 +5480,46 @@ localStorage.removeItem("lp");
         });
         saveBotSettings();
         console.log(`🔄 Coordinate mode changed to: ${state.coordinateMode}`);
-        Utils.showAlert(`Coordinate mode set to: ${state.coordinateMode}`, 'success');
+        Utils.showAlert(
+          `Coordinate mode set to: ${state.coordinateMode}`,
+          "success"
+        );
       });
     }
 
     if (coordinateDirectionSelect) {
       coordinateDirectionSelect.value = state.coordinateDirection;
-      coordinateDirectionSelect.addEventListener('change', (e) => {
+      coordinateDirectionSelect.addEventListener("change", (e) => {
         state.coordinateDirection = e.target.value;
         saveBotSettings();
-        console.log(`🧭 Coordinate direction changed to: ${state.coordinateDirection}`);
-        Utils.showAlert(`Coordinate direction set to: ${state.coordinateDirection}`, 'success');
+        console.log(
+          `🧭 Coordinate direction changed to: ${state.coordinateDirection}`
+        );
+        Utils.showAlert(
+          `Coordinate direction set to: ${state.coordinateDirection}`,
+          "success"
+        );
       });
     }
 
     if (coordinateSnakeToggle) {
       coordinateSnakeToggle.checked = state.coordinateSnake;
-      coordinateSnakeToggle.addEventListener('change', (e) => {
+      coordinateSnakeToggle.addEventListener("change", (e) => {
         state.coordinateSnake = e.target.checked;
         saveBotSettings();
-        console.log(`🐍 Snake pattern ${state.coordinateSnake ? 'enabled' : 'disabled'}`);
+        console.log(
+          `🐍 Snake pattern ${state.coordinateSnake ? "enabled" : "disabled"}`
+        );
         Utils.showAlert(
-          `Snake pattern ${state.coordinateSnake ? 'enabled' : 'disabled'}`,
-          'success'
+          `Snake pattern ${state.coordinateSnake ? "enabled" : "disabled"}`,
+          "success"
         );
       });
     }
 
     if (blockWidthInput) {
       blockWidthInput.value = state.blockWidth;
-      blockWidthInput.addEventListener('input', (e) => {
+      blockWidthInput.addEventListener("input", (e) => {
         const width = parseInt(e.target.value);
         if (width >= 1 && width <= 50) {
           state.blockWidth = width;
@@ -4669,7 +5530,7 @@ localStorage.removeItem("lp");
 
     if (blockHeightInput) {
       blockHeightInput.value = state.blockHeight;
-      blockHeightInput.addEventListener('change', (e) => {
+      blockHeightInput.addEventListener("change", (e) => {
         const height = parseInt(e.target.value);
         if (height >= 1 && height <= 50) {
           state.blockHeight = height;
@@ -4679,86 +5540,92 @@ localStorage.removeItem("lp");
     }
 
     if (compactBtn) {
-      compactBtn.addEventListener('click', () => {
-        container.classList.toggle('wplace-compact');
-        const isCompact = container.classList.contains('wplace-compact');
+      compactBtn.addEventListener("click", () => {
+        container.classList.toggle("wplace-compact");
+        const isCompact = container.classList.contains("wplace-compact");
 
         if (isCompact) {
           compactBtn.innerHTML = '<i class="fas fa-expand"></i>';
-          compactBtn.title = Utils.t('expandMode');
+          compactBtn.title = Utils.t("expandMode");
         } else {
           compactBtn.innerHTML = '<i class="fas fa-compress"></i>';
-          compactBtn.title = Utils.t('compactMode');
+          compactBtn.title = Utils.t("compactMode");
         }
       });
     }
 
     if (minimizeBtn) {
-      minimizeBtn.addEventListener('click', () => {
+      minimizeBtn.addEventListener("click", () => {
         state.minimized = !state.minimized;
         if (state.minimized) {
-          container.classList.add('wplace-minimized');
-          content.classList.add('wplace-hidden');
+          container.classList.add("wplace-minimized");
+          content.classList.add("wplace-hidden");
           minimizeBtn.innerHTML = '<i class="fas fa-expand"></i>';
-          minimizeBtn.title = Utils.t('restore');
+          minimizeBtn.title = Utils.t("restore");
         } else {
-          container.classList.remove('wplace-minimized');
-          content.classList.remove('wplace-hidden');
+          container.classList.remove("wplace-minimized");
+          content.classList.remove("wplace-hidden");
           minimizeBtn.innerHTML = '<i class="fas fa-minus"></i>';
-          minimizeBtn.title = Utils.t('minimize');
+          minimizeBtn.title = Utils.t("minimize");
         }
         saveBotSettings();
       });
     }
 
     if (toggleOverlayBtn) {
-      toggleOverlayBtn.addEventListener('click', () => {
+      toggleOverlayBtn.addEventListener("click", () => {
         const isEnabled = overlayManager.toggle();
-        toggleOverlayBtn.classList.toggle('active', isEnabled);
-        toggleOverlayBtn.setAttribute('aria-pressed', isEnabled ? 'true' : 'false');
-        Utils.showAlert(isEnabled ? Utils.t('overlayEnabled') : Utils.t('overlayDisabled'), 'info');
+        toggleOverlayBtn.classList.toggle("active", isEnabled);
+        toggleOverlayBtn.setAttribute(
+          "aria-pressed",
+          isEnabled ? "true" : "false"
+        );
+        Utils.showAlert(
+          isEnabled ? Utils.t("overlayEnabled") : Utils.t("overlayDisabled"),
+          "info"
+        );
       });
     }
 
     if (state.minimized) {
-      container.classList.add('wplace-minimized');
-      content.classList.add('wplace-hidden');
+      container.classList.add("wplace-minimized");
+      content.classList.add("wplace-hidden");
       if (minimizeBtn) {
         minimizeBtn.innerHTML = '<i class="fas fa-expand"></i>';
-        minimizeBtn.title = Utils.t('restore');
+        minimizeBtn.title = Utils.t("restore");
       }
     } else {
-      container.classList.remove('wplace-minimized');
-      content.classList.remove('wplace-hidden');
+      container.classList.remove("wplace-minimized");
+      content.classList.remove("wplace-hidden");
       if (minimizeBtn) {
         minimizeBtn.innerHTML = '<i class="fas fa-minus"></i>';
-        minimizeBtn.title = Utils.t('minimize');
+        minimizeBtn.title = Utils.t("minimize");
       }
     }
 
     if (saveBtn) {
-      saveBtn.addEventListener('click', () => {
+      saveBtn.addEventListener("click", () => {
         if (!state.imageLoaded) {
-          Utils.showAlert(Utils.t('missingRequirements'), 'error');
+          Utils.showAlert(Utils.t("missingRequirements"), "error");
           return;
         }
 
         const success = Utils.saveProgress();
         if (success) {
-          updateUI('autoSaved', 'success');
-          Utils.showAlert(Utils.t('autoSaved'), 'success');
+          updateUI("autoSaved", "success");
+          Utils.showAlert(Utils.t("autoSaved"), "success");
         } else {
-          Utils.showAlert(Utils.t('errorSavingProgress'), 'error');
+          Utils.showAlert(Utils.t("errorSavingProgress"), "error");
         }
       });
     }
 
     if (loadBtn) {
-      loadBtn.addEventListener('click', async () => {
+      loadBtn.addEventListener("click", async () => {
         let savedData = Utils.loadProgress();
         if (!savedData) {
-          updateUI('noSavedData', 'warning');
-          Utils.showAlert(Utils.t('noSavedData'), 'warning');
+          updateUI("noSavedData", "warning");
+          Utils.showAlert(Utils.t("noSavedData"), "warning");
           return;
         }
 
@@ -4767,19 +5634,21 @@ localStorage.removeItem("lp");
 
         // CRITICAL FIX: If save file contains complete data, bypass initial setup check
         // This matches old version behavior where save files could be loaded immediately
-        const hasCompleteData = savedData.state && savedData.imageData &&
+        const hasCompleteData =
+          savedData.state &&
+          savedData.imageData &&
           savedData.state.availableColors &&
           savedData.state.availableColors.length > 0;
 
         if (!state.initialSetupComplete && !hasCompleteData) {
-          Utils.showAlert(Utils.t('pleaseWaitInitialSetup'), 'warning');
+          Utils.showAlert(Utils.t("pleaseWaitInitialSetup"), "warning");
           return;
         }
 
         const confirmLoad = confirm(
-          `${Utils.t('savedDataFound')}\n\n` +
-          `Saved: ${new Date(savedData.timestamp).toLocaleString()}\n` +
-          `Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels`
+          `${Utils.t("savedDataFound")}\n\n` +
+            `Saved: ${new Date(savedData.timestamp).toLocaleString()}\n` +
+            `Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels`
         );
 
         if (confirmLoad) {
@@ -4790,16 +5659,18 @@ localStorage.removeItem("lp");
               state.initialSetupComplete = true;
             }
 
-            updateUI('dataLoaded', 'success');
-            Utils.showAlert(Utils.t('dataLoaded'), 'success');
+            updateUI("dataLoaded", "success");
+            Utils.showAlert(Utils.t("dataLoaded"), "success");
             updateDataButtons();
 
             // CRITICAL FIX: Force immediate stats update after save loading
             await updateStats();
 
             // Force stats display refresh by updating the stats container
-            const statsContainer = document.getElementById('wplace-stats-container');
-            if (statsContainer && typeof updateStats === 'function') {
+            const statsContainer = document.getElementById(
+              "wplace-stats-container"
+            );
+            if (statsContainer && typeof updateStats === "function") {
               // Trigger a forced visual refresh of the stats
               setTimeout(async () => {
                 await updateStats();
@@ -4808,170 +5679,216 @@ localStorage.removeItem("lp");
 
             // Restore overlay if image data was loaded from localStorage
             Utils.restoreOverlayFromData().catch((error) => {
-              console.error('Failed to restore overlay from localStorage:', error);
+              console.error(
+                "Failed to restore overlay from localStorage:",
+                error
+              );
             });
 
             if (!state.colorsChecked) {
               uploadBtn.disabled = false;
-              const loadExtractedBtn = document.getElementById('loadExtractedBtn');
+              const loadExtractedBtn =
+                document.getElementById("loadExtractedBtn");
               if (loadExtractedBtn) loadExtractedBtn.disabled = false;
             } else {
               uploadBtn.disabled = false;
-              const loadExtractedBtn = document.getElementById('loadExtractedBtn');
+              const loadExtractedBtn =
+                document.getElementById("loadExtractedBtn");
               if (loadExtractedBtn) loadExtractedBtn.disabled = false;
               selectPosBtn.disabled = false;
             }
 
-            if (state.imageLoaded && state.startPosition && state.region && state.colorsChecked) {
+            if (
+              state.imageLoaded &&
+              state.startPosition &&
+              state.region &&
+              state.colorsChecked
+            ) {
               startBtn.disabled = false;
             }
           } else {
-            Utils.showAlert(Utils.t('errorLoadingProgress'), 'error');
+            Utils.showAlert(Utils.t("errorLoadingProgress"), "error");
           }
         }
       });
     }
 
     if (saveToFileBtn) {
-      saveToFileBtn.addEventListener('click', () => {
+      saveToFileBtn.addEventListener("click", () => {
         const success = Utils.saveProgressToFile();
         if (success) {
-          updateUI('fileSaved', 'success');
-          Utils.showAlert(Utils.t('fileSaved'), 'success');
+          updateUI("fileSaved", "success");
+          Utils.showAlert(Utils.t("fileSaved"), "success");
         } else {
-          Utils.showAlert(Utils.t('fileError'), 'error');
+          Utils.showAlert(Utils.t("fileError"), "error");
         }
       });
     }
 
     if (loadFromFileBtn) {
-      loadFromFileBtn.addEventListener('click', async () => {
-        console.log('🔍 [DEBUG] Load from file button clicked');
-        console.log('🔍 [DEBUG] Initial setup complete:', state.initialSetupComplete);
+      loadFromFileBtn.addEventListener("click", async () => {
+        console.log("🔍 [DEBUG] Load from file button clicked");
+        console.log(
+          "🔍 [DEBUG] Initial setup complete:",
+          state.initialSetupComplete
+        );
 
         try {
           // First check if we can load the file - this will tell us if it has complete data
-          console.log('🔍 [DEBUG] Starting file upload...');
+          console.log("🔍 [DEBUG] Starting file upload...");
           const fileData = await Utils.createFileUploader();
 
-          console.log('🔍 [DEBUG] File data received:', !!fileData);
-          console.log('🔍 [DEBUG] File data keys:', fileData ? Object.keys(fileData) : 'N/A');
+          console.log("🔍 [DEBUG] File data received:", !!fileData);
+          console.log(
+            "🔍 [DEBUG] File data keys:",
+            fileData ? Object.keys(fileData) : "N/A"
+          );
 
           if (!fileData || !fileData.state) {
-            console.error('❌ [DEBUG] Invalid file data or missing state');
-            console.log('🔍 [DEBUG] FileData:', fileData);
-            Utils.showAlert(Utils.t('invalidFileFormat'), 'error');
+            console.error("❌ [DEBUG] Invalid file data or missing state");
+            console.log("🔍 [DEBUG] FileData:", fileData);
+            Utils.showAlert(Utils.t("invalidFileFormat"), "error");
             return;
           }
 
           // CRITICAL FIX: If file contains complete data, bypass initial setup check
-          const hasCompleteData = fileData.state && fileData.imageData &&
+          const hasCompleteData =
+            fileData.state &&
+            fileData.imageData &&
             fileData.state.availableColors &&
             fileData.state.availableColors.length > 0;
 
-          console.log('🔍 [DEBUG] Has complete data check:');
-          console.log('  - fileData.state:', !!fileData.state);
-          console.log('  - fileData.imageData:', !!fileData.imageData);
-          console.log('  - fileData.state.availableColors:', !!fileData.state.availableColors);
-          console.log('  - availableColors length:', fileData.state.availableColors?.length);
-          console.log('  - hasCompleteData result:', hasCompleteData);
+          console.log("🔍 [DEBUG] Has complete data check:");
+          console.log("  - fileData.state:", !!fileData.state);
+          console.log("  - fileData.imageData:", !!fileData.imageData);
+          console.log(
+            "  - fileData.state.availableColors:",
+            !!fileData.state.availableColors
+          );
+          console.log(
+            "  - availableColors length:",
+            fileData.state.availableColors?.length
+          );
+          console.log("  - hasCompleteData result:", hasCompleteData);
 
           if (!state.initialSetupComplete && !hasCompleteData) {
-            console.log('⚠️ [DEBUG] Setup not complete and no complete data, showing warning');
-            Utils.showAlert(Utils.t('pleaseWaitFileSetup'), 'warning');
+            console.log(
+              "⚠️ [DEBUG] Setup not complete and no complete data, showing warning"
+            );
+            Utils.showAlert(Utils.t("pleaseWaitFileSetup"), "warning");
             return;
           }
 
-          console.log('🔍 [DEBUG] Calling restoreProgress...');
+          console.log("🔍 [DEBUG] Calling restoreProgress...");
           const success = Utils.restoreProgress(fileData);
-          console.log('🔍 [DEBUG] RestoreProgress result:', success);
+          console.log("🔍 [DEBUG] RestoreProgress result:", success);
 
           if (success) {
-            console.log('✅ [DEBUG] File loaded successfully');
+            console.log("✅ [DEBUG] File loaded successfully");
 
             // CRITICAL FIX: Set initial setup complete if file had complete data
             if (hasCompleteData) {
-              console.log('🔍 [DEBUG] Setting initialSetupComplete to true due to complete data');
+              console.log(
+                "🔍 [DEBUG] Setting initialSetupComplete to true due to complete data"
+              );
               state.initialSetupComplete = true;
             }
 
-            updateUI('fileLoaded', 'success');
-            Utils.showAlert(Utils.t('fileLoaded'), 'success');
+            updateUI("fileLoaded", "success");
+            Utils.showAlert(Utils.t("fileLoaded"), "success");
             updateDataButtons();
 
-            console.log('🔍 [DEBUG] Updating stats...');
+            console.log("🔍 [DEBUG] Updating stats...");
             await updateStats();
 
             // Restore overlay if image data was loaded from file
-            console.log('🔍 [DEBUG] Attempting to restore overlay...');
+            console.log("🔍 [DEBUG] Attempting to restore overlay...");
             await Utils.restoreOverlayFromData().catch((error) => {
-              console.error('❌ [DEBUG] Failed to restore overlay from file:', error);
+              console.error(
+                "❌ [DEBUG] Failed to restore overlay from file:",
+                error
+              );
             });
 
-            console.log('🔍 [DEBUG] Updating button states after load...');
-            console.log('  - state.colorsChecked:', state.colorsChecked);
-            console.log('  - state.imageLoaded:', state.imageLoaded);
-            console.log('  - state.startPosition:', !!state.startPosition);
-            console.log('  - state.region:', !!state.region);
+            console.log("🔍 [DEBUG] Updating button states after load...");
+            console.log("  - state.colorsChecked:", state.colorsChecked);
+            console.log("  - state.imageLoaded:", state.imageLoaded);
+            console.log("  - state.startPosition:", !!state.startPosition);
+            console.log("  - state.region:", !!state.region);
 
             if (state.colorsChecked) {
-              console.log('🔍 [DEBUG] Enabling buttons due to colorsChecked');
+              console.log("🔍 [DEBUG] Enabling buttons due to colorsChecked");
               uploadBtn.disabled = false;
               selectPosBtn.disabled = false;
               resizeBtn.disabled = false;
             } else {
-              console.log('🔍 [DEBUG] Only enabling upload button');
+              console.log("🔍 [DEBUG] Only enabling upload button");
               uploadBtn.disabled = false;
             }
 
-            if (state.imageLoaded && state.startPosition && state.region && state.colorsChecked) {
-              console.log('🔍 [DEBUG] All conditions met, enabling start button');
+            if (
+              state.imageLoaded &&
+              state.startPosition &&
+              state.region &&
+              state.colorsChecked
+            ) {
+              console.log(
+                "🔍 [DEBUG] All conditions met, enabling start button"
+              );
               startBtn.disabled = false;
             } else {
-              console.log('⚠️ [DEBUG] Start button requirements not met');
+              console.log("⚠️ [DEBUG] Start button requirements not met");
             }
           } else {
-            console.error('❌ [DEBUG] RestoreProgress failed');
-            Utils.showAlert('File loading failed - check console for details', 'error');
+            console.error("❌ [DEBUG] RestoreProgress failed");
+            Utils.showAlert(
+              "File loading failed - check console for details",
+              "error"
+            );
           }
         } catch (error) {
-          console.error('❌ [DEBUG] Error in file load process:', error);
-          console.error('❌ [DEBUG] Error stack:', error.stack);
+          console.error("❌ [DEBUG] Error in file load process:", error);
+          console.error("❌ [DEBUG] Error stack:", error.stack);
 
-          if (error.message === 'Invalid JSON file') {
-            console.error('❌ [DEBUG] Invalid JSON file detected');
-            Utils.showAlert(Utils.t('invalidFileFormat'), 'error');
+          if (error.message === "Invalid JSON file") {
+            console.error("❌ [DEBUG] Invalid JSON file detected");
+            Utils.showAlert(Utils.t("invalidFileFormat"), "error");
           } else {
-            console.error('❌ [DEBUG] General file error:', error.message);
-            Utils.showAlert(`File error: ${error.message}`, 'error');
+            console.error("❌ [DEBUG] General file error:", error.message);
+            Utils.showAlert(`File error: ${error.message}`, "error");
           }
         }
       });
     }
 
-    updateUI = (messageKey, type = 'default', params = {}, silent = false) => {
+    updateUI = (messageKey, type = "default", params = {}, silent = false) => {
       const message = Utils.t(messageKey, params);
       statusText.textContent = message;
       statusText.className = `wplace-status status-${type}`;
 
       if (!silent) {
         // Trigger animation only when silent = false
-        statusText.style.animation = 'none';
+        statusText.style.animation = "none";
         void statusText.offsetWidth; // trick to restart the animation
-        statusText.style.animation = 'slide-in 0.3s ease-out';
+        statusText.style.animation = "slide-in 0.3s ease-out";
       }
     };
 
     function updateChargeStatsDisplay(intervalMs) {
-      const currentChargesEl = document.getElementById('wplace-stat-charges-value');
-      const fullChargeEl = document.getElementById('wplace-stat-fullcharge-value');
+      const currentChargesEl = document.getElementById(
+        "wplace-stat-charges-value"
+      );
+      const fullChargeEl = document.getElementById(
+        "wplace-stat-fullcharge-value"
+      );
       if (!fullChargeEl && !currentChargesEl) return;
       if (!state.fullChargeData) {
-        fullChargeEl.textContent = '--:--:--';
+        fullChargeEl.textContent = "--:--:--";
         return;
       }
 
-      const { current, max, cooldownMs, startTime, spentSinceShot } = state.fullChargeData;
+      const { current, max, cooldownMs, startTime, spentSinceShot } =
+        state.fullChargeData;
       const elapsed = Date.now() - startTime;
 
       // total charges including elapsed time and spent during painting since snapshot
@@ -4991,7 +5908,12 @@ localStorage.removeItem("lp");
       state.displayCharges = Math.max(0, displayCharges);
       state.preciseCurrentCharges = cappedCharges;
 
-      const remainingMs = getMsToTargetCharges(cappedCharges, max, state.cooldown, intervalMs);
+      const remainingMs = getMsToTargetCharges(
+        cappedCharges,
+        max,
+        state.cooldown,
+        intervalMs
+      );
       const timeText = Utils.msToTimeText(remainingMs);
 
       if (currentChargesEl) {
@@ -5023,8 +5945,10 @@ localStorage.removeItem("lp");
       const minUpdateInterval = 60_000;
       const maxUpdateInterval = 90_000;
       const randomUpdateThreshold =
-        minUpdateInterval + Math.random() * (maxUpdateInterval - minUpdateInterval);
-      const timeSinceLastUpdate = Date.now() - (state.fullChargeData?.startTime || 0);
+        minUpdateInterval +
+        Math.random() * (maxUpdateInterval - minUpdateInterval);
+      const timeSinceLastUpdate =
+        Date.now() - (state.fullChargeData?.startTime || 0);
       const isTimeToUpdate = timeSinceLastUpdate >= randomUpdateThreshold;
 
       const shouldCallApi = isFirstCheck || isTimeToUpdate;
@@ -5033,7 +5957,8 @@ localStorage.removeItem("lp");
       state.displayCharges = Math.floor(charges);
       state.preciseCurrentCharges = charges;
       state.cooldown = cooldown;
-      state.maxCharges = Math.floor(max) > 1 ? Math.floor(max) : state.maxCharges;
+      state.maxCharges =
+        Math.floor(max) > 1 ? Math.floor(max) : state.maxCharges;
 
       state.fullChargeData = {
         current: charges,
@@ -5065,10 +5990,12 @@ localStorage.removeItem("lp");
       // // Update current account charges in the account list
       // await updateCurrentAccountInList();
 
-      let imageStatsHTML = '';
+      let imageStatsHTML = "";
       if (state.imageLoaded) {
         const progress =
-          state.totalPixels > 0 ? Math.round((state.paintedPixels / state.totalPixels) * 100) : 0;
+          state.totalPixels > 0
+            ? Math.round((state.paintedPixels / state.totalPixels) * 100)
+            : 0;
         const remainingPixels = state.totalPixels - state.paintedPixels;
 
         // Updated estimation calculation for new cooldown logic
@@ -5077,7 +6004,10 @@ localStorage.removeItem("lp");
         // Calculate batch size - bot now uses all available charges
         let batchSize;
         try {
-          batchSize = typeof calculateBatchSize === 'function' ? calculateBatchSize() : state.displayCharges || 1;
+          batchSize =
+            typeof calculateBatchSize === "function"
+              ? calculateBatchSize()
+              : state.displayCharges || 1;
         } catch (e) {
           batchSize = state.displayCharges || 1;
         }
@@ -5088,10 +6018,17 @@ localStorage.removeItem("lp");
 
         // Calculate time accounting for cooldown threshold behavior with safety checks
         let estimatedMs = 0;
-        if (remainingPixels > 0 && Number.isFinite(state.cooldown) && state.cooldown > 0) {
+        if (
+          remainingPixels > 0 &&
+          Number.isFinite(state.cooldown) &&
+          state.cooldown > 0
+        ) {
           // Current charges available check
           const currentCharges = Math.max(0, state.displayCharges);
-          const thresholdCharges = Math.max(1, state.cooldownChargeThreshold || 1);
+          const thresholdCharges = Math.max(
+            1,
+            state.cooldownChargeThreshold || 1
+          );
 
           if (currentCharges < thresholdCharges) {
             // Need to wait for charges to reach threshold first
@@ -5106,7 +6043,8 @@ localStorage.removeItem("lp");
 
           // Time between cycles (waiting for charges to regenerate)
           if (cyclesNeeded > 1) {
-            const regenerationTime = (cyclesNeeded - 1) * thresholdCharges * state.cooldown;
+            const regenerationTime =
+              (cyclesNeeded - 1) * thresholdCharges * state.cooldown;
             estimatedMs += regenerationTime;
           }
 
@@ -5123,51 +6061,57 @@ localStorage.removeItem("lp");
 
         imageStatsHTML = `
           <div class="wplace-stat-item">
-            <div class="wplace-stat-label"><i class="fas fa-image"></i> ${Utils.t('progress')}</div>
+            <div class="wplace-stat-label"><i class="fas fa-image"></i> ${Utils.t(
+              "progress"
+            )}</div>
             <div class="wplace-stat-value">${progress}%</div>
           </div>
           <div class="wplace-stat-item">
             <div class="wplace-stat-label"><i class="fas fa-paint-brush"></i> ${Utils.t(
-          'pixels'
-        )}</div>
-            <div class="wplace-stat-value">${state.paintedPixels}/${state.totalPixels}</div>
+              "pixels"
+            )}</div>
+            <div class="wplace-stat-value">${state.paintedPixels}/${
+          state.totalPixels
+        }</div>
           </div>
         `;
       }
 
-      let colorSwatchesHTML = '';
+      let colorSwatchesHTML = "";
       state.availableColors = state.availableColors.filter(
-        (c) => c.name !== 'Unknown CoIor NaN' && c.id !== null
+        (c) => c.name !== "Unknown CoIor NaN" && c.id !== null
       );
 
       const availableColors = Utils.extractAvailableColors();
-      const newCount = Array.isArray(availableColors) ? availableColors.length : 0;
+      const newCount = Array.isArray(availableColors)
+        ? availableColors.length
+        : 0;
 
       if (newCount === 0 && isManualRefresh) {
-        Utils.showAlert(Utils.t('noColorsFound'), 'warning');
+        Utils.showAlert(Utils.t("noColorsFound"), "warning");
       } else if (newCount > 0 && state.availableColors.length < newCount) {
         const oldCount = state.availableColors.length;
 
         Utils.showAlert(
-          Utils.t('colorsUpdated', {
+          Utils.t("colorsUpdated", {
             oldCount,
             newCount: newCount,
             diffCount: newCount - oldCount,
           }),
-          'success'
+          "success"
         );
         state.availableColors = availableColors;
       }
       if (state.colorsChecked) {
         colorSwatchesHTML = state.availableColors
           .map((color) => {
-            const rgbString = `rgb(${color.rgb.join(',')})`;
+            const rgbString = `rgb(${color.rgb.join(",")})`;
             return `<div class="wplace-stat-color-swatch" style="background-color: ${rgbString};" title="${Utils.t(
-              'colorTooltip',
-              { id: color.id, rgb: color.rgb.join(', ') }
+              "colorTooltip",
+              { id: color.id, rgb: color.rgb.join(", ") }
             )}"></div>`;
           })
-          .join('');
+          .join("");
       }
 
       // Calculate multi-account statistics
@@ -5178,21 +6122,29 @@ localStorage.removeItem("lp");
         // Use ChargeModel (real-time) when available for consistent totals
         totalAllCharges = accounts.reduce((sum, acc) => {
           const node = ChargeModel.get(acc.token);
-          const charges = Number.isFinite(node?.charges) ? Math.floor(node.charges) : Math.floor(acc.Charges || 0);
-          const max = Number.isFinite(node?.max) ? Math.floor(node.max) : Math.floor(acc.Max || 0);
+          const charges = Number.isFinite(node?.charges)
+            ? Math.floor(node.charges)
+            : Math.floor(acc.Charges || 0);
+          const max = Number.isFinite(node?.max)
+            ? Math.floor(node.max)
+            : Math.floor(acc.Max || 0);
           const safeCharges = Math.max(0, Math.min(charges, max));
           return sum + safeCharges;
         }, 0);
         totalMaxCharges = accounts.reduce((sum, acc) => {
           const node = ChargeModel.get(acc.token);
-          const max = Number.isFinite(node?.max) ? Math.floor(node.max) : Math.floor(acc.Max || 0);
+          const max = Number.isFinite(node?.max)
+            ? Math.floor(node.max)
+            : Math.floor(acc.Max || 0);
           return sum + Math.max(0, max);
         }, 0);
       }
 
       statsArea.innerHTML = `
             ${imageStatsHTML}
-            ${accounts.length > 0 ? `
+            ${
+              accounts.length > 0
+                ? `
             <div class="wplace-stat-item">
               <div class="wplace-stat-label">
                 <i class="fas fa-coins"></i> Total All Accounts Charges
@@ -5201,35 +6153,40 @@ localStorage.removeItem("lp");
                 ${totalAllCharges}/${totalMaxCharges}
               </div>
             </div>
-            ` : ''}
+            `
+                : ""
+            }
             <div class="wplace-stat-item">
               <div class="wplace-stat-label">
-                <i class="fas fa-bolt"></i> ${Utils.t('charges')}
+                <i class="fas fa-bolt"></i> ${Utils.t("charges")}
               </div>
               <div class="wplace-stat-value" id="wplace-stat-charges-value">
-                ${state.displayCharges} / ${state.fullChargeData?.max ?? state.maxCharges}
+                ${state.displayCharges} / ${
+        state.fullChargeData?.max ?? state.maxCharges
+      }
               </div>
             </div>
             <div class="wplace-stat-item">
               <div class="wplace-stat-label">
-                <i class="fas fa-battery-half"></i> ${Utils.t('fullChargeIn')}
+                <i class="fas fa-battery-half"></i> ${Utils.t("fullChargeIn")}
               </div>
               <div class="wplace-stat-value" id="wplace-stat-fullcharge-value">--:--:--</div>
             </div>
-            ${state.colorsChecked
-          ? `
+            ${
+              state.colorsChecked
+                ? `
             <div class="wplace-colors-section">
                 <div class="wplace-stat-label"><i class="fas fa-palette"></i> ${Utils.t(
-            'availableColors',
-            { count: state.availableColors.length }
-          )}</div>
+                  "availableColors",
+                  { count: state.availableColors.length }
+                )}</div>
                 <div class="wplace-stat-colors-grid">
                     ${colorSwatchesHTML}
                 </div>
             </div>
             `
-          : ''
-        }
+                : ""
+            }
         `;
 
       // should be after statsArea.innerHTML = '...'. todo make full stats ui update partial
@@ -5249,9 +6206,9 @@ localStorage.removeItem("lp");
 
     function showMoveArtworkPanel() {
       // Create move artwork control panel like status panels
-      const movePanel = document.createElement('div');
-      movePanel.id = 'moveArtworkPanel';
-      movePanel.className = 'wplace-move-panel';
+      const movePanel = document.createElement("div");
+      movePanel.id = "moveArtworkPanel";
+      movePanel.className = "wplace-move-panel";
 
       movePanel.innerHTML = `
         <div class="wplace-header">
@@ -5292,7 +6249,9 @@ localStorage.removeItem("lp");
           const newX = state.startPosition.x + deltaX;
           const newY = state.startPosition.y + deltaY;
 
-          console.log(`🔄 Moving artwork from (${state.startPosition.x}, ${state.startPosition.y}) to (${newX}, ${newY})`);
+          console.log(
+            `🔄 Moving artwork from (${state.startPosition.x}, ${state.startPosition.y}) to (${newX}, ${newY})`
+          );
 
           state.startPosition.x = newX;
           state.startPosition.y = newY;
@@ -5306,22 +6265,29 @@ localStorage.removeItem("lp");
 
           // Update overlay position if available
           if (overlayManager) {
-            overlayManager.setPosition(state.startPosition, state.region)
+            overlayManager
+              .setPosition(state.startPosition, state.region)
               .then(() => {
-                console.log('✅ Overlay position updated');
-                Utils.showAlert(`Moved to position (${newX}, ${newY})`, 'success');
+                console.log("✅ Overlay position updated");
+                Utils.showAlert(
+                  `Moved to position (${newX}, ${newY})`,
+                  "success"
+                );
                 // Set new timeout for this message
                 currentMessageTimeout = setTimeout(() => {
                   Utils.hideAlert();
                   currentMessageTimeout = null;
                 }, 1500); // Message disappears after 1.5 seconds
               })
-              .catch(err => {
-                console.error('❌ Failed to update overlay:', err);
-                Utils.showAlert('Failed to update overlay position', 'error');
+              .catch((err) => {
+                console.error("❌ Failed to update overlay:", err);
+                Utils.showAlert("Failed to update overlay position", "error");
               });
           } else {
-            Utils.showAlert(`Position updated to (${newX}, ${newY})`, 'success');
+            Utils.showAlert(
+              `Position updated to (${newX}, ${newY})`,
+              "success"
+            );
             // Set new timeout for this message
             currentMessageTimeout = setTimeout(() => {
               Utils.hideAlert();
@@ -5329,14 +6295,25 @@ localStorage.removeItem("lp");
             }, 1500);
           }
         } else {
-          Utils.showAlert('Please select a position first before moving artwork', 'warning');
+          Utils.showAlert(
+            "Please select a position first before moving artwork",
+            "warning"
+          );
         }
       }
 
-      document.getElementById('moveUp').addEventListener('click', () => moveArtwork(0, -1));
-      document.getElementById('moveDown').addEventListener('click', () => moveArtwork(0, 1));
-      document.getElementById('moveLeft').addEventListener('click', () => moveArtwork(-1, 0));
-      document.getElementById('moveRight').addEventListener('click', () => moveArtwork(1, 0));
+      document
+        .getElementById("moveUp")
+        .addEventListener("click", () => moveArtwork(0, -1));
+      document
+        .getElementById("moveDown")
+        .addEventListener("click", () => moveArtwork(0, 1));
+      document
+        .getElementById("moveLeft")
+        .addEventListener("click", () => moveArtwork(-1, 0));
+      document
+        .getElementById("moveRight")
+        .addEventListener("click", () => moveArtwork(1, 0));
 
       // Close panel
       function closeMovePanel() {
@@ -5348,7 +6325,9 @@ localStorage.removeItem("lp");
         document.body.removeChild(movePanel);
       }
 
-      document.getElementById('closeMovePanel').addEventListener('click', closeMovePanel);
+      document
+        .getElementById("closeMovePanel")
+        .addEventListener("click", closeMovePanel);
     }
 
     function showResizeDialog(processor, isNewImage = false) {
@@ -5357,34 +6336,36 @@ localStorage.removeItem("lp");
       // (Only when a NEW image is uploaded)
       // ========================================
       if (isNewImage) {
-        console.log('🔄 Resetting ALL processing settings to default (new template uploaded)...');
-        
+        console.log(
+          "🔄 Resetting ALL processing settings to default (new template uploaded)..."
+        );
+
         // Dithering settings
         state.ditheringEnabled = false;
-        state.ditheringMethod = 'floyd';
+        state.ditheringMethod = "floyd";
         state.ditheringStrength = 0.5;
         state.posterizeLevels = 0;
-        
+
         // Pre-processing settings
-        state.preBlurMode = 'none';
+        state.preBlurMode = "none";
         state.preBlurRadius = 0;
         state.sharpenAmount = 0;
         state.sharpenRadius = 0;
         state.sharpenThreshold = 0;
-        
+
         // Resampling and color matching
-        state.resamplingMethod = 'nearest';
-        state.colorMatchingAlgorithm = 'rgb';  // Default to Legacy (RGB)
-        state.enableChromaPenalty = false;      // Chroma penalty OFF by default
+        state.resamplingMethod = "nearest";
+        state.colorMatchingAlgorithm = "rgb"; // Default to Legacy (RGB)
+        state.enableChromaPenalty = false; // Chroma penalty OFF by default
         state.chromaPenaltyWeight = 0.15;
-        
+
         // Post-processing settings
         state.enableEdgeOverlay = false;
         state.outlineThickness = 0;
         state.simplifyArea = 0;
         state.erodeAmount = 0;
         state.modeFilterSize = 0;
-        
+
         // Color correction settings
         state.enableColorCorrection = false;
         state.brightness = 0;
@@ -5392,17 +6373,23 @@ localStorage.removeItem("lp");
         state.saturation = 0;
         state.hue = 0;
         state.gamma = 1.0;
-        
-        console.log('✅ Processing settings reset - All OFF, Color Algorithm: RGB');
+
+        console.log(
+          "✅ Processing settings reset - All OFF, Color Algorithm: RGB"
+        );
       } else {
-        console.log('📂 Reopening processing panel - preserving existing settings');
+        console.log(
+          "📂 Reopening processing panel - preserving existing settings"
+        );
       }
-      
+
       let baseProcessor = processor;
       let width, height;
       if (state.originalImage?.dataUrl) {
         // Use global WPlaceImageProcessor which has resampleImage method
-        baseProcessor = new window.WPlaceImageProcessor(state.originalImage.dataUrl);
+        baseProcessor = new window.WPlaceImageProcessor(
+          state.originalImage.dataUrl
+        );
         width = state.originalImage.width;
         height = state.originalImage.height;
       } else {
@@ -5441,7 +6428,7 @@ localStorage.removeItem("lp");
       widthValue.textContent = initialW;
       heightValue.textContent = initialH;
       zoomSlider.value = 1;
-      if (zoomValue) zoomValue.textContent = '100%';
+      if (zoomValue) zoomValue.textContent = "100%";
       paintWhiteToggle.checked = state.paintWhitePixels;
       paintTransparentToggle.checked = state.paintTransparentPixels;
 
@@ -5449,270 +6436,362 @@ localStorage.removeItem("lp");
       if (isNewImage) {
         setTimeout(() => {
           // Dithering controls
-          const ditherToggle = document.getElementById('enableDitheringToggle');
+          const ditherToggle = document.getElementById("enableDitheringToggle");
           if (ditherToggle) {
             ditherToggle.checked = false;
-            const methodControl = document.getElementById('ditheringMethodControl');
-            const posterizeControl = document.getElementById('posterizeLevelsControl');
-            const strengthControl = document.getElementById('ditheringStrengthControl');
-            if (methodControl) methodControl.style.display = 'none';
-            if (posterizeControl) posterizeControl.style.display = 'none';
-            if (strengthControl) strengthControl.style.display = 'none';
+            const methodControl = document.getElementById(
+              "ditheringMethodControl"
+            );
+            const posterizeControl = document.getElementById(
+              "posterizeLevelsControl"
+            );
+            const strengthControl = document.getElementById(
+              "ditheringStrengthControl"
+            );
+            if (methodControl) methodControl.style.display = "none";
+            if (posterizeControl) posterizeControl.style.display = "none";
+            if (strengthControl) strengthControl.style.display = "none";
           }
-          
-          const ditheringMethodSelect = document.getElementById('ditheringMethodSelect');
-          if (ditheringMethodSelect) ditheringMethodSelect.value = 'floyd';
-          
-          const ditheringStrengthSlider = document.getElementById('ditheringStrengthSlider');
-          const ditheringStrengthValue = document.getElementById('ditheringStrengthValue');
+
+          const ditheringMethodSelect = document.getElementById(
+            "ditheringMethodSelect"
+          );
+          if (ditheringMethodSelect) ditheringMethodSelect.value = "floyd";
+
+          const ditheringStrengthSlider = document.getElementById(
+            "ditheringStrengthSlider"
+          );
+          const ditheringStrengthValue = document.getElementById(
+            "ditheringStrengthValue"
+          );
           if (ditheringStrengthSlider && ditheringStrengthValue) {
             ditheringStrengthSlider.value = 50;
-            ditheringStrengthValue.textContent = '50%';
+            ditheringStrengthValue.textContent = "50%";
           }
-          
-          const posterizeLevelsSlider = document.getElementById('posterizeLevelsSlider');
-          const posterizeLevelsValue = document.getElementById('posterizeLevelsValue');
+
+          const posterizeLevelsSlider = document.getElementById(
+            "posterizeLevelsSlider"
+          );
+          const posterizeLevelsValue = document.getElementById(
+            "posterizeLevelsValue"
+          );
           if (posterizeLevelsSlider && posterizeLevelsValue) {
             posterizeLevelsSlider.value = 0;
-            posterizeLevelsValue.textContent = 'Disabled';
+            posterizeLevelsValue.textContent = "Disabled";
           }
-          
+
           // Pre-processing controls
-          const preBlurModeSelect = document.getElementById('preBlurModeSelect');
-          const blurRadiusControl = document.getElementById('blurRadiusControl');
+          const preBlurModeSelect =
+            document.getElementById("preBlurModeSelect");
+          const blurRadiusControl =
+            document.getElementById("blurRadiusControl");
           if (preBlurModeSelect) {
-            preBlurModeSelect.value = 'none';
-            if (blurRadiusControl) blurRadiusControl.style.display = 'none';
+            preBlurModeSelect.value = "none";
+            if (blurRadiusControl) blurRadiusControl.style.display = "none";
           }
-          
-          const preBlurRadiusSlider = document.getElementById('preBlurRadiusSlider');
-          const blurRadiusValue = document.getElementById('blurRadiusValue');
+
+          const preBlurRadiusSlider = document.getElementById(
+            "preBlurRadiusSlider"
+          );
+          const blurRadiusValue = document.getElementById("blurRadiusValue");
           if (preBlurRadiusSlider && blurRadiusValue) {
             preBlurRadiusSlider.value = 0;
-            blurRadiusValue.textContent = '0';
+            blurRadiusValue.textContent = "0";
           }
-          
-          const sharpenAmountSlider = document.getElementById('sharpenAmountSlider');
-          const sharpenAmountValue = document.getElementById('sharpenAmountValue');
-          const sharpenRadiusControl = document.getElementById('sharpenRadiusControl');
-          const sharpenThresholdControl = document.getElementById('sharpenThresholdControl');
+
+          const sharpenAmountSlider = document.getElementById(
+            "sharpenAmountSlider"
+          );
+          const sharpenAmountValue =
+            document.getElementById("sharpenAmountValue");
+          const sharpenRadiusControl = document.getElementById(
+            "sharpenRadiusControl"
+          );
+          const sharpenThresholdControl = document.getElementById(
+            "sharpenThresholdControl"
+          );
           if (sharpenAmountSlider && sharpenAmountValue) {
             sharpenAmountSlider.value = 0;
-            sharpenAmountValue.textContent = '0';
-            if (sharpenRadiusControl) sharpenRadiusControl.style.display = 'none';
-            if (sharpenThresholdControl) sharpenThresholdControl.style.display = 'none';
+            sharpenAmountValue.textContent = "0";
+            if (sharpenRadiusControl)
+              sharpenRadiusControl.style.display = "none";
+            if (sharpenThresholdControl)
+              sharpenThresholdControl.style.display = "none";
           }
-          
-          const sharpenRadiusSlider = document.getElementById('sharpenRadiusSlider');
-          const sharpenRadiusValue = document.getElementById('sharpenRadiusValue');
+
+          const sharpenRadiusSlider = document.getElementById(
+            "sharpenRadiusSlider"
+          );
+          const sharpenRadiusValue =
+            document.getElementById("sharpenRadiusValue");
           if (sharpenRadiusSlider && sharpenRadiusValue) {
             sharpenRadiusSlider.value = 0;
-            sharpenRadiusValue.textContent = '0';
+            sharpenRadiusValue.textContent = "0";
           }
-          
-          const sharpenThresholdSlider = document.getElementById('sharpenThresholdSlider');
-          const sharpenThresholdValue = document.getElementById('sharpenThresholdValue');
+
+          const sharpenThresholdSlider = document.getElementById(
+            "sharpenThresholdSlider"
+          );
+          const sharpenThresholdValue = document.getElementById(
+            "sharpenThresholdValue"
+          );
           if (sharpenThresholdSlider && sharpenThresholdValue) {
             sharpenThresholdSlider.value = 0;
-            sharpenThresholdValue.textContent = '0';
+            sharpenThresholdValue.textContent = "0";
           }
-          
+
           // Resampling method
-          const resamplingMethodSelect = document.getElementById('resamplingMethodSelect');
-          if (resamplingMethodSelect) resamplingMethodSelect.value = 'nearest';
-          
+          const resamplingMethodSelect = document.getElementById(
+            "resamplingMethodSelect"
+          );
+          if (resamplingMethodSelect) resamplingMethodSelect.value = "nearest";
+
           // Advanced color matching - RESET TO DEFAULT (RGB, no chroma)
-          const colorAlgorithmSelect = document.getElementById('colorAlgorithmSelect');
-          if (colorAlgorithmSelect) colorAlgorithmSelect.value = 'rgb';
-          
-          const chromaPenaltyToggle = document.getElementById('enableChromaPenaltyToggle');
+          const colorAlgorithmSelect = document.getElementById(
+            "colorAlgorithmSelect"
+          );
+          if (colorAlgorithmSelect) colorAlgorithmSelect.value = "rgb";
+
+          const chromaPenaltyToggle = document.getElementById(
+            "enableChromaPenaltyToggle"
+          );
           if (chromaPenaltyToggle) chromaPenaltyToggle.checked = false;
-          
-          const chromaPenaltyWeightSlider = document.getElementById('chromaPenaltyWeightSlider');
-          const chromaWeightValue = document.getElementById('chromaWeightValue');
+
+          const chromaPenaltyWeightSlider = document.getElementById(
+            "chromaPenaltyWeightSlider"
+          );
+          const chromaWeightValue =
+            document.getElementById("chromaWeightValue");
           if (chromaPenaltyWeightSlider && chromaWeightValue) {
             chromaPenaltyWeightSlider.value = 0.15;
-            chromaWeightValue.textContent = '0.15';
+            chromaWeightValue.textContent = "0.15";
           }
-          
+
           // Post-processing controls
-          const enableEdgeOverlayToggle = document.getElementById('enableEdgeOverlayToggle');
+          const enableEdgeOverlayToggle = document.getElementById(
+            "enableEdgeOverlayToggle"
+          );
           if (enableEdgeOverlayToggle) enableEdgeOverlayToggle.checked = false;
-          
-          const edgeAlgorithmControl = document.getElementById('edgeAlgorithmControl');
-          if (edgeAlgorithmControl) edgeAlgorithmControl.style.display = 'none';
-          
-          const edgeDetectionAlgorithmSelect = document.getElementById('edgeDetectionAlgorithmSelect');
-          if (edgeDetectionAlgorithmSelect) edgeDetectionAlgorithmSelect.value = 'sobel';
-          
-          const outlineThicknessSlider = document.getElementById('outlineThicknessSlider');
-          const outlineThicknessValue = document.getElementById('outlineThicknessValue');
+
+          const edgeAlgorithmControl = document.getElementById(
+            "edgeAlgorithmControl"
+          );
+          if (edgeAlgorithmControl) edgeAlgorithmControl.style.display = "none";
+
+          const edgeDetectionAlgorithmSelect = document.getElementById(
+            "edgeDetectionAlgorithmSelect"
+          );
+          if (edgeDetectionAlgorithmSelect)
+            edgeDetectionAlgorithmSelect.value = "sobel";
+
+          const outlineThicknessSlider = document.getElementById(
+            "outlineThicknessSlider"
+          );
+          const outlineThicknessValue = document.getElementById(
+            "outlineThicknessValue"
+          );
           if (outlineThicknessSlider && outlineThicknessValue) {
             outlineThicknessSlider.value = 0;
-            outlineThicknessValue.textContent = '0';
+            outlineThicknessValue.textContent = "0";
           }
-          
-          const simplifyAreaSlider = document.getElementById('simplifyAreaSlider');
-          const simplifyAreaValue = document.getElementById('simplifyAreaValue');
+
+          const simplifyAreaSlider =
+            document.getElementById("simplifyAreaSlider");
+          const simplifyAreaValue =
+            document.getElementById("simplifyAreaValue");
           if (simplifyAreaSlider && simplifyAreaValue) {
             simplifyAreaSlider.value = 0;
-            simplifyAreaValue.textContent = '0';
+            simplifyAreaValue.textContent = "0";
           }
-          
-          const erodeAmountSlider = document.getElementById('erodeAmountSlider');
-          const erodeAmountValue = document.getElementById('erodeAmountValue');
+
+          const erodeAmountSlider =
+            document.getElementById("erodeAmountSlider");
+          const erodeAmountValue = document.getElementById("erodeAmountValue");
           if (erodeAmountSlider && erodeAmountValue) {
             erodeAmountSlider.value = 0;
-            erodeAmountValue.textContent = '0';
+            erodeAmountValue.textContent = "0";
           }
-          
-          const modeFilterSlider = document.getElementById('modeFilterSlider');
-          const modeFilterValue = document.getElementById('modeFilterValue');
+
+          const modeFilterSlider = document.getElementById("modeFilterSlider");
+          const modeFilterValue = document.getElementById("modeFilterValue");
           if (modeFilterSlider && modeFilterValue) {
             modeFilterSlider.value = 0;
-            modeFilterValue.textContent = '0';
+            modeFilterValue.textContent = "0";
           }
-          
+
           // Color correction controls
-          const enableColorCorrectionToggle = document.getElementById('enableColorCorrectionToggle');
-          if (enableColorCorrectionToggle) enableColorCorrectionToggle.checked = false;
-          
-          const colorCorrectionControls = document.getElementById('colorCorrectionControls');
-          if (colorCorrectionControls) colorCorrectionControls.style.display = 'none';
-          
-          const brightnessSlider = document.getElementById('brightnessSlider');
-          const brightnessValue = document.getElementById('brightnessValue');
+          const enableColorCorrectionToggle = document.getElementById(
+            "enableColorCorrectionToggle"
+          );
+          if (enableColorCorrectionToggle)
+            enableColorCorrectionToggle.checked = false;
+
+          const colorCorrectionControls = document.getElementById(
+            "colorCorrectionControls"
+          );
+          if (colorCorrectionControls)
+            colorCorrectionControls.style.display = "none";
+
+          const brightnessSlider = document.getElementById("brightnessSlider");
+          const brightnessValue = document.getElementById("brightnessValue");
           if (brightnessSlider && brightnessValue) {
             brightnessSlider.value = 0;
-            brightnessValue.textContent = '0';
+            brightnessValue.textContent = "0";
           }
-          
-          const contrastSlider = document.getElementById('contrastSlider');
-          const contrastValue = document.getElementById('contrastValue');
+
+          const contrastSlider = document.getElementById("contrastSlider");
+          const contrastValue = document.getElementById("contrastValue");
           if (contrastSlider && contrastValue) {
             contrastSlider.value = 0;
-            contrastValue.textContent = '0';
+            contrastValue.textContent = "0";
           }
-          
-          const saturationSlider = document.getElementById('saturationSlider');
-          const saturationValue = document.getElementById('saturationValue');
+
+          const saturationSlider = document.getElementById("saturationSlider");
+          const saturationValue = document.getElementById("saturationValue");
           if (saturationSlider && saturationValue) {
             saturationSlider.value = 0;
-            saturationValue.textContent = '0';
+            saturationValue.textContent = "0";
           }
-          
-          const hueSlider = document.getElementById('hueSlider');
-          const hueValue = document.getElementById('hueValue');
+
+          const hueSlider = document.getElementById("hueSlider");
+          const hueValue = document.getElementById("hueValue");
           if (hueSlider && hueValue) {
             hueSlider.value = 0;
-            hueValue.textContent = '0°';
+            hueValue.textContent = "0°";
           }
-          
-          const gammaSlider = document.getElementById('gammaSlider');
-          const gammaValue = document.getElementById('gammaValue');
+
+          const gammaSlider = document.getElementById("gammaSlider");
+          const gammaValue = document.getElementById("gammaValue");
           if (gammaSlider && gammaValue) {
             gammaSlider.value = 1.0;
-            gammaValue.textContent = '1.0';
+            gammaValue.textContent = "1.0";
           }
-          
-          console.log('✅ UI elements reset - All controls to default, Color Algorithm: RGB, Chroma OFF, Post-Processing OFF, Color Correction OFF');
+
+          console.log(
+            "✅ UI elements reset - All controls to default, Color Algorithm: RGB, Chroma OFF, Post-Processing OFF, Color Correction OFF"
+          );
         }, 100);
       } else {
         // Panel reopened - just sync UI with current state
         setTimeout(() => {
           // Update all sliders to match current state values
-          const ditheringStrengthSlider = document.getElementById('ditheringStrengthSlider');
-          const ditheringStrengthValue = document.getElementById('ditheringStrengthValue');
+          const ditheringStrengthSlider = document.getElementById(
+            "ditheringStrengthSlider"
+          );
+          const ditheringStrengthValue = document.getElementById(
+            "ditheringStrengthValue"
+          );
           if (ditheringStrengthSlider && ditheringStrengthValue) {
-            ditheringStrengthSlider.value = Math.round(state.ditheringStrength * 100);
-            ditheringStrengthValue.textContent = `${Math.round(state.ditheringStrength * 100)}%`;
+            ditheringStrengthSlider.value = Math.round(
+              state.ditheringStrength * 100
+            );
+            ditheringStrengthValue.textContent = `${Math.round(
+              state.ditheringStrength * 100
+            )}%`;
           }
-          
-          const posterizeLevelsSlider = document.getElementById('posterizeLevelsSlider');
-          const posterizeLevelsValue = document.getElementById('posterizeLevelsValue');
+
+          const posterizeLevelsSlider = document.getElementById(
+            "posterizeLevelsSlider"
+          );
+          const posterizeLevelsValue = document.getElementById(
+            "posterizeLevelsValue"
+          );
           if (posterizeLevelsSlider && posterizeLevelsValue) {
             posterizeLevelsSlider.value = state.posterizeLevels;
-            posterizeLevelsValue.textContent = state.posterizeLevels === 0 ? 'Disabled' : state.posterizeLevels;
+            posterizeLevelsValue.textContent =
+              state.posterizeLevels === 0 ? "Disabled" : state.posterizeLevels;
           }
-          
-          const preBlurRadiusSlider = document.getElementById('preBlurRadiusSlider');
-          const blurRadiusValue = document.getElementById('blurRadiusValue');
+
+          const preBlurRadiusSlider = document.getElementById(
+            "preBlurRadiusSlider"
+          );
+          const blurRadiusValue = document.getElementById("blurRadiusValue");
           if (preBlurRadiusSlider && blurRadiusValue) {
             preBlurRadiusSlider.value = state.preBlurRadius;
             blurRadiusValue.textContent = state.preBlurRadius;
           }
-          
-          const sharpenAmountSlider = document.getElementById('sharpenAmountSlider');
-          const sharpenAmountValue = document.getElementById('sharpenAmountValue');
+
+          const sharpenAmountSlider = document.getElementById(
+            "sharpenAmountSlider"
+          );
+          const sharpenAmountValue =
+            document.getElementById("sharpenAmountValue");
           if (sharpenAmountSlider && sharpenAmountValue) {
             sharpenAmountSlider.value = state.sharpenAmount;
             sharpenAmountValue.textContent = state.sharpenAmount;
           }
-          
-          const outlineThicknessSlider = document.getElementById('outlineThicknessSlider');
-          const outlineThicknessValue = document.getElementById('outlineThicknessValue');
+
+          const outlineThicknessSlider = document.getElementById(
+            "outlineThicknessSlider"
+          );
+          const outlineThicknessValue = document.getElementById(
+            "outlineThicknessValue"
+          );
           if (outlineThicknessSlider && outlineThicknessValue) {
             outlineThicknessSlider.value = state.outlineThickness;
             outlineThicknessValue.textContent = state.outlineThickness;
           }
-          
-          const simplifyAreaSlider = document.getElementById('simplifyAreaSlider');
-          const simplifyAreaValue = document.getElementById('simplifyAreaValue');
+
+          const simplifyAreaSlider =
+            document.getElementById("simplifyAreaSlider");
+          const simplifyAreaValue =
+            document.getElementById("simplifyAreaValue");
           if (simplifyAreaSlider && simplifyAreaValue) {
             simplifyAreaSlider.value = state.simplifyArea;
             simplifyAreaValue.textContent = state.simplifyArea;
           }
-          
-          const erodeAmountSlider = document.getElementById('erodeAmountSlider');
-          const erodeAmountValue = document.getElementById('erodeAmountValue');
+
+          const erodeAmountSlider =
+            document.getElementById("erodeAmountSlider");
+          const erodeAmountValue = document.getElementById("erodeAmountValue");
           if (erodeAmountSlider && erodeAmountValue) {
             erodeAmountSlider.value = state.erodeAmount;
             erodeAmountValue.textContent = state.erodeAmount;
           }
-          
-          const modeFilterSlider = document.getElementById('modeFilterSlider');
-          const modeFilterValue = document.getElementById('modeFilterValue');
+
+          const modeFilterSlider = document.getElementById("modeFilterSlider");
+          const modeFilterValue = document.getElementById("modeFilterValue");
           if (modeFilterSlider && modeFilterValue) {
             modeFilterSlider.value = state.modeFilterSize;
             modeFilterValue.textContent = state.modeFilterSize;
           }
-          
-          const brightnessSlider = document.getElementById('brightnessSlider');
-          const brightnessValue = document.getElementById('brightnessValue');
+
+          const brightnessSlider = document.getElementById("brightnessSlider");
+          const brightnessValue = document.getElementById("brightnessValue");
           if (brightnessSlider && brightnessValue) {
             brightnessSlider.value = state.brightness;
             brightnessValue.textContent = state.brightness;
           }
-          
-          const contrastSlider = document.getElementById('contrastSlider');
-          const contrastValue = document.getElementById('contrastValue');
+
+          const contrastSlider = document.getElementById("contrastSlider");
+          const contrastValue = document.getElementById("contrastValue");
           if (contrastSlider && contrastValue) {
             contrastSlider.value = state.contrast;
             contrastValue.textContent = state.contrast;
           }
-          
-          const saturationSlider = document.getElementById('saturationSlider');
-          const saturationValue = document.getElementById('saturationValue');
+
+          const saturationSlider = document.getElementById("saturationSlider");
+          const saturationValue = document.getElementById("saturationValue");
           if (saturationSlider && saturationValue) {
             saturationSlider.value = state.saturation;
             saturationValue.textContent = state.saturation;
           }
-          
-          const hueSlider = document.getElementById('hueSlider');
-          const hueValue = document.getElementById('hueValue');
+
+          const hueSlider = document.getElementById("hueSlider");
+          const hueValue = document.getElementById("hueValue");
           if (hueSlider && hueValue) {
             hueSlider.value = state.hue;
-            hueValue.textContent = state.hue + '°';
+            hueValue.textContent = state.hue + "°";
           }
-          
-          const gammaSlider = document.getElementById('gammaSlider');
-          const gammaValue = document.getElementById('gammaValue');
+
+          const gammaSlider = document.getElementById("gammaSlider");
+          const gammaValue = document.getElementById("gammaValue");
           if (gammaSlider && gammaValue) {
             gammaSlider.value = state.gamma;
             gammaValue.textContent = state.gamma.toFixed(1);
           }
-          
-          console.log('📂 UI synced with current state - settings preserved');
+
+          console.log("📂 UI synced with current state - settings preserved");
         }, 100);
       }
 
@@ -5743,16 +6822,22 @@ localStorage.removeItem("lp");
         if (y > _dirty.maxY) _dirty.maxY = y;
       };
       const _flushDirty = () => {
-        if (!_dirty || _dirty.maxX < _dirty.minX || _dirty.maxY < _dirty.minY) return;
+        if (!_dirty || _dirty.maxX < _dirty.minX || _dirty.maxY < _dirty.minY)
+          return;
         const x = Math.max(0, _dirty.minX);
         const y = Math.max(0, _dirty.minY);
         const w = Math.min(maskCanvas.width - x, _dirty.maxX - x + 1);
         const h = Math.min(maskCanvas.height - y, _dirty.maxY - y + 1);
-        if (w > 0 && h > 0) maskCtx.putImageData(_maskImageData, 0, 0, x, y, w, h);
+        if (w > 0 && h > 0)
+          maskCtx.putImageData(_maskImageData, 0, 0, x, y, w, h);
         _resetDirty();
       };
       const _ensureMaskOverlayBuffers = (w, h, rebuildFromMask = false) => {
-        if (!_maskImageData || _maskImageData.width !== w || _maskImageData.height !== h) {
+        if (
+          !_maskImageData ||
+          _maskImageData.width !== w ||
+          _maskImageData.height !== h
+        ) {
           _maskImageData = maskCtx.createImageData(w, h);
           _maskData = _maskImageData.data;
           rebuildFromMask = true;
@@ -5776,7 +6861,10 @@ localStorage.removeItem("lp");
         }
       };
       const ensureMaskSize = (w, h) => {
-        if (!state.resizeIgnoreMask || state.resizeIgnoreMask.length !== w * h) {
+        if (
+          !state.resizeIgnoreMask ||
+          state.resizeIgnoreMask.length !== w * h
+        ) {
           state.resizeIgnoreMask = new Uint8Array(w * h);
         }
         baseCanvas.width = w;
@@ -5787,60 +6875,97 @@ localStorage.removeItem("lp");
         // Ensure overlay buffers exist and rebuild from mask when dimensions change
         _ensureMaskOverlayBuffers(w, h, true);
       };
-      
+
       // Helper function to resample an image source using the global WPlaceImageProcessor
-      const performResampling = (imageSource, targetWidth, targetHeight, method) => {
+      const performResampling = (
+        imageSource,
+        targetWidth,
+        targetHeight,
+        method
+      ) => {
         // Get the source canvas/image
         let source = imageSource.canvas || imageSource.img;
-        
+
         // Apply pre-blur if enabled
-        if (state.preBlurMode && state.preBlurMode !== 'none' && state.preBlurRadius > 0) {
-          const preBlurCanvas = document.createElement('canvas');
+        if (
+          state.preBlurMode &&
+          state.preBlurMode !== "none" &&
+          state.preBlurRadius > 0
+        ) {
+          const preBlurCanvas = document.createElement("canvas");
           preBlurCanvas.width = source.width;
           preBlurCanvas.height = source.height;
-          const preBlurCtx = preBlurCanvas.getContext('2d');
+          const preBlurCtx = preBlurCanvas.getContext("2d");
           preBlurCtx.drawImage(source, 0, 0);
-          
+
           // Apply blur using global image processor
-          if (globalImageProcessor && typeof globalImageProcessor.applyPreBlur === 'function') {
-            source = globalImageProcessor.applyPreBlur(preBlurCanvas, state.preBlurMode, state.preBlurRadius);
-            console.log(`✨ Applied ${state.preBlurMode} blur with radius ${state.preBlurRadius}`);
+          if (
+            globalImageProcessor &&
+            typeof globalImageProcessor.applyPreBlur === "function"
+          ) {
+            source = globalImageProcessor.applyPreBlur(
+              preBlurCanvas,
+              state.preBlurMode,
+              state.preBlurRadius
+            );
+            console.log(
+              `✨ Applied ${state.preBlurMode} blur with radius ${state.preBlurRadius}`
+            );
           }
         }
-        
+
         // Perform resampling
         let resampledCanvas;
-        if (typeof imageSource.resampleImage === 'function') {
-          resampledCanvas = imageSource.resampleImage(source, targetWidth, targetHeight, method);
-        } else if (window.WPlaceImageProcessor && globalImageProcessor && typeof globalImageProcessor.resampleImage === 'function') {
-          resampledCanvas = globalImageProcessor.resampleImage(source, targetWidth, targetHeight, method);
+        if (typeof imageSource.resampleImage === "function") {
+          resampledCanvas = imageSource.resampleImage(
+            source,
+            targetWidth,
+            targetHeight,
+            method
+          );
+        } else if (
+          window.WPlaceImageProcessor &&
+          globalImageProcessor &&
+          typeof globalImageProcessor.resampleImage === "function"
+        ) {
+          resampledCanvas = globalImageProcessor.resampleImage(
+            source,
+            targetWidth,
+            targetHeight,
+            method
+          );
         } else {
           // Final fallback: simple canvas drawing
-          const fallbackCanvas = document.createElement('canvas');
-          const fallbackCtx = fallbackCanvas.getContext('2d');
+          const fallbackCanvas = document.createElement("canvas");
+          const fallbackCtx = fallbackCanvas.getContext("2d");
           fallbackCanvas.width = targetWidth;
           fallbackCanvas.height = targetHeight;
-          fallbackCtx.imageSmoothingEnabled = (method === 'bilinear');
+          fallbackCtx.imageSmoothingEnabled = method === "bilinear";
           fallbackCtx.drawImage(source, 0, 0, targetWidth, targetHeight);
           resampledCanvas = fallbackCanvas;
         }
-        
+
         // Apply sharpening if enabled
         if (state.sharpenAmount > 0 && state.sharpenRadius > 0) {
-          if (globalImageProcessor && typeof globalImageProcessor.applyUnsharpMask === 'function') {
+          if (
+            globalImageProcessor &&
+            typeof globalImageProcessor.applyUnsharpMask === "function"
+          ) {
             resampledCanvas = globalImageProcessor.applyUnsharpMask(
               resampledCanvas,
               state.sharpenAmount,
               state.sharpenRadius,
               state.sharpenThreshold
             );
-            console.log(`✨ Applied unsharp mask: amount=${state.sharpenAmount}, radius=${state.sharpenRadius}, threshold=${state.sharpenThreshold}`);
+            console.log(
+              `✨ Applied unsharp mask: amount=${state.sharpenAmount}, radius=${state.sharpenRadius}, threshold=${state.sharpenThreshold}`
+            );
           }
         }
-        
+
         return resampledCanvas;
       };
-      
+
       _updateResizePreview = async () => {
         const jobId = ++_previewJobId;
         const newWidth = parseInt(widthSlider.value, 10);
@@ -5851,15 +6976,18 @@ localStorage.removeItem("lp");
         heightValue.textContent = newHeight;
 
         ensureMaskSize(newWidth, newHeight);
-        canvasStack.style.width = newWidth + 'px';
-        canvasStack.style.height = newHeight + 'px';
+        canvasStack.style.width = newWidth + "px";
+        canvasStack.style.height = newHeight + "px";
         baseCtx.imageSmoothingEnabled = false;
 
         if (!state.availableColors || state.availableColors.length === 0) {
-          if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
+          if (
+            baseProcessor !== processor &&
+            (!baseProcessor.img || !baseProcessor.canvas)
+          ) {
             await baseProcessor.load();
           }
-          
+
           // Use the resampling helper function
           const resampledCanvas = performResampling(
             baseProcessor,
@@ -5867,10 +6995,10 @@ localStorage.removeItem("lp");
             newHeight,
             state.resamplingMethod
           );
-          
+
           baseCtx.clearRect(0, 0, newWidth, newHeight);
           baseCtx.drawImage(resampledCanvas, 0, 0);
-          
+
           // Draw existing mask overlay buffer
           maskCtx.clearRect(0, 0, maskCanvas.width, maskCanvas.height);
           if (_maskImageData) maskCtx.putImageData(_maskImageData, 0, 0);
@@ -5878,10 +7006,13 @@ localStorage.removeItem("lp");
           return;
         }
 
-        if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
+        if (
+          baseProcessor !== processor &&
+          (!baseProcessor.img || !baseProcessor.canvas)
+        ) {
           await baseProcessor.load();
         }
-        
+
         // Use the resampling helper function
         const resampledCanvas = performResampling(
           baseProcessor,
@@ -5889,23 +7020,25 @@ localStorage.removeItem("lp");
           newHeight,
           state.resamplingMethod
         );
-        
+
         baseCtx.clearRect(0, 0, newWidth, newHeight);
         baseCtx.drawImage(resampledCanvas, 0, 0);
         const imgData = baseCtx.getImageData(0, 0, newWidth, newHeight);
         const data = imgData.data;
 
-        const tThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
+        const tThresh =
+          state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
 
         // Apply color correction BEFORE palette conversion (if enabled)
         // This ensures color adjustments happen before snapping to palette
-        if (state.enableColorCorrection && (
-          state.brightness !== 0 ||
-          state.contrast !== 0 ||
-          state.saturation !== 0 ||
-          state.hue !== 0 ||
-          state.gamma !== 1.0
-        )) {
+        if (
+          state.enableColorCorrection &&
+          (state.brightness !== 0 ||
+            state.contrast !== 0 ||
+            state.saturation !== 0 ||
+            state.hue !== 0 ||
+            state.gamma !== 1.0)
+        ) {
           const processedData = globalImageProcessor.applyColorCorrection(
             data,
             state.brightness || 0,
@@ -5920,7 +7053,9 @@ localStorage.removeItem("lp");
         }
 
         // Apply multi-algorithm dithering if enabled
-        console.log(`🎨 Preview render - ditheringEnabled: ${state.ditheringEnabled}, _isDraggingSize: ${_isDraggingSize}`);
+        console.log(
+          `🎨 Preview render - ditheringEnabled: ${state.ditheringEnabled}, _isDraggingSize: ${_isDraggingSize}`
+        );
         if (state.ditheringEnabled && !_isDraggingSize) {
           const ditherResult = globalImageProcessor.applyDithering(
             data,
@@ -5928,35 +7063,38 @@ localStorage.removeItem("lp");
             newHeight,
             state.activeColorPalette,
             {
-              method: state.ditheringMethod || 'floyd',
+              method: state.ditheringMethod || "floyd",
               strength: state.ditheringStrength || 0.5,
               posterizeLevels: state.posterizeLevels || 0,
               paintTransparentPixels: state.paintTransparentPixels,
               paintWhitePixels: state.paintWhitePixels,
               transparencyThreshold: tThresh,
-              whiteThreshold: state.customWhiteThreshold || CONFIG.WHITE_THRESHOLD,
-              algorithm: state.colorMatchingAlgorithm || 'lab',
+              whiteThreshold:
+                state.customWhiteThreshold || CONFIG.WHITE_THRESHOLD,
+              algorithm: state.colorMatchingAlgorithm || "lab",
               enableChromaPenalty: state.enableChromaPenalty,
               chromaPenaltyWeight: state.chromaPenaltyWeight,
-              mask: state.resizeIgnoreMask
+              mask: state.resizeIgnoreMask,
             }
           );
-          
+
           // Copy dithered data back
           for (let i = 0; i < ditherResult.data.length; i++) {
             data[i] = ditherResult.data[i];
           }
         } else {
           // No dithering - simple color quantization
-          console.log('⛔ Dithering disabled - applying direct color quantization');
+          console.log(
+            "⛔ Dithering disabled - applying direct color quantization"
+          );
           for (let i = 0; i < data.length; i += 4) {
             const r = data[i],
               g = data[i + 1],
               b = data[i + 2],
               a = data[i + 3];
-            
+
             const isTransparent = a < tThresh;
-            
+
             if (
               (!state.paintTransparentPixels && isTransparent) ||
               (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))
@@ -5964,7 +7102,7 @@ localStorage.removeItem("lp");
               data[i + 3] = 0;
               continue;
             }
-            
+
             // If painting transparent pixels and this pixel is transparent, keep it transparent
             if (state.paintTransparentPixels && isTransparent) {
               data[i] = 0;
@@ -5973,8 +7111,13 @@ localStorage.removeItem("lp");
               data[i + 3] = 0;
               continue;
             }
-            
-            const [nr, ng, nb] = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+
+            const [nr, ng, nb] = Utils.findClosestPaletteColor(
+              r,
+              g,
+              b,
+              state.activeColorPalette
+            );
             data[i] = nr;
             data[i + 1] = ng;
             data[i + 2] = nb;
@@ -5987,7 +7130,7 @@ localStorage.removeItem("lp");
             data,
             newWidth,
             newHeight,
-            state.edgeDetectionAlgorithm || 'sobel',
+            state.edgeDetectionAlgorithm || "sobel",
             state.edgeThreshold || 60,
             state.edgeThickness || 1,
             state.edgeThin || false
@@ -6060,29 +7203,33 @@ localStorage.removeItem("lp");
             state.imageData.pixels = processedPixels;
             state.imageData.width = newWidth;
             state.imageData.height = newHeight;
-            
+
             // Update overlay with processed image
-            const overlayCanvas = document.createElement('canvas');
+            const overlayCanvas = document.createElement("canvas");
             overlayCanvas.width = newWidth;
             overlayCanvas.height = newHeight;
-            const overlayCtx = overlayCanvas.getContext('2d');
+            const overlayCtx = overlayCanvas.getContext("2d");
             overlayCtx.putImageData(imgData, 0, 0);
-            
-            createImageBitmap(overlayCanvas).then(bitmap => {
-              overlayManager.setImage(bitmap);
-              console.log('✅ Overlay auto-updated with processing changes');
-            }).catch(err => {
-              console.warn('Failed to auto-update overlay:', err);
-            });
+
+            createImageBitmap(overlayCanvas)
+              .then((bitmap) => {
+                overlayManager.setImage(bitmap);
+                console.log("✅ Overlay auto-updated with processing changes");
+              })
+              .catch((err) => {
+                console.warn("Failed to auto-update overlay:", err);
+              });
           } catch (err) {
-            console.warn('Failed to auto-commit processing changes:', err);
+            console.warn("Failed to auto-commit processing changes:", err);
           }
         }
       };
 
       const onWidthInput = () => {
         if (keepAspect.checked) {
-          heightSlider.value = Math.round(parseInt(widthSlider.value, 10) / aspectRatio);
+          heightSlider.value = Math.round(
+            parseInt(widthSlider.value, 10) / aspectRatio
+          );
         }
         _updateResizePreview();
         const curW = parseInt(widthSlider.value, 10);
@@ -6095,13 +7242,15 @@ localStorage.removeItem("lp");
         };
         saveBotSettings();
         // Auto-fit after size changes
-        const fit = typeof computeFitZoom === 'function' ? computeFitZoom() : 1;
+        const fit = typeof computeFitZoom === "function" ? computeFitZoom() : 1;
         if (!isNaN(fit) && isFinite(fit)) applyZoom(fit);
       };
 
       const onHeightInput = () => {
         if (keepAspect.checked) {
-          widthSlider.value = Math.round(parseInt(heightSlider.value, 10) * aspectRatio);
+          widthSlider.value = Math.round(
+            parseInt(heightSlider.value, 10) * aspectRatio
+          );
         }
         _updateResizePreview();
         const curW = parseInt(widthSlider.value, 10);
@@ -6114,7 +7263,7 @@ localStorage.removeItem("lp");
         };
         saveBotSettings();
         // Auto-fit after size changes
-        const fit = typeof computeFitZoom === 'function' ? computeFitZoom() : 1;
+        const fit = typeof computeFitZoom === "function" ? computeFitZoom() : 1;
         if (!isNaN(fit) && isFinite(fit)) applyZoom(fit);
       };
 
@@ -6167,27 +7316,32 @@ localStorage.removeItem("lp");
       const updateZoomLayout = () => {
         const w = baseCanvas.width || 1,
           h = baseCanvas.height || 1;
-        baseCanvas.style.width = w + 'px';
-        baseCanvas.style.height = h + 'px';
-        maskCanvas.style.width = w + 'px';
-        maskCanvas.style.height = h + 'px';
-        canvasStack.style.width = w + 'px';
-        canvasStack.style.height = h + 'px';
+        baseCanvas.style.width = w + "px";
+        baseCanvas.style.height = h + "px";
+        maskCanvas.style.width = w + "px";
+        maskCanvas.style.height = h + "px";
+        canvasStack.style.width = w + "px";
+        canvasStack.style.height = h + "px";
         applyPan();
       };
       const applyZoom = (z) => {
         _zoomLevel = Math.max(0.05, Math.min(20, z || 1));
         zoomSlider.value = _zoomLevel;
         updateZoomLayout();
-        if (zoomValue) zoomValue.textContent = `${Math.round(_zoomLevel * 100)}%`;
+        if (zoomValue)
+          zoomValue.textContent = `${Math.round(_zoomLevel * 100)}%`;
       };
-      zoomSlider.addEventListener('input', () => {
+      zoomSlider.addEventListener("input", () => {
         applyZoom(parseFloat(zoomSlider.value));
       });
       if (zoomInBtn)
-        zoomInBtn.addEventListener('click', () => applyZoom(parseFloat(zoomSlider.value) + 0.1));
+        zoomInBtn.addEventListener("click", () =>
+          applyZoom(parseFloat(zoomSlider.value) + 0.1)
+        );
       if (zoomOutBtn)
-        zoomOutBtn.addEventListener('click', () => applyZoom(parseFloat(zoomSlider.value) - 0.1));
+        zoomOutBtn.addEventListener("click", () =>
+          applyZoom(parseFloat(zoomSlider.value) - 0.1)
+        );
       const computeFitZoom = () => {
         const wrapRect = panStage?.getBoundingClientRect();
         if (!wrapRect) return 1;
@@ -6199,12 +7353,12 @@ localStorage.removeItem("lp");
         return Math.max(0.05, Math.min(20, Math.min(scaleX, scaleY)));
       };
       if (zoomFitBtn)
-        zoomFitBtn.addEventListener('click', () => {
+        zoomFitBtn.addEventListener("click", () => {
           applyZoom(computeFitZoom());
           centerInView();
         });
       if (zoomActualBtn)
-        zoomActualBtn.addEventListener('click', () => {
+        zoomActualBtn.addEventListener("click", () => {
           applyZoom(1);
           centerInView();
         });
@@ -6233,34 +7387,34 @@ localStorage.removeItem("lp");
       const isPanActive = (e) => panMode || allowPan || isPanMouseButton(e);
       const updatePanModeBtn = () => {
         if (!panModeBtn) return;
-        panModeBtn.classList.toggle('active', panMode);
-        panModeBtn.setAttribute('aria-pressed', panMode ? 'true' : 'false');
+        panModeBtn.classList.toggle("active", panMode);
+        panModeBtn.setAttribute("aria-pressed", panMode ? "true" : "false");
       };
       if (panModeBtn) {
         updatePanModeBtn();
-        panModeBtn.addEventListener('click', () => {
+        panModeBtn.addEventListener("click", () => {
           panMode = !panMode;
           updatePanModeBtn();
-          setCursor(panMode ? 'grab' : '');
+          setCursor(panMode ? "grab" : "");
         });
       }
       if (panStage) {
-        panStage.addEventListener('contextmenu', (e) => {
+        panStage.addEventListener("contextmenu", (e) => {
           if (allowPan) e.preventDefault();
         });
-        window.addEventListener('keydown', (e) => {
-          if (e.code === 'Space') {
+        window.addEventListener("keydown", (e) => {
+          if (e.code === "Space") {
             allowPan = true;
-            setCursor('grab');
+            setCursor("grab");
           }
         });
-        window.addEventListener('keyup', (e) => {
-          if (e.code === 'Space') {
+        window.addEventListener("keyup", (e) => {
+          if (e.code === "Space") {
             allowPan = false;
-            if (!isPanning) setCursor('');
+            if (!isPanning) setCursor("");
           }
         });
-        panStage.addEventListener('mousedown', (e) => {
+        panStage.addEventListener("mousedown", (e) => {
           if (!isPanActive(e)) return;
           e.preventDefault();
           isPanning = true;
@@ -6268,9 +7422,9 @@ localStorage.removeItem("lp");
           startY = e.clientY;
           startPanX = panX;
           startPanY = panY;
-          setCursor('grabbing');
+          setCursor("grabbing");
         });
-        window.addEventListener('mousemove', (e) => {
+        window.addEventListener("mousemove", (e) => {
           if (!isPanning) return;
           const dx = e.clientX - startX;
           const dy = e.clientY - startY;
@@ -6278,14 +7432,14 @@ localStorage.removeItem("lp");
           panY = startPanY + dy;
           applyPan();
         });
-        window.addEventListener('mouseup', () => {
+        window.addEventListener("mouseup", () => {
           if (isPanning) {
             isPanning = false;
-            setCursor(allowPan ? 'grab' : '');
+            setCursor(allowPan ? "grab" : "");
           }
         });
         panStage.addEventListener(
-          'wheel',
+          "wheel",
           (e) => {
             if (!e.ctrlKey && !e.metaKey) return;
             e.preventDefault();
@@ -6293,8 +7447,14 @@ localStorage.removeItem("lp");
             const cx = e.clientX - rect.left - panX;
             const cy = e.clientY - rect.top - panY;
             const before = _zoomLevel;
-            const step = Math.max(0.05, Math.min(0.5, Math.abs(e.deltaY) > 20 ? 0.2 : 0.1));
-            const next = Math.max(0.05, Math.min(20, before + (e.deltaY > 0 ? -step : step)));
+            const step = Math.max(
+              0.05,
+              Math.min(0.5, Math.abs(e.deltaY) > 20 ? 0.2 : 0.1)
+            );
+            const next = Math.max(
+              0.05,
+              Math.min(20, before + (e.deltaY > 0 ? -step : step))
+            );
             if (next === before) return;
             const scale = next / before;
             panX = panX - cx * (scale - 1);
@@ -6307,7 +7467,7 @@ localStorage.removeItem("lp");
         let touchStartTime = 0;
         let doubleTapTimer = null;
         panStage.addEventListener(
-          'touchstart',
+          "touchstart",
           (e) => {
             if (e.touches.length === 1) {
               const t = e.touches[0];
@@ -6316,11 +7476,12 @@ localStorage.removeItem("lp");
               startY = t.clientY;
               startPanX = panX;
               startPanY = panY;
-              setCursor('grabbing');
+              setCursor("grabbing");
               const now = Date.now();
               if (now - touchStartTime < 300) {
                 // double tap -> toggle 100%/fit
-                const z = Math.abs(_zoomLevel - 1) < 0.01 ? computeFitZoom() : 1;
+                const z =
+                  Math.abs(_zoomLevel - 1) < 0.01 ? computeFitZoom() : 1;
                 applyZoom(z);
                 centerInView();
                 if (doubleTapTimer) clearTimeout(doubleTapTimer);
@@ -6333,13 +7494,16 @@ localStorage.removeItem("lp");
             } else if (e.touches.length === 2) {
               // Pinch start
               const [a, b] = e.touches;
-              lastTouchDist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+              lastTouchDist = Math.hypot(
+                b.clientX - a.clientX,
+                b.clientY - a.clientY
+              );
             }
           },
           { passive: true }
         );
         panStage.addEventListener(
-          'touchmove',
+          "touchmove",
           (e) => {
             if (e.touches.length === 1 && isPanning) {
               const t = e.touches[0];
@@ -6351,7 +7515,10 @@ localStorage.removeItem("lp");
             } else if (e.touches.length === 2 && lastTouchDist != null) {
               e.preventDefault();
               const [a, b] = e.touches;
-              const dist = Math.hypot(b.clientX - a.clientX, b.clientY - a.clientY);
+              const dist = Math.hypot(
+                b.clientX - a.clientX,
+                b.clientY - a.clientY
+              );
               const rect = panStage.getBoundingClientRect();
               const centerX = (a.clientX + b.clientX) / 2 - rect.left - panX;
               const centerY = (a.clientY + b.clientY) / 2 - rect.top - panY;
@@ -6368,62 +7535,75 @@ localStorage.removeItem("lp");
           },
           { passive: false }
         );
-        panStage.addEventListener('touchend', () => {
+        panStage.addEventListener("touchend", () => {
           isPanning = false;
           lastTouchDist = null;
-          setCursor(panMode || allowPan ? 'grab' : '');
+          setCursor(panMode || allowPan ? "grab" : "");
         });
-        
+
         // WASD keyboard panning support (like edit panel)
         const wasdKeys = new Set();
         const wasdPanSpeed = 15; // Base speed in pixels
         let wasdAnimationFrame = null;
-        
+
         const updateWASDPan = () => {
           if (wasdKeys.size === 0) {
             wasdAnimationFrame = null;
             return;
           }
-          
+
           const speed = wasdPanSpeed * _zoomLevel; // Speed scales with zoom
-          
-          if (wasdKeys.has('w') || wasdKeys.has('arrowup')) {
+
+          if (wasdKeys.has("w") || wasdKeys.has("arrowup")) {
             panY += speed;
           }
-          if (wasdKeys.has('s') || wasdKeys.has('arrowdown')) {
+          if (wasdKeys.has("s") || wasdKeys.has("arrowdown")) {
             panY -= speed;
           }
-          if (wasdKeys.has('a') || wasdKeys.has('arrowleft')) {
+          if (wasdKeys.has("a") || wasdKeys.has("arrowleft")) {
             panX += speed;
           }
-          if (wasdKeys.has('d') || wasdKeys.has('arrowright')) {
+          if (wasdKeys.has("d") || wasdKeys.has("arrowright")) {
             panX -= speed;
           }
-          
+
           applyPan();
           wasdAnimationFrame = requestAnimationFrame(updateWASDPan);
         };
-        
-        window.addEventListener('keydown', (e) => {
+
+        window.addEventListener("keydown", (e) => {
           const key = e.key.toLowerCase();
-          if (['w', 'a', 's', 'd', 'arrowup', 'arrowdown', 'arrowleft', 'arrowright'].includes(key)) {
+          if (
+            [
+              "w",
+              "a",
+              "s",
+              "d",
+              "arrowup",
+              "arrowdown",
+              "arrowleft",
+              "arrowright",
+            ].includes(key)
+          ) {
             // Only handle if focus is not in an input/textarea
-            if (document.activeElement.tagName === 'INPUT' || 
-                document.activeElement.tagName === 'TEXTAREA' ||
-                document.activeElement.tagName === 'SELECT') {
+            if (
+              document.activeElement.tagName === "INPUT" ||
+              document.activeElement.tagName === "TEXTAREA" ||
+              document.activeElement.tagName === "SELECT"
+            ) {
               return;
             }
-            
+
             e.preventDefault();
             wasdKeys.add(key);
-            
+
             if (!wasdAnimationFrame) {
               wasdAnimationFrame = requestAnimationFrame(updateWASDPan);
             }
           }
         });
-        
-        window.addEventListener('keyup', (e) => {
+
+        window.addEventListener("keyup", (e) => {
           const key = e.key.toLowerCase();
           wasdKeys.delete(key);
         });
@@ -6435,7 +7615,10 @@ localStorage.removeItem("lp");
           _updateResizePreview();
         };
         if (window.requestIdleCallback) {
-          _previewTimer = setTimeout(() => requestIdleCallback(run, { timeout: 150 }), 50);
+          _previewTimer = setTimeout(
+            () => requestIdleCallback(run, { timeout: 150 }),
+            50
+          );
         } else {
           _previewTimer = setTimeout(() => requestAnimationFrame(run), 50);
         }
@@ -6448,88 +7631,95 @@ localStorage.removeItem("lp");
         _isDraggingSize = false;
         schedulePreview();
       };
-      widthSlider.addEventListener('pointerdown', markDragStart);
-      heightSlider.addEventListener('pointerdown', markDragStart);
-      widthSlider.addEventListener('pointerup', markDragEnd);
-      heightSlider.addEventListener('pointerup', markDragEnd);
-      widthSlider.addEventListener('input', () => {
+      widthSlider.addEventListener("pointerdown", markDragStart);
+      heightSlider.addEventListener("pointerdown", markDragStart);
+      widthSlider.addEventListener("pointerup", markDragEnd);
+      heightSlider.addEventListener("pointerup", markDragEnd);
+      widthSlider.addEventListener("input", () => {
         onWidthInput();
         schedulePreview();
       });
-      heightSlider.addEventListener('input', () => {
+      heightSlider.addEventListener("input", () => {
         onHeightInput();
         schedulePreview();
       });
-      
+
       // Resampling method change listener
       if (resamplingMethodSelect) {
-        resamplingMethodSelect.addEventListener('change', (e) => {
+        resamplingMethodSelect.addEventListener("change", (e) => {
           state.resamplingMethod = e.target.value;
-          console.log(`🎨 Resampling method changed to: ${state.resamplingMethod}`);
+          console.log(
+            `🎨 Resampling method changed to: ${state.resamplingMethod}`
+          );
           saveBotSettings(); // Save the new method
           schedulePreview(); // Trigger preview update with new method
         });
       }
-      
+
       // Pre-blur controls
       if (preBlurModeSelect) {
-        preBlurModeSelect.addEventListener('change', (e) => {
+        preBlurModeSelect.addEventListener("change", (e) => {
           state.preBlurMode = e.target.value;
           console.log(`🎨 Pre-blur mode changed to: ${state.preBlurMode}`);
-          
+
           // Auto-enable pre-blur if a method is selected
-          if (state.preBlurMode !== 'none' && state.preBlurRadius === 0) {
+          if (state.preBlurMode !== "none" && state.preBlurRadius === 0) {
             state.preBlurRadius = 5; // Set to visible default value
             if (preBlurRadiusSlider) preBlurRadiusSlider.value = 5;
             if (blurRadiusValue) blurRadiusValue.textContent = 5;
-            console.log('✨ Pre-blur AUTO-ENABLED with radius: 5');
+            console.log("✨ Pre-blur AUTO-ENABLED with radius: 5");
           }
-          
+
           // Show/hide blur radius control
           if (blurRadiusControl) {
-            blurRadiusControl.style.display = (state.preBlurMode !== 'none') ? 'block' : 'none';
+            blurRadiusControl.style.display =
+              state.preBlurMode !== "none" ? "block" : "none";
           }
           saveBotSettings();
           schedulePreview();
         });
       }
-      
+
       if (preBlurRadiusSlider && blurRadiusValue) {
-        preBlurRadiusSlider.addEventListener('change', (e) => {
+        preBlurRadiusSlider.addEventListener("change", (e) => {
           state.preBlurRadius = parseInt(e.target.value, 10);
           blurRadiusValue.textContent = state.preBlurRadius;
           saveBotSettings();
           schedulePreview();
         });
       }
-      
+
       // Sharpen controls
       if (sharpenAmountSlider && sharpenAmountValue) {
-        sharpenAmountSlider.addEventListener('change', (e) => {
+        sharpenAmountSlider.addEventListener("change", (e) => {
           state.sharpenAmount = parseInt(e.target.value, 10);
           sharpenAmountValue.textContent = state.sharpenAmount;
           // Show/hide additional sharpen controls
           if (sharpenRadiusControl && sharpenThresholdControl) {
             const showControls = state.sharpenAmount > 0;
-            sharpenRadiusControl.style.display = showControls ? 'block' : 'none';
-            sharpenThresholdControl.style.display = showControls ? 'block' : 'none';
+            sharpenRadiusControl.style.display = showControls
+              ? "block"
+              : "none";
+            sharpenThresholdControl.style.display = showControls
+              ? "block"
+              : "none";
           }
           saveBotSettings();
           schedulePreview();
         });
       }
-      
+
       if (sharpenRadiusSlider && sharpenRadiusValue) {
-        sharpenRadiusSlider.addEventListener('change', (e) => {
+        sharpenRadiusSlider.addEventListener("change", (e) => {
           state.sharpenRadius = parseInt(e.target.value, 10);
           sharpenRadiusValue.textContent = state.sharpenRadius;
           saveBotSettings();
           schedulePreview();
         });
       }
-      
+
       if (sharpenThresholdSlider && sharpenThresholdValue) {
-        sharpenThresholdSlider.addEventListener('change', (e) => {
+        sharpenThresholdSlider.addEventListener("change", (e) => {
           state.sharpenThreshold = parseInt(e.target.value, 10);
           sharpenThresholdValue.textContent = state.sharpenThreshold;
           saveBotSettings();
@@ -6544,27 +7734,28 @@ localStorage.removeItem("lp");
       let brushSize = 1;
       let rowColSize = 1;
       let maskMode = null; // null (inactive) | 'ignore' | 'unignore' | 'toggle'
-      const brushEl = resizeContainer.querySelector('#maskBrushSize');
-      const brushValEl = resizeContainer.querySelector('#maskBrushSizeValue');
-      const btnIgnore = resizeContainer.querySelector('#maskModeIgnore');
-      const btnUnignore = resizeContainer.querySelector('#maskModeUnignore');
-      const btnToggle = resizeContainer.querySelector('#maskModeToggle');
-      const clearIgnoredBtnEl = resizeContainer.querySelector('#clearIgnoredBtn');
-      const invertMaskBtn = resizeContainer.querySelector('#invertMaskBtn');
-      const rowColSizeEl = resizeContainer.querySelector('#rowColSize');
-      const rowColSizeValEl = resizeContainer.querySelector('#rowColSizeValue');
+      const brushEl = resizeContainer.querySelector("#maskBrushSize");
+      const brushValEl = resizeContainer.querySelector("#maskBrushSizeValue");
+      const btnIgnore = resizeContainer.querySelector("#maskModeIgnore");
+      const btnUnignore = resizeContainer.querySelector("#maskModeUnignore");
+      const btnToggle = resizeContainer.querySelector("#maskModeToggle");
+      const clearIgnoredBtnEl =
+        resizeContainer.querySelector("#clearIgnoredBtn");
+      const invertMaskBtn = resizeContainer.querySelector("#invertMaskBtn");
+      const rowColSizeEl = resizeContainer.querySelector("#rowColSize");
+      const rowColSizeValEl = resizeContainer.querySelector("#rowColSizeValue");
 
       const updateModeButtons = () => {
         const map = [
-          [btnIgnore, 'ignore'],
-          [btnUnignore, 'unignore'],
-          [btnToggle, 'toggle'],
+          [btnIgnore, "ignore"],
+          [btnUnignore, "unignore"],
+          [btnToggle, "toggle"],
         ];
         for (const [el, m] of map) {
           if (!el) continue;
           const active = maskMode === m;
-          el.classList.toggle('active', active);
-          el.setAttribute('aria-pressed', active ? 'true' : 'false');
+          el.classList.toggle("active", active);
+          el.setAttribute("aria-pressed", active ? "true" : "false");
         }
       };
       const setMode = (mode) => {
@@ -6572,7 +7763,7 @@ localStorage.removeItem("lp");
         updateModeButtons();
       };
       if (brushEl && brushValEl) {
-        brushEl.addEventListener('input', () => {
+        brushEl.addEventListener("input", () => {
           brushSize = parseInt(brushEl.value, 10) || 1;
           brushValEl.textContent = brushSize;
         });
@@ -6580,16 +7771,19 @@ localStorage.removeItem("lp");
         brushSize = parseInt(brushEl.value, 10) || 1;
       }
       if (rowColSizeEl && rowColSizeValEl) {
-        rowColSizeEl.addEventListener('input', () => {
+        rowColSizeEl.addEventListener("input", () => {
           rowColSize = parseInt(rowColSizeEl.value, 10) || 1;
           rowColSizeValEl.textContent = rowColSize;
         });
         rowColSizeValEl.textContent = rowColSizeEl.value;
         rowColSize = parseInt(rowColSizeEl.value, 10) || 1;
       }
-      if (btnIgnore) btnIgnore.addEventListener('click', () => setMode('ignore'));
-      if (btnUnignore) btnUnignore.addEventListener('click', () => setMode('unignore'));
-      if (btnToggle) btnToggle.addEventListener('click', () => setMode('toggle'));
+      if (btnIgnore)
+        btnIgnore.addEventListener("click", () => setMode("ignore"));
+      if (btnUnignore)
+        btnUnignore.addEventListener("click", () => setMode("unignore"));
+      if (btnToggle)
+        btnToggle.addEventListener("click", () => setMode("toggle"));
       // Initialize button state (no mode selected by default)
       updateModeButtons();
 
@@ -6606,7 +7800,10 @@ localStorage.removeItem("lp");
       };
 
       const ensureMask = (w, h) => {
-        if (!state.resizeIgnoreMask || state.resizeIgnoreMask.length !== w * h) {
+        if (
+          !state.resizeIgnoreMask ||
+          state.resizeIgnoreMask.length !== w * h
+        ) {
           state.resizeIgnoreMask = new Uint8Array(w * h);
         }
       };
@@ -6626,9 +7823,9 @@ localStorage.removeItem("lp");
             if (dx * dx + dy * dy <= r2) {
               const idx = yy * w + xx;
               let val = state.resizeIgnoreMask[idx];
-              if (maskMode === 'toggle') {
+              if (maskMode === "toggle") {
                 val = val ? 0 : 1;
-              } else if (maskMode === 'ignore') {
+              } else if (maskMode === "ignore") {
                 val = 1;
               } else {
                 val = 0;
@@ -6670,9 +7867,9 @@ localStorage.removeItem("lp");
           for (let x = 0; x < w; x++) {
             const idx = rowY * w + x;
             let val = state.resizeIgnoreMask[idx];
-            if (maskMode === 'toggle') {
+            if (maskMode === "toggle") {
               val = val ? 0 : 1;
-            } else if (maskMode === 'ignore') {
+            } else if (maskMode === "ignore") {
               val = 1;
             } else {
               val = 0;
@@ -6716,9 +7913,9 @@ localStorage.removeItem("lp");
           for (let y = 0; y < h; y++) {
             const idx = y * w + colX;
             let val = state.resizeIgnoreMask[idx];
-            if (maskMode === 'toggle') {
+            if (maskMode === "toggle") {
               val = val ? 0 : 1;
-            } else if (maskMode === 'ignore') {
+            } else if (maskMode === "ignore") {
               val = 1;
             } else {
               val = 0;
@@ -6771,37 +7968,37 @@ localStorage.removeItem("lp");
         redrawMaskOverlay();
       };
 
-      maskCanvas.addEventListener('mousedown', (e) => {
+      maskCanvas.addEventListener("mousedown", (e) => {
         if (e.button === 1 || e.button === 2 || allowPan) return; // let pan handler manage
         draggingMask = true;
         handlePaint(e);
       });
       // Avoid hijacking touch gestures for panning/zooming
       maskCanvas.addEventListener(
-        'touchstart',
+        "touchstart",
         (e) => {
           /* let panStage handle */
         },
         { passive: true }
       );
       maskCanvas.addEventListener(
-        'touchmove',
+        "touchmove",
         (e) => {
           /* let panStage handle */
         },
         { passive: true }
       );
       maskCanvas.addEventListener(
-        'touchend',
+        "touchend",
         (e) => {
           /* let panStage handle */
         },
         { passive: true }
       );
-      window.addEventListener('mousemove', (e) => {
+      window.addEventListener("mousemove", (e) => {
         if (draggingMask) handlePaint(e);
       });
-      window.addEventListener('mouseup', () => {
+      window.addEventListener("mouseup", () => {
         if (draggingMask) {
           draggingMask = false;
           saveBotSettings();
@@ -6809,7 +8006,7 @@ localStorage.removeItem("lp");
       });
 
       if (clearIgnoredBtnEl)
-        clearIgnoredBtnEl.addEventListener('click', () => {
+        clearIgnoredBtnEl.addEventListener("click", () => {
           const w = baseCanvas.width,
             h = baseCanvas.height;
           if (state.resizeIgnoreMask) state.resizeIgnoreMask.fill(0);
@@ -6819,7 +8016,7 @@ localStorage.removeItem("lp");
         });
 
       if (invertMaskBtn)
-        invertMaskBtn.addEventListener('click', () => {
+        invertMaskBtn.addEventListener("click", () => {
           if (!state.resizeIgnoreMask) return;
           for (let i = 0; i < state.resizeIgnoreMask.length; i++)
             state.resizeIgnoreMask[i] = state.resizeIgnoreMask[i] ? 0 : 1;
@@ -6835,21 +8032,26 @@ localStorage.removeItem("lp");
         const newHeight = parseInt(heightSlider.value, 10);
 
         // Generate the final paletted image data
-        const tempCanvas = document.createElement('canvas');
-        const tempCtx = tempCanvas.getContext('2d');
+        const tempCanvas = document.createElement("canvas");
+        const tempCtx = tempCanvas.getContext("2d");
         tempCanvas.width = newWidth;
         tempCanvas.height = newHeight;
         tempCtx.imageSmoothingEnabled = false;
-        if (baseProcessor !== processor && (!baseProcessor.img || !baseProcessor.canvas)) {
+        if (
+          baseProcessor !== processor &&
+          (!baseProcessor.img || !baseProcessor.canvas)
+        ) {
           await baseProcessor.load();
         }
         tempCtx.drawImage(baseProcessor.img, 0, 0, newWidth, newHeight);
         const imgData = tempCtx.getImageData(0, 0, newWidth, newHeight);
         const data = imgData.data;
-        const tThresh2 = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
+        const tThresh2 =
+          state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
         let totalValidPixels = 0;
         const mask =
-          state.resizeIgnoreMask && state.resizeIgnoreMask.length === newWidth * newHeight
+          state.resizeIgnoreMask &&
+          state.resizeIgnoreMask.length === newWidth * newHeight
             ? state.resizeIgnoreMask
             : null;
 
@@ -6861,20 +8063,21 @@ localStorage.removeItem("lp");
             newHeight,
             state.activeColorPalette,
             {
-              method: state.ditheringMethod || 'floyd',
+              method: state.ditheringMethod || "floyd",
               strength: state.ditheringStrength || 0.5,
               posterizeLevels: state.posterizeLevels || 0,
               paintTransparentPixels: state.paintTransparentPixels,
               paintWhitePixels: state.paintWhitePixels,
               transparencyThreshold: tThresh2,
-              whiteThreshold: state.customWhiteThreshold || CONFIG.WHITE_THRESHOLD,
-              algorithm: state.colorMatchingAlgorithm || 'lab',
+              whiteThreshold:
+                state.customWhiteThreshold || CONFIG.WHITE_THRESHOLD,
+              algorithm: state.colorMatchingAlgorithm || "lab",
               enableChromaPenalty: state.enableChromaPenalty,
               chromaPenaltyWeight: state.chromaPenaltyWeight,
-              mask: mask
+              mask: mask,
             }
           );
-          
+
           // Copy dithered data and count valid pixels
           for (let i = 0; i < ditherResult.data.length; i++) {
             data[i] = ditherResult.data[i];
@@ -6887,14 +8090,18 @@ localStorage.removeItem("lp");
               b = data[i + 2],
               a = data[i + 3];
             const masked = mask && mask[i >> 2];
-            
+
             const isTransparent = a < tThresh2;
-            
-            if (masked || (!state.paintTransparentPixels && isTransparent) || (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))) {
+
+            if (
+              masked ||
+              (!state.paintTransparentPixels && isTransparent) ||
+              (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))
+            ) {
               data[i + 3] = 0; // overlay transparency
               continue;
             }
-            
+
             // If painting transparent AND this pixel is transparent, keep it transparent
             if (state.paintTransparentPixels && isTransparent) {
               data[i] = 0;
@@ -6904,9 +8111,14 @@ localStorage.removeItem("lp");
               totalValidPixels++;
               continue;
             }
-            
+
             totalValidPixels++;
-            const [nr, ng, nb] = Utils.findClosestPaletteColor(r, g, b, state.activeColorPalette);
+            const [nr, ng, nb] = Utils.findClosestPaletteColor(
+              r,
+              g,
+              b,
+              state.activeColorPalette
+            );
             data[i] = nr;
             data[i + 1] = ng;
             data[i + 2] = nb;
@@ -6936,13 +8148,13 @@ localStorage.removeItem("lp");
         const finalImageBitmap = await createImageBitmap(tempCanvas);
         await overlayManager.setImage(finalImageBitmap);
         overlayManager.enable();
-        toggleOverlayBtn.classList.add('active');
-        toggleOverlayBtn.setAttribute('aria-pressed', 'true');
+        toggleOverlayBtn.classList.add("active");
+        toggleOverlayBtn.setAttribute("aria-pressed", "true");
 
         // Keep state.imageData.processor as the original-based source; painting uses paletted pixels already stored
 
         await updateStats();
-        updateUI('resizeSuccess', 'success', {
+        updateUI("resizeSuccess", "success", {
           width: newWidth,
           height: newHeight,
         });
@@ -6950,7 +8162,8 @@ localStorage.removeItem("lp");
         // ✅ Mark image as processed and enable position selection
         state.imageProcessed = true;
         selectPosBtn.disabled = false;
-        selectPosBtn.title = Utils.t('selectPosition') || 'Select starting position on canvas';
+        selectPosBtn.title =
+          Utils.t("selectPosition") || "Select starting position on canvas";
 
         // Enable start button if position is already set
         if (state.startPosition) {
@@ -6967,19 +8180,19 @@ localStorage.removeItem("lp");
         try {
           const w = baseCanvas.width,
             h = baseCanvas.height;
-          const out = document.createElement('canvas');
+          const out = document.createElement("canvas");
           out.width = w;
           out.height = h;
-          const octx = out.getContext('2d');
+          const octx = out.getContext("2d");
           octx.imageSmoothingEnabled = false;
           octx.drawImage(baseCanvas, 0, 0);
           octx.drawImage(maskCanvas, 0, 0);
-          const link = document.createElement('a');
-          link.download = 'wplace-preview.png';
+          const link = document.createElement("a");
+          link.download = "wplace-preview.png";
           link.href = out.toDataURL();
           link.click();
         } catch (e) {
-          console.warn('Failed to download preview:', e);
+          console.warn("Failed to download preview:", e);
         }
       };
 
@@ -6989,8 +8202,8 @@ localStorage.removeItem("lp");
         showEditPanel();
       };
 
-      resizeOverlay.style.display = 'block';
-      resizeContainer.style.display = 'block';
+      resizeOverlay.style.display = "block";
+      resizeContainer.style.display = "block";
 
       // Reinitialize color palette with current available colors
       initializeColorPalette(resizeContainer);
@@ -6999,16 +8212,16 @@ localStorage.removeItem("lp");
       _resizeDialogCleanup = () => {
         try {
           zoomSlider.replaceWith(zoomSlider.cloneNode(true));
-        } catch { }
+        } catch {}
         try {
           if (zoomInBtn) zoomInBtn.replaceWith(zoomInBtn.cloneNode(true));
-        } catch { }
+        } catch {}
         try {
           if (zoomOutBtn) zoomOutBtn.replaceWith(zoomOutBtn.cloneNode(true));
-        } catch { }
+        } catch {}
       };
       setTimeout(() => {
-        if (typeof computeFitZoom === 'function') {
+        if (typeof computeFitZoom === "function") {
           const z = computeFitZoom();
           if (!isNaN(z) && isFinite(z)) {
             applyZoom(z);
@@ -7022,24 +8235,24 @@ localStorage.removeItem("lp");
 
     function closeResizeDialog() {
       try {
-        if (typeof _resizeDialogCleanup === 'function') {
+        if (typeof _resizeDialogCleanup === "function") {
           _resizeDialogCleanup();
         }
-      } catch { }
-      resizeOverlay.style.display = 'none';
-      resizeContainer.style.display = 'none';
-      _updateResizePreview = () => { };
+      } catch {}
+      resizeOverlay.style.display = "none";
+      resizeContainer.style.display = "none";
+      _updateResizePreview = () => {};
       try {
-        if (typeof cancelAnimationFrame === 'function' && _panRaf) {
+        if (typeof cancelAnimationFrame === "function" && _panRaf) {
           cancelAnimationFrame(_panRaf);
         }
-      } catch { }
+      } catch {}
       try {
         if (_previewTimer) {
           clearTimeout(_previewTimer);
           _previewTimer = null;
         }
-      } catch { }
+      } catch {}
       _maskImageData = null;
       _maskData = null;
       _dirty = null;
@@ -7052,18 +8265,21 @@ localStorage.removeItem("lp");
       try {
         // Validate that we have a valid base canvas
         if (!baseCanvas || !baseCanvas.width || !baseCanvas.height) {
-          Utils.showAlert('No image available for editing. Please upload an image first.', 'error');
+          Utils.showAlert(
+            "No image available for editing. Please upload an image first.",
+            "error"
+          );
           return;
         }
 
         // Hide resize panel
-        resizeContainer.style.display = 'none';
+        resizeContainer.style.display = "none";
 
         // Create edit panel if it doesn't exist
-        let editOverlay = document.getElementById('editOverlay');
+        let editOverlay = document.getElementById("editOverlay");
         if (!editOverlay) {
           createEditPanel();
-          editOverlay = document.getElementById('editOverlay');
+          editOverlay = document.getElementById("editOverlay");
         }
 
         // Get current image data from baseCanvas
@@ -7073,25 +8289,28 @@ localStorage.removeItem("lp");
         initializeEditPanel(imageData);
 
         // Show edit panel (use flex to center content)
-        editOverlay.style.display = 'block';
+        editOverlay.style.display = "block";
 
         // Show helpful tooltip
         showEditPanelTip();
 
-        console.log('✨ Pixel Art Editor opened successfully');
+        console.log("✨ Pixel Art Editor opened successfully");
       } catch (error) {
-        console.error('Error opening pixel art editor:', error);
-        Utils.showAlert('Failed to open pixel art editor. Please try again.', 'error');
+        console.error("Error opening pixel art editor:", error);
+        Utils.showAlert(
+          "Failed to open pixel art editor. Please try again.",
+          "error"
+        );
       }
     }
 
     function createEditPanel() {
       // CSS is already injected globally by background.js
       // Modern App Layout with 3-column design
-      
-      const editOverlay = document.createElement('div');
-      editOverlay.id = 'editOverlay';
-      editOverlay.className = 'edit-overlay';
+
+      const editOverlay = document.createElement("div");
+      editOverlay.id = "editOverlay";
+      editOverlay.className = "edit-overlay";
 
       editOverlay.innerHTML = `
         <div class="edit-panel-container">
@@ -7281,23 +8500,23 @@ localStorage.removeItem("lp");
     }
 
     function setupEditPanelEvents() {
-      const editBackBtn = document.getElementById('editBackBtn');
-      const editApplyBtn = document.getElementById('editApplyBtn');
-      const paintBrush = document.getElementById('paintBrush');
-      const eraseTool = document.getElementById('eraseTool');
-      const eyedropperTool = document.getElementById('eyedropperTool');
-      const fillTool = document.getElementById('fillTool');
-      const brushSize = document.getElementById('brushSize');
-      const brushSizeValue = document.getElementById('brushSizeValue');
-      const undoBtn = document.getElementById('undoBtn');
-      const redoBtn = document.getElementById('redoBtn');
-      const resetViewBtn = document.getElementById('resetViewBtn');
-      const editZoomIn = document.getElementById('editZoomIn');
-      const editZoomOut = document.getElementById('editZoomOut');
-      const zoomSelect = document.getElementById('zoomSelect');
-      const zoomFit = document.getElementById('zoomFit');
-      const zoom100 = document.getElementById('zoom100');
-      const minimapCanvas = document.getElementById('minimapCanvas');
+      const editBackBtn = document.getElementById("editBackBtn");
+      const editApplyBtn = document.getElementById("editApplyBtn");
+      const paintBrush = document.getElementById("paintBrush");
+      const eraseTool = document.getElementById("eraseTool");
+      const eyedropperTool = document.getElementById("eyedropperTool");
+      const fillTool = document.getElementById("fillTool");
+      const brushSize = document.getElementById("brushSize");
+      const brushSizeValue = document.getElementById("brushSizeValue");
+      const undoBtn = document.getElementById("undoBtn");
+      const redoBtn = document.getElementById("redoBtn");
+      const resetViewBtn = document.getElementById("resetViewBtn");
+      const editZoomIn = document.getElementById("editZoomIn");
+      const editZoomOut = document.getElementById("editZoomOut");
+      const zoomSelect = document.getElementById("zoomSelect");
+      const zoomFit = document.getElementById("zoomFit");
+      const zoom100 = document.getElementById("zoom100");
+      const minimapCanvas = document.getElementById("minimapCanvas");
 
       // Back to resize panel
       editBackBtn.onclick = () => {
@@ -7307,41 +8526,41 @@ localStorage.removeItem("lp");
           editState.wasdAnimationFrame = null;
         }
         editState.wasdKeys = { w: false, a: false, s: false, d: false };
-        
-        document.getElementById('editOverlay').style.display = 'none';
-        resizeContainer.style.display = 'block';
+
+        document.getElementById("editOverlay").style.display = "none";
+        resizeContainer.style.display = "block";
       };
 
       // Apply changes
       editApplyBtn.onclick = () => {
         applyEditChanges();
-        
+
         // Stop WASD animation
         if (editState.wasdAnimationFrame) {
           cancelAnimationFrame(editState.wasdAnimationFrame);
           editState.wasdAnimationFrame = null;
         }
         editState.wasdKeys = { w: false, a: false, s: false, d: false };
-        
-        document.getElementById('editOverlay').style.display = 'none';
-        resizeContainer.style.display = 'block';
+
+        document.getElementById("editOverlay").style.display = "none";
+        resizeContainer.style.display = "block";
       };
 
       // Tool selection
       paintBrush.onclick = () => {
-        selectTool('paint');
+        selectTool("paint");
       };
 
       eraseTool.onclick = () => {
-        selectTool('erase');
+        selectTool("erase");
       };
 
       eyedropperTool.onclick = () => {
-        selectTool('eyedropper');
+        selectTool("eyedropper");
       };
 
       fillTool.onclick = () => {
-        selectTool('fill');
+        selectTool("fill");
       };
 
       // Brush size
@@ -7353,10 +8572,10 @@ localStorage.removeItem("lp");
       // Undo/Redo
       undoBtn.onclick = () => undoEdit();
       redoBtn.onclick = () => redoEdit();
-      
+
       // Duplicate undo/redo in status bar
-      const undoBtn2 = document.getElementById('undoBtn2');
-      const redoBtn2 = document.getElementById('redoBtn2');
+      const undoBtn2 = document.getElementById("undoBtn2");
+      const redoBtn2 = document.getElementById("redoBtn2");
       if (undoBtn2) undoBtn2.onclick = () => undoEdit();
       if (redoBtn2) redoBtn2.onclick = () => redoEdit();
 
@@ -7381,11 +8600,13 @@ localStorage.removeItem("lp");
       }
     }
 
-    const ZOOM_LEVELS = [0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4, 6, 8, 12, 16, 24, 32];
+    const ZOOM_LEVELS = [
+      0.1, 0.25, 0.5, 0.75, 1, 1.5, 2, 3, 4, 6, 8, 12, 16, 24, 32,
+    ];
 
     let editState = {
-      currentTool: 'paint',
-      currentColor: '#000000',
+      currentTool: "paint",
+      currentColor: "#000000",
       currentColorId: null,
       brushSize: 1,
       zoom: 1,
@@ -7405,10 +8626,10 @@ localStorage.removeItem("lp");
       touchStart: null,
       lastTouchDistance: 0,
       lastTouchCenter: { x: 0, y: 0 },
-      
+
       // WASD movement
       wasdKeys: { w: false, a: false, s: false, d: false },
-      wasdAnimationFrame: null
+      wasdAnimationFrame: null,
     };
 
     function calculateOptimalPanelSize(imageWidth, imageHeight) {
@@ -7420,11 +8641,16 @@ localStorage.removeItem("lp");
         header: 80,
         toolbar: 60,
         bottomBar: 120,
-        padding: 40
+        padding: 40,
       };
 
       const maxCanvasWidth = viewportWidth - uiReserved.padding;
-      const maxCanvasHeight = viewportHeight - uiReserved.header - uiReserved.toolbar - uiReserved.bottomBar - uiReserved.padding;
+      const maxCanvasHeight =
+        viewportHeight -
+        uiReserved.header -
+        uiReserved.toolbar -
+        uiReserved.bottomBar -
+        uiReserved.padding;
 
       // Calculate optimal initial zoom to fit image
       const scaleX = maxCanvasWidth / imageWidth;
@@ -7432,17 +8658,27 @@ localStorage.removeItem("lp");
       const initialZoom = Math.min(scaleX, scaleY, 1); // Don't zoom in initially
 
       return {
-        panelWidth: Math.min(viewportWidth * 0.95, imageWidth * initialZoom + uiReserved.colorPanel + uiReserved.padding),
-        panelHeight: Math.min(viewportHeight * 0.95, imageHeight * initialZoom + uiReserved.toolbar + uiReserved.statusBar + uiReserved.canvasToolbar + uiReserved.padding),
+        panelWidth: Math.min(
+          viewportWidth * 0.95,
+          imageWidth * initialZoom + uiReserved.colorPanel + uiReserved.padding
+        ),
+        panelHeight: Math.min(
+          viewportHeight * 0.95,
+          imageHeight * initialZoom +
+            uiReserved.toolbar +
+            uiReserved.statusBar +
+            uiReserved.canvasToolbar +
+            uiReserved.padding
+        ),
         canvasWidth: Math.min(maxCanvasWidth, imageWidth * initialZoom),
         canvasHeight: Math.min(maxCanvasHeight, imageHeight * initialZoom),
-        initialZoom: Math.max(0.1, initialZoom)
+        initialZoom: Math.max(0.1, initialZoom),
       };
     }
 
     function initializeEditPanel(imageData) {
-      const editCanvas = document.getElementById('editCanvas');
-      const ctx = editCanvas.getContext('2d');
+      const editCanvas = document.getElementById("editCanvas");
+      const ctx = editCanvas.getContext("2d");
 
       // Reset edit state
       editState.zoom = 1;
@@ -7450,7 +8686,7 @@ localStorage.removeItem("lp");
       editState.panY = 0;
       editState.undoStack = [];
       editState.redoStack = [];
-      editState.currentTool = 'paint';
+      editState.currentTool = "paint";
       editState.brushSize = 1;
       editState.isPanning = false;
       editState.isDrawing = false;
@@ -7462,111 +8698,154 @@ localStorage.removeItem("lp");
       }
 
       // Reset processing settings to default (everything OFF)
-      console.log('🔄 Resetting processing settings to default...');
+      console.log("🔄 Resetting processing settings to default...");
       state.ditheringEnabled = false;
-      state.ditheringMethod = 'floyd';
+      state.ditheringMethod = "floyd";
       state.ditheringStrength = 0.5;
       state.posterizeLevels = 0;
-      state.preBlurMode = 'none';
+      state.preBlurMode = "none";
       state.preBlurRadius = 0;
       state.sharpenAmount = 0;
       state.sharpenRadius = 0;
       state.sharpenThreshold = 0;
-      state.resamplingMethod = 'nearest';
-      state.colorMatchingAlgorithm = 'rgb'; // Default to Legacy (RGB)
-      state.enableChromaPenalty = false;     // Chroma penalty OFF by default
+      state.resamplingMethod = "nearest";
+      state.colorMatchingAlgorithm = "rgb"; // Default to Legacy (RGB)
+      state.enableChromaPenalty = false; // Chroma penalty OFF by default
       state.chromaPenaltyWeight = 0.15;
-      console.log('✅ Processing settings reset - All OFF, Color Algorithm: RGB');
+      console.log(
+        "✅ Processing settings reset - All OFF, Color Algorithm: RGB"
+      );
 
       // Reset UI elements to match the default state
       // This will be called after the resize panel is created
       setTimeout(() => {
         // Dithering controls
-        const ditherToggle = document.getElementById('enableDitheringToggle');
+        const ditherToggle = document.getElementById("enableDitheringToggle");
         if (ditherToggle) {
           ditherToggle.checked = false;
-          const methodControl = document.getElementById('ditheringMethodControl');
-          const posterizeControl = document.getElementById('posterizeLevelsControl');
-          if (methodControl) methodControl.style.display = 'none';
-          if (posterizeControl) posterizeControl.style.display = 'none';
+          const methodControl = document.getElementById(
+            "ditheringMethodControl"
+          );
+          const posterizeControl = document.getElementById(
+            "posterizeLevelsControl"
+          );
+          if (methodControl) methodControl.style.display = "none";
+          if (posterizeControl) posterizeControl.style.display = "none";
         }
-        
-        const ditheringMethodSelect = document.getElementById('ditheringMethodSelect');
-        if (ditheringMethodSelect) ditheringMethodSelect.value = 'floyd';
-        
-        const ditheringStrengthSlider = document.getElementById('ditheringStrengthSlider');
-        const ditheringStrengthValue = document.getElementById('ditheringStrengthValue');
+
+        const ditheringMethodSelect = document.getElementById(
+          "ditheringMethodSelect"
+        );
+        if (ditheringMethodSelect) ditheringMethodSelect.value = "floyd";
+
+        const ditheringStrengthSlider = document.getElementById(
+          "ditheringStrengthSlider"
+        );
+        const ditheringStrengthValue = document.getElementById(
+          "ditheringStrengthValue"
+        );
         if (ditheringStrengthSlider && ditheringStrengthValue) {
           ditheringStrengthSlider.value = 50;
-          ditheringStrengthValue.textContent = '50%';
+          ditheringStrengthValue.textContent = "50%";
         }
-        
-        const posterizeLevelsSlider = document.getElementById('posterizeLevelsSlider');
-        const posterizeLevelsValue = document.getElementById('posterizeLevelsValue');
+
+        const posterizeLevelsSlider = document.getElementById(
+          "posterizeLevelsSlider"
+        );
+        const posterizeLevelsValue = document.getElementById(
+          "posterizeLevelsValue"
+        );
         if (posterizeLevelsSlider && posterizeLevelsValue) {
           posterizeLevelsSlider.value = 0;
-          posterizeLevelsValue.textContent = 'Disabled';
+          posterizeLevelsValue.textContent = "Disabled";
         }
-        
+
         // Pre-processing controls
-        const preBlurModeSelect = document.getElementById('preBlurModeSelect');
-        const blurRadiusControl = document.getElementById('blurRadiusControl');
+        const preBlurModeSelect = document.getElementById("preBlurModeSelect");
+        const blurRadiusControl = document.getElementById("blurRadiusControl");
         if (preBlurModeSelect) {
-          preBlurModeSelect.value = 'none';
-          if (blurRadiusControl) blurRadiusControl.style.display = 'none';
+          preBlurModeSelect.value = "none";
+          if (blurRadiusControl) blurRadiusControl.style.display = "none";
         }
-        
-        const preBlurRadiusSlider = document.getElementById('preBlurRadiusSlider');
-        const blurRadiusValue = document.getElementById('blurRadiusValue');
+
+        const preBlurRadiusSlider = document.getElementById(
+          "preBlurRadiusSlider"
+        );
+        const blurRadiusValue = document.getElementById("blurRadiusValue");
         if (preBlurRadiusSlider && blurRadiusValue) {
           preBlurRadiusSlider.value = 0;
-          blurRadiusValue.textContent = '0';
+          blurRadiusValue.textContent = "0";
         }
-        
-        const sharpenAmountSlider = document.getElementById('sharpenAmountSlider');
-        const sharpenAmountValue = document.getElementById('sharpenAmountValue');
-        const sharpenRadiusControl = document.getElementById('sharpenRadiusControl');
-        const sharpenThresholdControl = document.getElementById('sharpenThresholdControl');
+
+        const sharpenAmountSlider = document.getElementById(
+          "sharpenAmountSlider"
+        );
+        const sharpenAmountValue =
+          document.getElementById("sharpenAmountValue");
+        const sharpenRadiusControl = document.getElementById(
+          "sharpenRadiusControl"
+        );
+        const sharpenThresholdControl = document.getElementById(
+          "sharpenThresholdControl"
+        );
         if (sharpenAmountSlider && sharpenAmountValue) {
           sharpenAmountSlider.value = 0;
-          sharpenAmountValue.textContent = '0';
-          if (sharpenRadiusControl) sharpenRadiusControl.style.display = 'none';
-          if (sharpenThresholdControl) sharpenThresholdControl.style.display = 'none';
+          sharpenAmountValue.textContent = "0";
+          if (sharpenRadiusControl) sharpenRadiusControl.style.display = "none";
+          if (sharpenThresholdControl)
+            sharpenThresholdControl.style.display = "none";
         }
-        
-        const sharpenRadiusSlider = document.getElementById('sharpenRadiusSlider');
-        const sharpenRadiusValue = document.getElementById('sharpenRadiusValue');
+
+        const sharpenRadiusSlider = document.getElementById(
+          "sharpenRadiusSlider"
+        );
+        const sharpenRadiusValue =
+          document.getElementById("sharpenRadiusValue");
         if (sharpenRadiusSlider && sharpenRadiusValue) {
           sharpenRadiusSlider.value = 0;
-          sharpenRadiusValue.textContent = '0';
+          sharpenRadiusValue.textContent = "0";
         }
-        
-        const sharpenThresholdSlider = document.getElementById('sharpenThresholdSlider');
-        const sharpenThresholdValue = document.getElementById('sharpenThresholdValue');
+
+        const sharpenThresholdSlider = document.getElementById(
+          "sharpenThresholdSlider"
+        );
+        const sharpenThresholdValue = document.getElementById(
+          "sharpenThresholdValue"
+        );
         if (sharpenThresholdSlider && sharpenThresholdValue) {
           sharpenThresholdSlider.value = 0;
-          sharpenThresholdValue.textContent = '0';
+          sharpenThresholdValue.textContent = "0";
         }
-        
+
         // Resampling method
-        const resamplingMethodSelect = document.getElementById('resamplingMethodSelect');
-        if (resamplingMethodSelect) resamplingMethodSelect.value = 'nearest';
-        
+        const resamplingMethodSelect = document.getElementById(
+          "resamplingMethodSelect"
+        );
+        if (resamplingMethodSelect) resamplingMethodSelect.value = "nearest";
+
         // Advanced color matching - RESET TO DEFAULT (RGB, no chroma)
-        const colorAlgorithmSelect = document.getElementById('colorAlgorithmSelect');
-        if (colorAlgorithmSelect) colorAlgorithmSelect.value = 'rgb';
-        
-        const chromaPenaltyToggle = document.getElementById('enableChromaPenaltyToggle');
+        const colorAlgorithmSelect = document.getElementById(
+          "colorAlgorithmSelect"
+        );
+        if (colorAlgorithmSelect) colorAlgorithmSelect.value = "rgb";
+
+        const chromaPenaltyToggle = document.getElementById(
+          "enableChromaPenaltyToggle"
+        );
         if (chromaPenaltyToggle) chromaPenaltyToggle.checked = false;
-        
-        const chromaPenaltyWeightSlider = document.getElementById('chromaPenaltyWeightSlider');
-        const chromaWeightValue = document.getElementById('chromaWeightValue');
+
+        const chromaPenaltyWeightSlider = document.getElementById(
+          "chromaPenaltyWeightSlider"
+        );
+        const chromaWeightValue = document.getElementById("chromaWeightValue");
         if (chromaPenaltyWeightSlider && chromaWeightValue) {
           chromaPenaltyWeightSlider.value = 0.15;
-          chromaWeightValue.textContent = '0.15';
+          chromaWeightValue.textContent = "0.15";
         }
-        
-        console.log('✅ UI elements reset to default values - All OFF, Color Algorithm: RGB, Chroma OFF');
+
+        console.log(
+          "✅ UI elements reset to default values - All OFF, Color Algorithm: RGB, Chroma OFF"
+        );
       }, 100);
 
       // Set canvas size to match baseCanvas
@@ -7574,9 +8853,9 @@ localStorage.removeItem("lp");
       editCanvas.height = baseCanvas.height;
       editState.canvasWidth = editCanvas.width;
       editState.canvasHeight = editCanvas.height;
-      
+
       // Update header info
-      const editImageInfo = document.getElementById('editImageInfo');
+      const editImageInfo = document.getElementById("editImageInfo");
       if (editImageInfo) {
         editImageInfo.textContent = `${editCanvas.width}×${editCanvas.height}`;
       }
@@ -7593,10 +8872,10 @@ localStorage.removeItem("lp");
 
       // Setup canvas container
       setupCanvasContainer();
-      
+
       // Add CSS checkerboard background to the wrapper element (not the canvas)
       // This allows users to see transparency without saving it to the template
-      const canvasWrapper = document.getElementById('editCanvasWrapper');
+      const canvasWrapper = document.getElementById("editCanvasWrapper");
       if (canvasWrapper) {
         canvasWrapper.style.background = `
           repeating-conic-gradient(#f0f0f0 0% 25%, #e0e0e0 0% 50%) 
@@ -7634,7 +8913,7 @@ localStorage.removeItem("lp");
         setupTouchSupport();
 
         // Set initial tool
-        selectTool('paint');
+        selectTool("paint");
 
         // Update status bar
         updateStatusBar(0, 0);
@@ -7647,9 +8926,9 @@ localStorage.removeItem("lp");
 
     // mapClientToCanvas function for coordinate mapping
     function mapClientToCanvas(clientX, clientY) {
-      const canvas = document.getElementById('editCanvas');
-      const wrapper = document.getElementById('editCanvasWrapper');
-      const container = document.getElementById('editCanvasContainer');
+      const canvas = document.getElementById("editCanvas");
+      const wrapper = document.getElementById("editCanvasWrapper");
+      const container = document.getElementById("editCanvasContainer");
 
       if (!canvas || !wrapper || !container) return null;
 
@@ -7657,15 +8936,22 @@ localStorage.removeItem("lp");
       const canvasRect = canvas.getBoundingClientRect();
 
       // Calculate relative position within the actual canvas bounds
-      const relativeX = (clientX - canvasRect.left) / canvasRect.width * canvas.width;
-      const relativeY = (clientY - canvasRect.top) / canvasRect.height * canvas.height;
+      const relativeX =
+        ((clientX - canvasRect.left) / canvasRect.width) * canvas.width;
+      const relativeY =
+        ((clientY - canvasRect.top) / canvasRect.height) * canvas.height;
 
       // Convert to canvas coordinates
       const canvasX = Math.floor(relativeX);
       const canvasY = Math.floor(relativeY);
 
       // Bounds checking
-      if (canvasX < 0 || canvasX >= canvas.width || canvasY < 0 || canvasY >= canvas.height) {
+      if (
+        canvasX < 0 ||
+        canvasX >= canvas.width ||
+        canvasY < 0 ||
+        canvasY >= canvas.height
+      ) {
         return null;
       }
 
@@ -7673,8 +8959,8 @@ localStorage.removeItem("lp");
     }
 
     function setupCanvasDrawing() {
-      const editCanvas = document.getElementById('editCanvas');
-      const ctx = editCanvas.getContext('2d');
+      const editCanvas = document.getElementById("editCanvas");
+      const ctx = editCanvas.getContext("2d");
 
       let isDrawing = false;
       let isPanning = false;
@@ -7688,11 +8974,12 @@ localStorage.removeItem("lp");
       };
 
       editCanvas.onmousedown = (e) => {
-        if (e.button === 2 || e.ctrlKey) { // Right click or Ctrl+click for panning
+        if (e.button === 2 || e.ctrlKey) {
+          // Right click or Ctrl+click for panning
           editState.isPanning = true;
           panStartX = e.clientX - editState.panX;
           panStartY = e.clientY - editState.panY;
-          editCanvas.style.cursor = 'move';
+          editCanvas.style.cursor = "move";
           e.preventDefault();
           return;
         }
@@ -7700,12 +8987,12 @@ localStorage.removeItem("lp");
         const pos = getMousePos(e);
         if (!pos) return;
 
-        if (editState.currentTool === 'eyedropper') {
+        if (editState.currentTool === "eyedropper") {
           handleEyedropper(pos.x, pos.y);
           return;
         }
 
-        if (editState.currentTool === 'fill') {
+        if (editState.currentTool === "fill") {
           floodFill(pos.x, pos.y, editState.currentColor);
           saveEditState();
           return;
@@ -7791,12 +9078,19 @@ localStorage.removeItem("lp");
     function paintAtPosition(x, y, isMouseDown = true) {
       if (!isMouseDown || !editState.currentColor) return;
 
-      const canvas = document.getElementById('editCanvas');
-      const ctx = canvas.getContext('2d');
+      const canvas = document.getElementById("editCanvas");
+      const ctx = canvas.getContext("2d");
 
-      if (editState.lastPaintPos && editState.currentTool === 'paint') {
+      if (editState.lastPaintPos && editState.currentTool === "paint") {
         // Draw line from last position to current position
-        drawLine(ctx, editState.lastPaintPos.x, editState.lastPaintPos.y, x, y, editState.currentTool);
+        drawLine(
+          ctx,
+          editState.lastPaintPos.x,
+          editState.lastPaintPos.y,
+          x,
+          y,
+          editState.currentTool
+        );
       } else {
         // Single brush stroke
         drawBrush(ctx, x, y, editState.currentTool);
@@ -7818,7 +9112,7 @@ localStorage.removeItem("lp");
       const size = editState.brushSize;
       const halfSize = Math.floor(size / 2);
 
-      if (tool === 'paint') {
+      if (tool === "paint") {
         ctx.fillStyle = editState.currentColor;
         for (let dx = 0; dx < size; dx++) {
           for (let dy = 0; dy < size; dy++) {
@@ -7826,19 +9120,29 @@ localStorage.removeItem("lp");
             const px = x - halfSize + dx;
             const py = y - halfSize + dy;
 
-            if (px >= 0 && px < ctx.canvas.width && py >= 0 && py < ctx.canvas.height) {
+            if (
+              px >= 0 &&
+              px < ctx.canvas.width &&
+              py >= 0 &&
+              py < ctx.canvas.height
+            ) {
               ctx.fillRect(px, py, 1, 1);
             }
           }
         }
-      } else if (tool === 'erase') {
+      } else if (tool === "erase") {
         for (let dx = 0; dx < size; dx++) {
           for (let dy = 0; dy < size; dy++) {
             // Center the brush at the cursor position
             const px = x - halfSize + dx;
             const py = y - halfSize + dy;
 
-            if (px >= 0 && px < ctx.canvas.width && py >= 0 && py < ctx.canvas.height) {
+            if (
+              px >= 0 &&
+              px < ctx.canvas.width &&
+              py >= 0 &&
+              py < ctx.canvas.height
+            ) {
               ctx.clearRect(px, py, 1, 1);
             }
           }
@@ -7847,12 +9151,17 @@ localStorage.removeItem("lp");
     }
 
     function drawPixel(x, y) {
-      drawBrush(document.getElementById('editCanvas').getContext('2d'), x, y, 'paint');
+      drawBrush(
+        document.getElementById("editCanvas").getContext("2d"),
+        x,
+        y,
+        "paint"
+      );
     }
 
     function erasePixel(x, y) {
-      const editCanvas = document.getElementById('editCanvas');
-      const ctx = editCanvas.getContext('2d');
+      const editCanvas = document.getElementById("editCanvas");
+      const ctx = editCanvas.getContext("2d");
 
       const size = editState.brushSize;
       const halfSize = Math.floor(size / 2);
@@ -7863,7 +9172,12 @@ localStorage.removeItem("lp");
           const px = x - halfSize + dx;
           const py = y - halfSize + dy;
 
-          if (px >= 0 && px < editCanvas.width && py >= 0 && py < editCanvas.height) {
+          if (
+            px >= 0 &&
+            px < editCanvas.width &&
+            py >= 0 &&
+            py < editCanvas.height
+          ) {
             ctx.clearRect(px, py, 1, 1);
           }
         }
@@ -7928,8 +9242,8 @@ localStorage.removeItem("lp");
 
     function showEditPanelTip() {
       // Create tip overlay
-      const tipOverlay = document.createElement('div');
-      tipOverlay.className = 'edit-tip-overlay';
+      const tipOverlay = document.createElement("div");
+      tipOverlay.className = "edit-tip-overlay";
       tipOverlay.innerHTML = `
         <div class="edit-tip-box">
           <div class="edit-tip-icon">💡</div>
@@ -7942,23 +9256,23 @@ localStorage.removeItem("lp");
           <button class="edit-tip-close">Got it!</button>
         </div>
       `;
-      
+
       document.body.appendChild(tipOverlay);
-      
+
       // Auto-close after 5 seconds
       const autoCloseTimer = setTimeout(() => {
         closeTip();
       }, 5000);
-      
+
       // Close button
-      const closeBtn = tipOverlay.querySelector('.edit-tip-close');
+      const closeBtn = tipOverlay.querySelector(".edit-tip-close");
       closeBtn.onclick = () => {
         clearTimeout(autoCloseTimer);
         closeTip();
       };
-      
+
       function closeTip() {
-        tipOverlay.style.opacity = '0';
+        tipOverlay.style.opacity = "0";
         setTimeout(() => {
           if (tipOverlay.parentNode) {
             tipOverlay.parentNode.removeChild(tipOverlay);
@@ -7971,28 +9285,28 @@ localStorage.removeItem("lp");
       editState.currentTool = tool;
 
       // Remove active class from all tool buttons
-      document.querySelectorAll('.edit-tool-btn').forEach(btn => {
-        btn.classList.remove('active');
+      document.querySelectorAll(".edit-tool-btn").forEach((btn) => {
+        btn.classList.remove("active");
       });
 
-      const editCanvas = document.getElementById('editCanvas');
+      const editCanvas = document.getElementById("editCanvas");
 
       switch (tool) {
-        case 'paint':
-          document.getElementById('paintBrush').classList.add('active');
-          editCanvas.style.cursor = 'crosshair';
+        case "paint":
+          document.getElementById("paintBrush").classList.add("active");
+          editCanvas.style.cursor = "crosshair";
           break;
-        case 'erase':
-          document.getElementById('eraseTool').classList.add('active');
-          editCanvas.style.cursor = 'not-allowed';
+        case "erase":
+          document.getElementById("eraseTool").classList.add("active");
+          editCanvas.style.cursor = "not-allowed";
           break;
-        case 'eyedropper':
-          document.getElementById('eyedropperTool').classList.add('active');
-          editCanvas.style.cursor = 'copy';
+        case "eyedropper":
+          document.getElementById("eyedropperTool").classList.add("active");
+          editCanvas.style.cursor = "copy";
           break;
-        case 'fill':
-          document.getElementById('fillTool').classList.add('active');
-          editCanvas.style.cursor = 'pointer';
+        case "fill":
+          document.getElementById("fillTool").classList.add("active");
+          editCanvas.style.cursor = "pointer";
           break;
       }
     }
@@ -8002,59 +9316,65 @@ localStorage.removeItem("lp");
     }
 
     function initializeEditColorPalette() {
-      const colorGrid = document.getElementById('editColorGrid');
-      const currentColorDisplay = document.getElementById('currentColorDisplay');
+      const colorGrid = document.getElementById("editColorGrid");
+      const currentColorDisplay = document.getElementById(
+        "currentColorDisplay"
+      );
 
-      colorGrid.innerHTML = '';
+      colorGrid.innerHTML = "";
 
       let availableColors = [];
 
       // Try to get colors from state first
       if (state && state.availableColors && state.availableColors.length > 0) {
-        availableColors = state.availableColors.map(color => ({
+        availableColors = state.availableColors.map((color) => ({
           id: color.id,
           name: color.name,
           rgb: color.rgb,
-          hex: `#${color.rgb[0].toString(16).padStart(2, '0')}${color.rgb[1].toString(16).padStart(2, '0')}${color.rgb[2].toString(16).padStart(2, '0')}`
+          hex: `#${color.rgb[0].toString(16).padStart(2, "0")}${color.rgb[1]
+            .toString(16)
+            .padStart(2, "0")}${color.rgb[2].toString(16).padStart(2, "0")}`,
         }));
       } else {
         // Fallback to CONFIG.COLOR_MAP
         availableColors = Object.values(CONFIG.COLOR_MAP)
-          .filter(color => color.rgb !== null)
-          .map(color => ({
+          .filter((color) => color.rgb !== null)
+          .map((color) => ({
             id: color.id,
             name: color.name,
             rgb: [color.rgb.r, color.rgb.g, color.rgb.b],
-            hex: `#${color.rgb.r.toString(16).padStart(2, '0')}${color.rgb.g.toString(16).padStart(2, '0')}${color.rgb.b.toString(16).padStart(2, '0')}`
+            hex: `#${color.rgb.r.toString(16).padStart(2, "0")}${color.rgb.g
+              .toString(16)
+              .padStart(2, "0")}${color.rgb.b.toString(16).padStart(2, "0")}`,
           }));
       }
 
       // Fallback to basic colors if nothing available
       if (availableColors.length === 0) {
         availableColors = [
-          { id: 0, name: 'Black', rgb: [0, 0, 0], hex: '#000000' },
-          { id: 1, name: 'White', rgb: [255, 255, 255], hex: '#ffffff' },
-          { id: 2, name: 'Red', rgb: [255, 0, 0], hex: '#ff0000' },
-          { id: 3, name: 'Green', rgb: [0, 255, 0], hex: '#00ff00' },
-          { id: 4, name: 'Blue', rgb: [0, 0, 255], hex: '#0000ff' }
+          { id: 0, name: "Black", rgb: [0, 0, 0], hex: "#000000" },
+          { id: 1, name: "White", rgb: [255, 255, 255], hex: "#ffffff" },
+          { id: 2, name: "Red", rgb: [255, 0, 0], hex: "#ff0000" },
+          { id: 3, name: "Green", rgb: [0, 255, 0], hex: "#00ff00" },
+          { id: 4, name: "Blue", rgb: [0, 0, 255], hex: "#0000ff" },
         ];
       }
 
       // Update color count
-      const colorCount = document.getElementById('editColorCount');
+      const colorCount = document.getElementById("editColorCount");
       if (colorCount) {
         colorCount.textContent = availableColors.length;
       }
 
-      availableColors.forEach(color => {
-        const colorSwatch = document.createElement('div');
-        colorSwatch.className = 'edit-swatch';
+      availableColors.forEach((color) => {
+        const colorSwatch = document.createElement("div");
+        colorSwatch.className = "edit-swatch";
         colorSwatch.title = `${color.name} (${color.hex})`;
         colorSwatch.dataset.colorId = color.id;
         colorSwatch.dataset.colorHex = color.hex;
-        
-        const swatchFill = document.createElement('div');
-        swatchFill.className = 'edit-swatch-fill';
+
+        const swatchFill = document.createElement("div");
+        swatchFill.className = "edit-swatch-fill";
         swatchFill.style.backgroundColor = color.hex;
         colorSwatch.appendChild(swatchFill);
 
@@ -8062,18 +9382,18 @@ localStorage.removeItem("lp");
           editState.currentColor = color.hex;
           editState.currentColorId = color.id;
           currentColorDisplay.style.backgroundColor = color.hex;
-          
+
           // Update color info
-          const colorHex = document.getElementById('colorHex');
-          const colorRgb = document.getElementById('colorRgb');
+          const colorHex = document.getElementById("colorHex");
+          const colorRgb = document.getElementById("colorRgb");
           if (colorHex) colorHex.textContent = color.hex.toUpperCase();
-          if (colorRgb) colorRgb.textContent = `RGB(${color.rgb.join(', ')})`;
+          if (colorRgb) colorRgb.textContent = `RGB(${color.rgb.join(", ")})`;
 
           // Update active color
-          document.querySelectorAll('.edit-swatch').forEach(btn => {
-            btn.classList.remove('active');
+          document.querySelectorAll(".edit-swatch").forEach((btn) => {
+            btn.classList.remove("active");
           });
-          colorSwatch.classList.add('active');
+          colorSwatch.classList.add("active");
 
           updateStatusBar(editState.mouseX, editState.mouseY);
         };
@@ -8086,18 +9406,20 @@ localStorage.removeItem("lp");
         editState.currentColor = availableColors[0].hex;
         editState.currentColorId = availableColors[0].id;
         currentColorDisplay.style.backgroundColor = availableColors[0].hex;
-        
-        const colorHex = document.getElementById('colorHex');
-        const colorRgb = document.getElementById('colorRgb');
-        if (colorHex) colorHex.textContent = availableColors[0].hex.toUpperCase();
-        if (colorRgb) colorRgb.textContent = `RGB(${availableColors[0].rgb.join(', ')})`;
-        
-        colorGrid.firstChild.classList.add('active');
+
+        const colorHex = document.getElementById("colorHex");
+        const colorRgb = document.getElementById("colorRgb");
+        if (colorHex)
+          colorHex.textContent = availableColors[0].hex.toUpperCase();
+        if (colorRgb)
+          colorRgb.textContent = `RGB(${availableColors[0].rgb.join(", ")})`;
+
+        colorGrid.firstChild.classList.add("active");
       }
     }
 
     function saveEditState() {
-      const editCanvas = document.getElementById('editCanvas');
+      const editCanvas = document.getElementById("editCanvas");
       const imageData = editCanvas.toDataURL();
 
       editState.undoStack.push(imageData);
@@ -8137,8 +9459,8 @@ localStorage.removeItem("lp");
     }
 
     function loadEditState(imageData) {
-      const editCanvas = document.getElementById('editCanvas');
-      const ctx = editCanvas.getContext('2d');
+      const editCanvas = document.getElementById("editCanvas");
+      const ctx = editCanvas.getContext("2d");
 
       const img = new Image();
       img.onload = () => {
@@ -8150,8 +9472,8 @@ localStorage.removeItem("lp");
     }
 
     function updateUndoRedoButtons() {
-      const undoBtn = document.getElementById('undoBtn');
-      const redoBtn = document.getElementById('redoBtn');
+      const undoBtn = document.getElementById("undoBtn");
+      const redoBtn = document.getElementById("redoBtn");
 
       if (undoBtn) {
         undoBtn.disabled = editState.undoStack.length <= 1;
@@ -8163,29 +9485,37 @@ localStorage.removeItem("lp");
     }
 
     function updateCanvasTransform() {
-      const wrapper = document.getElementById('editCanvasWrapper');
+      const wrapper = document.getElementById("editCanvasWrapper");
       if (wrapper) {
         wrapper.style.transform = `translate(${editState.panX}px, ${editState.panY}px) scale(${editState.zoom})`;
       }
 
       // Update zoom select
-      const zoomSelect = document.getElementById('zoomSelect');
+      const zoomSelect = document.getElementById("zoomSelect");
       if (zoomSelect) {
         // If exact value exists, use it, otherwise show nearest but update displayed text
-        const exact = ZOOM_LEVELS.find(z => z === editState.zoom);
-        zoomSelect.value = exact != null ? exact : ZOOM_LEVELS.reduce((prev, curr) => Math.abs(curr - editState.zoom) < Math.abs(prev - editState.zoom) ? curr : prev);
+        const exact = ZOOM_LEVELS.find((z) => z === editState.zoom);
+        zoomSelect.value =
+          exact != null
+            ? exact
+            : ZOOM_LEVELS.reduce((prev, curr) =>
+                Math.abs(curr - editState.zoom) <
+                Math.abs(prev - editState.zoom)
+                  ? curr
+                  : prev
+              );
         // Also update status bar zoom text
         updateStatusBar(editState.mouseX || 0, editState.mouseY || 0);
       }
-      
+
       // Update navigator viewport indicator
       updateMinimap();
     }
 
     function setupCanvasContainer() {
-      const canvasContainer = document.getElementById('editCanvasContainer');
-      const editCanvas = document.getElementById('editCanvas');
-      const wrapper = document.getElementById('editCanvasWrapper');
+      const canvasContainer = document.getElementById("editCanvasContainer");
+      const editCanvas = document.getElementById("editCanvas");
+      const wrapper = document.getElementById("editCanvasWrapper");
 
       if (!canvasContainer || !wrapper) return;
 
@@ -8220,8 +9550,8 @@ localStorage.removeItem("lp");
     }
 
     function zoomToPoint(newZoom, clientX, clientY) {
-      const container = document.getElementById('editCanvasContainer');
-      const wrapper = document.getElementById('editCanvasWrapper');
+      const container = document.getElementById("editCanvasContainer");
+      const wrapper = document.getElementById("editCanvasWrapper");
 
       if (!container || !wrapper) return;
 
@@ -8252,8 +9582,8 @@ localStorage.removeItem("lp");
     }
 
     function constrainPan() {
-      const container = document.getElementById('editCanvasContainer');
-      const canvas = document.getElementById('editCanvas');
+      const container = document.getElementById("editCanvasContainer");
+      const canvas = document.getElementById("editCanvas");
 
       if (!container || !canvas) return;
 
@@ -8265,8 +9595,14 @@ localStorage.removeItem("lp");
       const padding = 10;
 
       // Calculate limits to keep canvas somewhat visible
-      const maxPanX = Math.max(0, (scaledWidth - containerRect.width) / 2 + padding);
-      const maxPanY = Math.max(0, (scaledHeight - containerRect.height) / 2 + padding);
+      const maxPanX = Math.max(
+        0,
+        (scaledWidth - containerRect.width) / 2 + padding
+      );
+      const maxPanY = Math.max(
+        0,
+        (scaledHeight - containerRect.height) / 2 + padding
+      );
 
       editState.panX = Math.max(-maxPanX, Math.min(maxPanX, editState.panX));
       editState.panY = Math.max(-maxPanY, Math.min(maxPanY, editState.panY));
@@ -8277,20 +9613,20 @@ localStorage.removeItem("lp");
     }
 
     function zoomIn() {
-      const currentIndex = ZOOM_LEVELS.findIndex(z => z >= editState.zoom);
+      const currentIndex = ZOOM_LEVELS.findIndex((z) => z >= editState.zoom);
       const nextIndex = Math.min(currentIndex + 1, ZOOM_LEVELS.length - 1);
       setZoom(ZOOM_LEVELS[nextIndex]);
     }
 
     function zoomOut() {
-      const currentIndex = ZOOM_LEVELS.findIndex(z => z >= editState.zoom);
+      const currentIndex = ZOOM_LEVELS.findIndex((z) => z >= editState.zoom);
       const prevIndex = Math.max(currentIndex - 1, 0);
       setZoom(ZOOM_LEVELS[prevIndex]);
     }
 
     function fitToWindow() {
-      const container = document.getElementById('editCanvasContainer');
-      const canvas = document.getElementById('editCanvas');
+      const container = document.getElementById("editCanvasContainer");
+      const canvas = document.getElementById("editCanvas");
 
       if (!container || !canvas) return;
 
@@ -8327,49 +9663,59 @@ localStorage.removeItem("lp");
     }
 
     function setupMinimap() {
-      const minimapCanvas = document.getElementById('minimapCanvas');
-      const editCanvas = document.getElementById('editCanvas');
-      const minimapContainer = document.getElementById('minimapContainer');
+      const minimapCanvas = document.getElementById("minimapCanvas");
+      const editCanvas = document.getElementById("editCanvas");
+      const minimapContainer = document.getElementById("minimapContainer");
 
       if (!minimapCanvas || !editCanvas) return;
 
       // Show minimap only for larger images
       if (editCanvas.width < 100 || editCanvas.height < 100) {
-        if (minimapContainer) minimapContainer.style.display = 'none';
+        if (minimapContainer) minimapContainer.style.display = "none";
         return;
       }
 
       // Make minimap visible
-      if (minimapContainer) minimapContainer.style.display = 'block';
+      if (minimapContainer) minimapContainer.style.display = "block";
 
       // Calculate minimap size - fit within the navigator container
       const maxSize = 164; // 180px container - 16px padding
-      const scale = Math.min(maxSize / editCanvas.width, maxSize / editCanvas.height);
+      const scale = Math.min(
+        maxSize / editCanvas.width,
+        maxSize / editCanvas.height
+      );
 
       minimapCanvas.width = editCanvas.width * scale;
       minimapCanvas.height = editCanvas.height * scale;
 
       // Draw thumbnail
-      const minimapCtx = minimapCanvas.getContext('2d');
+      const minimapCtx = minimapCanvas.getContext("2d");
       minimapCtx.imageSmoothingEnabled = false;
       minimapCtx.webkitImageSmoothingEnabled = false;
       minimapCtx.mozImageSmoothingEnabled = false;
-      
+
       // Draw the image
-      minimapCtx.drawImage(editCanvas, 0, 0, minimapCanvas.width, minimapCanvas.height);
+      minimapCtx.drawImage(
+        editCanvas,
+        0,
+        0,
+        minimapCanvas.width,
+        minimapCanvas.height
+      );
 
       // Update viewport indicator
       updateMinimap();
     }
 
     function updateMinimap() {
-      const viewport = document.getElementById('minimapViewport');
-      const minimapCanvas = document.getElementById('minimapCanvas');
-      const container = document.getElementById('editCanvasContainer');
-      const editCanvas = document.getElementById('editCanvas');
-      const wrapper = document.getElementById('editCanvasWrapper');
+      const viewport = document.getElementById("minimapViewport");
+      const minimapCanvas = document.getElementById("minimapCanvas");
+      const container = document.getElementById("editCanvasContainer");
+      const editCanvas = document.getElementById("editCanvas");
+      const wrapper = document.getElementById("editCanvasWrapper");
 
-      if (!viewport || !minimapCanvas || !container || !editCanvas || !wrapper) return;
+      if (!viewport || !minimapCanvas || !container || !editCanvas || !wrapper)
+        return;
       if (minimapCanvas.width === 0 || minimapCanvas.height === 0) return;
       if (editCanvas.width === 0 || editCanvas.height === 0) return;
 
@@ -8382,53 +9728,85 @@ localStorage.removeItem("lp");
       const visibleCanvasHeight = containerRect.height / editState.zoom;
 
       // Clamp visible area to actual canvas dimensions
-      const clampedVisibleWidth = Math.min(visibleCanvasWidth, editCanvas.width);
-      const clampedVisibleHeight = Math.min(visibleCanvasHeight, editCanvas.height);
+      const clampedVisibleWidth = Math.min(
+        visibleCanvasWidth,
+        editCanvas.width
+      );
+      const clampedVisibleHeight = Math.min(
+        visibleCanvasHeight,
+        editCanvas.height
+      );
 
       // Convert visible area to minimap pixels and clamp to minimap size
-      const viewportWidth = Math.min(clampedVisibleWidth * scale, minimapCanvas.width);
-      const viewportHeight = Math.min(clampedVisibleHeight * scale, minimapCanvas.height);
+      const viewportWidth = Math.min(
+        clampedVisibleWidth * scale,
+        minimapCanvas.width
+      );
+      const viewportHeight = Math.min(
+        clampedVisibleHeight * scale,
+        minimapCanvas.height
+      );
 
       // Calculate the offset of the wrapper from the container center
       const containerCenterX = containerRect.left + containerRect.width / 2;
       const containerCenterY = containerRect.top + containerRect.height / 2;
       const wrapperCenterX = wrapperRect.left + wrapperRect.width / 2;
       const wrapperCenterY = wrapperRect.top + wrapperRect.height / 2;
-      
+
       // Calculate how much we've panned in canvas coordinates
       const panOffsetX = (containerCenterX - wrapperCenterX) / editState.zoom;
       const panOffsetY = (containerCenterY - wrapperCenterY) / editState.zoom;
-      
+
       // Calculate the top-left corner of the visible area in canvas coordinates
-      const visibleLeft = (editCanvas.width / 2) + panOffsetX - (clampedVisibleWidth / 2);
-      const visibleTop = (editCanvas.height / 2) + panOffsetY - (clampedVisibleHeight / 2);
-      
+      const visibleLeft =
+        editCanvas.width / 2 + panOffsetX - clampedVisibleWidth / 2;
+      const visibleTop =
+        editCanvas.height / 2 + panOffsetY - clampedVisibleHeight / 2;
+
       // Clamp visible position to canvas bounds
-      const clampedLeft = Math.max(0, Math.min(editCanvas.width - clampedVisibleWidth, visibleLeft));
-      const clampedTop = Math.max(0, Math.min(editCanvas.height - clampedVisibleHeight, visibleTop));
-      
+      const clampedLeft = Math.max(
+        0,
+        Math.min(editCanvas.width - clampedVisibleWidth, visibleLeft)
+      );
+      const clampedTop = Math.max(
+        0,
+        Math.min(editCanvas.height - clampedVisibleHeight, visibleTop)
+      );
+
       // Convert to minimap coordinates
       const viewportX = clampedLeft * scale;
       const viewportY = clampedTop * scale;
 
       // Apply strict bounds to ensure viewport stays within minimap
-      const boundedX = Math.max(0, Math.min(minimapCanvas.width - viewportWidth, viewportX));
-      const boundedY = Math.max(0, Math.min(minimapCanvas.height - viewportHeight, viewportY));
+      const boundedX = Math.max(
+        0,
+        Math.min(minimapCanvas.width - viewportWidth, viewportX)
+      );
+      const boundedY = Math.max(
+        0,
+        Math.min(minimapCanvas.height - viewportHeight, viewportY)
+      );
 
       // Ensure dimensions are valid
-      const finalWidth = Math.max(1, Math.min(viewportWidth, minimapCanvas.width));
-      const finalHeight = Math.max(1, Math.min(viewportHeight, minimapCanvas.height));
+      const finalWidth = Math.max(
+        1,
+        Math.min(viewportWidth, minimapCanvas.width)
+      );
+      const finalHeight = Math.max(
+        1,
+        Math.min(viewportHeight, minimapCanvas.height)
+      );
 
       viewport.style.width = `${finalWidth}px`;
       viewport.style.height = `${finalHeight}px`;
       viewport.style.left = `${boundedX}px`;
       viewport.style.top = `${boundedY}px`;
-      viewport.style.display = 'block';
+      viewport.style.display = "block";
     }
 
     function navigateToMinimapPosition(e) {
-      const minimapCanvas = document.getElementById('minimapCanvas');
-      const editCanvas = document.getElementById('editCanvas');
+      const minimapCanvas = document.getElementById("minimapCanvas");
+      const editCanvas = document.getElementById("editCanvas");
 
       if (!minimapCanvas || !editCanvas) return;
 
@@ -8449,18 +9827,20 @@ localStorage.removeItem("lp");
     }
 
     function updateStatusBar(x, y) {
-      const statusBar = document.getElementById('editStatusBar');
-      const posX = document.getElementById('posX');
-      const posY = document.getElementById('posY');
-      const zoomStatus = document.getElementById('editZoomStatus');
-      
+      const statusBar = document.getElementById("editStatusBar");
+      const posX = document.getElementById("posX");
+      const posY = document.getElementById("posY");
+      const zoomStatus = document.getElementById("editZoomStatus");
+
       if (statusBar) {
-        statusBar.textContent = `Position: (${x}, ${y}) | Color: ${editState.currentColor || '#000000'}`;
+        statusBar.textContent = `Position: (${x}, ${y}) | Color: ${
+          editState.currentColor || "#000000"
+        }`;
       }
-      
+
       if (posX) posX.value = x;
       if (posY) posY.value = y;
-      
+
       if (zoomStatus) {
         const zoomPercent = Math.round(editState.zoom * 100);
         zoomStatus.textContent = `Zoom: ${zoomPercent}%`;
@@ -8468,32 +9848,36 @@ localStorage.removeItem("lp");
     }
 
     function handleEyedropper(x, y) {
-      const editCanvas = document.getElementById('editCanvas');
-      const ctx = editCanvas.getContext('2d');
+      const editCanvas = document.getElementById("editCanvas");
+      const ctx = editCanvas.getContext("2d");
 
       if (x >= 0 && x < editCanvas.width && y >= 0 && y < editCanvas.height) {
         const imageData = ctx.getImageData(x, y, 1, 1);
         const [r, g, b] = imageData.data;
-        const pickedColor = `#${r.toString(16).padStart(2, '0')}${g.toString(16).padStart(2, '0')}${b.toString(16).padStart(2, '0')}`;
+        const pickedColor = `#${r.toString(16).padStart(2, "0")}${g
+          .toString(16)
+          .padStart(2, "0")}${b.toString(16).padStart(2, "0")}`;
 
         editState.currentColor = pickedColor;
-        const currentColorDisplay = document.getElementById('currentColorDisplay');
+        const currentColorDisplay = document.getElementById(
+          "currentColorDisplay"
+        );
         if (currentColorDisplay) {
           currentColorDisplay.style.backgroundColor = pickedColor;
         }
-        
+
         // Update color info
-        const colorHex = document.getElementById('colorHex');
-        const colorRgb = document.getElementById('colorRgb');
+        const colorHex = document.getElementById("colorHex");
+        const colorRgb = document.getElementById("colorRgb");
         if (colorHex) colorHex.textContent = pickedColor.toUpperCase();
         if (colorRgb) colorRgb.textContent = `RGB(${r}, ${g}, ${b})`;
 
         // Try to find matching color in palette
-        document.querySelectorAll('.edit-swatch').forEach(btn => {
-          btn.classList.remove('active');
+        document.querySelectorAll(".edit-swatch").forEach((btn) => {
+          btn.classList.remove("active");
           const swatchHex = btn.dataset.colorHex;
           if (swatchHex === pickedColor) {
-            btn.classList.add('active');
+            btn.classList.add("active");
             editState.currentColorId = parseInt(btn.dataset.colorId);
           }
         });
@@ -8503,12 +9887,23 @@ localStorage.removeItem("lp");
     }
 
     function floodFill(startX, startY, fillColor) {
-      const editCanvas = document.getElementById('editCanvas');
-      const ctx = editCanvas.getContext('2d');
-      const imageData = ctx.getImageData(0, 0, editCanvas.width, editCanvas.height);
+      const editCanvas = document.getElementById("editCanvas");
+      const ctx = editCanvas.getContext("2d");
+      const imageData = ctx.getImageData(
+        0,
+        0,
+        editCanvas.width,
+        editCanvas.height
+      );
       const data = imageData.data;
 
-      if (startX < 0 || startX >= editCanvas.width || startY < 0 || startY >= editCanvas.height) return;
+      if (
+        startX < 0 ||
+        startX >= editCanvas.width ||
+        startY < 0 ||
+        startY >= editCanvas.height
+      )
+        return;
 
       const startIndex = (startY * editCanvas.width + startX) * 4;
       const startR = data[startIndex];
@@ -8534,7 +9929,8 @@ localStorage.removeItem("lp");
         if (checkedPixels.has(key)) continue;
         checkedPixels.add(key);
 
-        if (x < 0 || x >= editCanvas.width || y < 0 || y >= editCanvas.height) continue;
+        if (x < 0 || x >= editCanvas.width || y < 0 || y >= editCanvas.height)
+          continue;
 
         const index = (y * editCanvas.width + x) * 4;
         const r = data[index];
@@ -8570,13 +9966,16 @@ localStorage.removeItem("lp");
 
     function drawCheckerboardBackground(ctx, width, height) {
       const checkerSize = 8; // Size of each checker square
-      ctx.fillStyle = '#f0f0f0'; // Light gray
+      ctx.fillStyle = "#f0f0f0"; // Light gray
       ctx.fillRect(0, 0, width, height);
 
-      ctx.fillStyle = '#e0e0e0'; // Slightly darker gray
+      ctx.fillStyle = "#e0e0e0"; // Slightly darker gray
       for (let x = 0; x < width; x += checkerSize) {
         for (let y = 0; y < height; y += checkerSize) {
-          if ((Math.floor(x / checkerSize) + Math.floor(y / checkerSize)) % 2 === 1) {
+          if (
+            (Math.floor(x / checkerSize) + Math.floor(y / checkerSize)) % 2 ===
+            1
+          ) {
             ctx.fillRect(x, y, checkerSize, checkerSize);
           }
         }
@@ -8587,8 +9986,8 @@ localStorage.removeItem("lp");
       if (editState.undoStack.length === 0) return;
 
       const currentState = editState.undoStack[editState.undoStack.length - 1];
-      const editCanvas = document.getElementById('editCanvas');
-      const ctx = editCanvas.getContext('2d');
+      const editCanvas = document.getElementById("editCanvas");
+      const ctx = editCanvas.getContext("2d");
 
       const img = new Image();
       img.onload = () => {
@@ -8596,7 +9995,7 @@ localStorage.removeItem("lp");
         // REMOVED: drawCheckerboardBackground - prevents checkerboard from being saved with template
         ctx.drawImage(img, 0, 0);
         drawGrid(ctx, editCanvas.width, editCanvas.height);
-        
+
         // Update minimap to reflect changes
         setupMinimap();
       };
@@ -8604,14 +10003,16 @@ localStorage.removeItem("lp");
     }
 
     function setupTouchSupport() {
-      const canvas = document.getElementById('editCanvas');
+      const canvas = document.getElementById("editCanvas");
       if (!canvas) return;
 
       let touchStartTime = 0;
 
-      canvas.addEventListener('touchstart', handleTouchStart, { passive: false });
-      canvas.addEventListener('touchmove', handleTouchMove, { passive: false });
-      canvas.addEventListener('touchend', handleTouchEnd, { passive: false });
+      canvas.addEventListener("touchstart", handleTouchStart, {
+        passive: false,
+      });
+      canvas.addEventListener("touchmove", handleTouchMove, { passive: false });
+      canvas.addEventListener("touchend", handleTouchEnd, { passive: false });
 
       function handleTouchStart(e) {
         e.preventDefault();
@@ -8638,7 +10039,7 @@ localStorage.removeItem("lp");
 
           editState.lastTouchCenter = {
             x: (touch1.clientX + touch2.clientX) / 2,
-            y: (touch1.clientY + touch2.clientY) / 2
+            y: (touch1.clientY + touch2.clientY) / 2,
           };
         }
       }
@@ -8665,13 +10066,16 @@ localStorage.removeItem("lp");
 
           const currentCenter = {
             x: (touch1.clientX + touch2.clientX) / 2,
-            y: (touch1.clientY + touch2.clientY) / 2
+            y: (touch1.clientY + touch2.clientY) / 2,
           };
 
           // Zoom based on distance change
           if (editState.lastTouchDistance > 0) {
             const zoomFactor = currentDistance / editState.lastTouchDistance;
-            const newZoom = Math.max(0.1, Math.min(32, editState.zoom * zoomFactor));
+            const newZoom = Math.max(
+              0.1,
+              Math.min(32, editState.zoom * zoomFactor)
+            );
             zoomToPoint(newZoom, currentCenter.x, currentCenter.y);
           }
 
@@ -8710,7 +10114,7 @@ localStorage.removeItem("lp");
         // Multiply by zoom so it moves faster when zoomed in (feels more natural)
         const scaledSpeed = baseSpeed * editState.zoom;
         let moved = false;
-        
+
         if (editState.wasdKeys.w) {
           editState.panY += scaledSpeed;
           moved = true;
@@ -8727,59 +10131,66 @@ localStorage.removeItem("lp");
           editState.panX -= scaledSpeed;
           moved = true;
         }
-        
+
         if (moved) {
           constrainPan();
           updateCanvasTransform();
         }
-        
+
         // Continue animation if any key is pressed
-        if (editState.wasdKeys.w || editState.wasdKeys.s || editState.wasdKeys.a || editState.wasdKeys.d) {
-          editState.wasdAnimationFrame = requestAnimationFrame(updateWASDMovement);
+        if (
+          editState.wasdKeys.w ||
+          editState.wasdKeys.s ||
+          editState.wasdKeys.a ||
+          editState.wasdKeys.d
+        ) {
+          editState.wasdAnimationFrame =
+            requestAnimationFrame(updateWASDMovement);
         } else {
           editState.wasdAnimationFrame = null;
         }
       }
-      
-      document.addEventListener('keydown', (e) => {
+
+      document.addEventListener("keydown", (e) => {
         // Only handle shortcuts when edit panel is visible
-        const editOverlay = document.getElementById('editOverlay');
-        if (!editOverlay || editOverlay.style.display === 'none') return;
+        const editOverlay = document.getElementById("editOverlay");
+        if (!editOverlay || editOverlay.style.display === "none") return;
 
         // Handle WASD movement
         const key = e.key.toLowerCase();
-        if (['w', 'a', 's', 'd'].includes(key)) {
+        if (["w", "a", "s", "d"].includes(key)) {
           e.preventDefault();
           if (!editState.wasdKeys[key]) {
             editState.wasdKeys[key] = true;
             // Start animation if not already running
             if (!editState.wasdAnimationFrame) {
-              editState.wasdAnimationFrame = requestAnimationFrame(updateWASDMovement);
+              editState.wasdAnimationFrame =
+                requestAnimationFrame(updateWASDMovement);
             }
           }
           return;
         }
 
         // Prevent default for other handled keys
-        const handledKeys = ['b', 'e', 'i', 'f', 'z', '[', ']'];
-        if (handledKeys.includes(key) || (e.ctrlKey && key === 'z')) {
+        const handledKeys = ["b", "e", "i", "f", "z", "[", "]"];
+        if (handledKeys.includes(key) || (e.ctrlKey && key === "z")) {
           e.preventDefault();
         }
 
         switch (key) {
-          case 'b': // Brush
-            selectTool('paint');
+          case "b": // Brush
+            selectTool("paint");
             break;
-          case 'e': // Erase
-            selectTool('erase');
+          case "e": // Erase
+            selectTool("erase");
             break;
-          case 'i': // Eyedropper
-            selectTool('eyedropper');
+          case "i": // Eyedropper
+            selectTool("eyedropper");
             break;
-          case 'f': // Fill
-            selectTool('fill');
+          case "f": // Fill
+            selectTool("fill");
             break;
-          case 'z':
+          case "z":
             if (e.ctrlKey || e.metaKey) {
               if (e.shiftKey) {
                 redoEdit();
@@ -8788,55 +10199,57 @@ localStorage.removeItem("lp");
               }
             }
             break;
-          case '=':
-          case '+':
+          case "=":
+          case "+":
             if (e.ctrlKey || e.metaKey) {
               zoomIn();
             }
             break;
-          case '-':
+          case "-":
             if (e.ctrlKey || e.metaKey) {
               zoomOut();
             }
             break;
-          case '0':
+          case "0":
             if (e.ctrlKey || e.metaKey) {
               fitToWindow();
             }
             break;
-          case '1':
+          case "1":
             if (e.ctrlKey || e.metaKey) {
               setZoom(1);
             }
             break;
-          case '[': // Decrease brush size
-            const brushSize = document.getElementById('brushSize');
+          case "[": // Decrease brush size
+            const brushSize = document.getElementById("brushSize");
             const currentSize = parseInt(brushSize.value);
             if (currentSize > 1) {
               brushSize.value = currentSize - 1;
-              document.getElementById('brushSizeValue').textContent = currentSize - 1;
+              document.getElementById("brushSizeValue").textContent =
+                currentSize - 1;
               updateBrushSize(currentSize - 1);
             }
             break;
-          case ']': // Increase brush size
-            const brushSize2 = document.getElementById('brushSize');
+          case "]": // Increase brush size
+            const brushSize2 = document.getElementById("brushSize");
             const currentSize2 = parseInt(brushSize2.value);
             if (currentSize2 < 20) {
               brushSize2.value = currentSize2 + 1;
-              document.getElementById('brushSizeValue').textContent = currentSize2 + 1;
+              document.getElementById("brushSizeValue").textContent =
+                currentSize2 + 1;
               updateBrushSize(currentSize2 + 1);
             }
             break;
         }
       });
-      
+
       // Handle keyup for WASD
-      document.addEventListener('keyup', (e) => {
-        const editOverlay = document.getElementById('editOverlay');
-        if (!editOverlay || editOverlay.style.display === 'none') return;
-        
+      document.addEventListener("keyup", (e) => {
+        const editOverlay = document.getElementById("editOverlay");
+        if (!editOverlay || editOverlay.style.display === "none") return;
+
         const key = e.key.toLowerCase();
-        if (['w', 'a', 's', 'd'].includes(key)) {
+        if (["w", "a", "s", "d"].includes(key)) {
           editState.wasdKeys[key] = false;
         }
       });
@@ -8844,24 +10257,27 @@ localStorage.removeItem("lp");
 
     function applyEditChanges() {
       try {
-        const editCanvas = document.getElementById('editCanvas');
+        const editCanvas = document.getElementById("editCanvas");
         if (!editCanvas) {
-          throw new Error('Edit canvas not found');
+          throw new Error("Edit canvas not found");
         }
 
         // Find the resize canvas in the resize panel
-        const resizeCanvas = document.getElementById('resizeCanvas');
+        const resizeCanvas = document.getElementById("resizeCanvas");
         if (!resizeCanvas) {
-          throw new Error('Resize canvas not found');
+          throw new Error("Resize canvas not found");
         }
 
-        const baseCtx = resizeCanvas.getContext('2d');
+        const baseCtx = resizeCanvas.getContext("2d");
         if (!baseCtx) {
-          throw new Error('Resize canvas context not available');
+          throw new Error("Resize canvas context not available");
         }
 
         // Make sure the resize canvas has the same dimensions as the edit canvas
-        if (resizeCanvas.width !== editCanvas.width || resizeCanvas.height !== editCanvas.height) {
+        if (
+          resizeCanvas.width !== editCanvas.width ||
+          resizeCanvas.height !== editCanvas.height
+        ) {
           resizeCanvas.width = editCanvas.width;
           resizeCanvas.height = editCanvas.height;
         }
@@ -8879,127 +10295,153 @@ localStorage.removeItem("lp");
         // Create new processor with edited image as the template
         if (window.WPlaceImageProcessor) {
           const newProcessor = new window.WPlaceImageProcessor(editedImageData);
-          newProcessor.load().then(() => {
-            // Get the processed pixel data from the edited canvas
-            const editCtx = editCanvas.getContext('2d');
-            const editImageData = editCtx.getImageData(0, 0, editCanvas.width, editCanvas.height);
-            const pixels = editImageData.data;
+          newProcessor
+            .load()
+            .then(() => {
+              // Get the processed pixel data from the edited canvas
+              const editCtx = editCanvas.getContext("2d");
+              const editImageData = editCtx.getImageData(
+                0,
+                0,
+                editCanvas.width,
+                editCanvas.height
+              );
+              const pixels = editImageData.data;
 
-            // Count valid pixels in the edited image
-            let totalValidPixels = 0;
-            for (let i = 0; i < pixels.length; i += 4) {
-              const a = pixels[i + 3];
-              const r = pixels[i];
-              const g = pixels[i + 1];
-              const b = pixels[i + 2];
+              // Count valid pixels in the edited image
+              let totalValidPixels = 0;
+              for (let i = 0; i < pixels.length; i += 4) {
+                const a = pixels[i + 3];
+                const r = pixels[i];
+                const g = pixels[i + 1];
+                const b = pixels[i + 2];
 
-              const isTransparent = !state.paintTransparentPixels && a < state.customTransparencyThreshold;
-              const isWhiteAndSkipped = !state.paintWhitePixels && Utils.isWhitePixel(r, g, b);
+                const isTransparent =
+                  !state.paintTransparentPixels &&
+                  a < state.customTransparencyThreshold;
+                const isWhiteAndSkipped =
+                  !state.paintWhitePixels && Utils.isWhitePixel(r, g, b);
 
-              if (!isTransparent && !isWhiteAndSkipped) {
-                totalValidPixels++;
-              }
-            }
-
-            // COMPLETELY REBUILD state.imageData with the edited artwork
-            state.imageData = {
-              width: editCanvas.width,
-              height: editCanvas.height,
-              pixels: pixels,
-              totalPixels: totalValidPixels,
-              processor: newProcessor,
-            };
-
-            // CRITICAL: Update state.originalImage so resize panel uses edited artwork as base template
-            state.originalImage = {
-              dataUrl: editedImageData,
-              width: editCanvas.width,
-              height: editCanvas.height
-            };
-
-            // Update state with new totals
-            state.totalPixels = totalValidPixels;
-            state.paintedPixels = 0; // Reset progress since this is a new template
-            state.currentPaintingColor = null; // Reset color tracking
-            state.imageLoaded = true;
-
-            // Update local processors
-            if (typeof processor !== 'undefined') {
-              processor = newProcessor;
-              console.log('🔄 Updated local processor with edited artwork');
-            }
-            if (typeof baseProcessor !== 'undefined') {
-              baseProcessor = newProcessor;
-              console.log('🔄 Updated baseProcessor with edited artwork');
-            }
-
-            // Force regeneration of overlays by clearing cached mask data
-            if (typeof window._maskImageData !== 'undefined') {
-              delete window._maskImageData;
-            }
-
-            // Update UI to reflect the new template
-            if (typeof updateUI === 'function') {
-              updateUI();
-            }
-
-            // Show loading and properly reload resize panel with new template
-            Utils.showAlert('Updating template... Please wait.', 'info');
-
-            // Give more time for template to fully update and force resize panel reload
-            setTimeout(() => {
-              // Hide edit overlay first
-              document.getElementById('editOverlay').style.display = 'none';
-
-              // Completely reload resize dialog with updated processor
-              setTimeout(() => {
-                // Clean up existing dialog
-                if (typeof _resizeDialogCleanup === 'function') {
-                  _resizeDialogCleanup();
+                if (!isTransparent && !isWhiteAndSkipped) {
+                  totalValidPixels++;
                 }
+              }
 
-                // Force complete reload of resize dialog with new processor
+              // COMPLETELY REBUILD state.imageData with the edited artwork
+              state.imageData = {
+                width: editCanvas.width,
+                height: editCanvas.height,
+                pixels: pixels,
+                totalPixels: totalValidPixels,
+                processor: newProcessor,
+              };
+
+              // CRITICAL: Update state.originalImage so resize panel uses edited artwork as base template
+              state.originalImage = {
+                dataUrl: editedImageData,
+                width: editCanvas.width,
+                height: editCanvas.height,
+              };
+
+              // Update state with new totals
+              state.totalPixels = totalValidPixels;
+              state.paintedPixels = 0; // Reset progress since this is a new template
+              state.currentPaintingColor = null; // Reset color tracking
+              state.imageLoaded = true;
+
+              // Update local processors
+              if (typeof processor !== "undefined") {
+                processor = newProcessor;
+                console.log("🔄 Updated local processor with edited artwork");
+              }
+              if (typeof baseProcessor !== "undefined") {
+                baseProcessor = newProcessor;
+                console.log("🔄 Updated baseProcessor with edited artwork");
+              }
+
+              // Force regeneration of overlays by clearing cached mask data
+              if (typeof window._maskImageData !== "undefined") {
+                delete window._maskImageData;
+              }
+
+              // Update UI to reflect the new template
+              if (typeof updateUI === "function") {
+                updateUI();
+              }
+
+              // Show loading and properly reload resize panel with new template
+              Utils.showAlert("Updating template... Please wait.", "info");
+
+              // Give more time for template to fully update and force resize panel reload
+              setTimeout(() => {
+                // Hide edit overlay first
+                document.getElementById("editOverlay").style.display = "none";
+
+                // Completely reload resize dialog with updated processor
                 setTimeout(() => {
-                  showResizeDialog(newProcessor, true);  // true = new image uploaded
+                  // Clean up existing dialog
+                  if (typeof _resizeDialogCleanup === "function") {
+                    _resizeDialogCleanup();
+                  }
 
-                  console.log('✅ Template COMPLETELY replaced with edited artwork');
-                  console.log(`📊 New template stats: ${editCanvas.width}x${editCanvas.height}, ${totalValidPixels} pixels`);
-                  Utils.showAlert('Template successfully replaced with your edited artwork!', 'success');
-                }, 100);
-              }, 300);
-            }, 100);
-          }).catch((error) => {
-            console.error('Failed to load new processor:', error);
-            Utils.showAlert('Failed to update template. Please try again.', 'error');
-          });
+                  // Force complete reload of resize dialog with new processor
+                  setTimeout(() => {
+                    showResizeDialog(newProcessor, true); // true = new image uploaded
+
+                    console.log(
+                      "✅ Template COMPLETELY replaced with edited artwork"
+                    );
+                    console.log(
+                      `📊 New template stats: ${editCanvas.width}x${editCanvas.height}, ${totalValidPixels} pixels`
+                    );
+                    Utils.showAlert(
+                      "Template successfully replaced with your edited artwork!",
+                      "success"
+                    );
+                  }, 100);
+                }, 300);
+              }, 100);
+            })
+            .catch((error) => {
+              console.error("Failed to load new processor:", error);
+              Utils.showAlert(
+                "Failed to update template. Please try again.",
+                "error"
+              );
+            });
         } else {
-          console.error('WPlaceImageProcessor not available');
-          Utils.showAlert('Image processor not available. Please reload the page.', 'error');
+          console.error("WPlaceImageProcessor not available");
+          Utils.showAlert(
+            "Image processor not available. Please reload the page.",
+            "error"
+          );
         }
 
-        console.log('✅ Edit changes applied - template replacement in progress');
+        console.log(
+          "✅ Edit changes applied - template replacement in progress"
+        );
       } catch (error) {
-        console.error('Error applying edit changes:', error);
-        Utils.showAlert('Failed to apply changes. Please try again.', 'error');
+        console.error("Error applying edit changes:", error);
+        Utils.showAlert("Failed to apply changes. Please try again.", "error");
       }
     }
 
     if (uploadBtn) {
-      uploadBtn.addEventListener('click', async () => {
+      uploadBtn.addEventListener("click", async () => {
         // Auto-open color palette if not already open
         Utils.openColorPalette();
 
         const availableColors = Utils.extractAvailableColors();
         if (availableColors === null || availableColors.length < 10) {
-          updateUI('noColorsFound', 'error');
-          Utils.showAlert(Utils.t('noColorsFound'), 'error');
+          updateUI("noColorsFound", "error");
+          Utils.showAlert(Utils.t("noColorsFound"), "error");
           return;
         }
 
         if (!state.colorsChecked) {
           state.availableColors = availableColors;
           state.colorsChecked = true;
-          updateUI('colorsFound', 'success', { count: availableColors.length });
+          updateUI("colorsFound", "success", { count: availableColors.length });
           await updateStats();
           selectPosBtn.disabled = false;
           // Only enable resize button if image is also loaded
@@ -9009,10 +10451,10 @@ localStorage.removeItem("lp");
         }
 
         try {
-          updateUI('loadingImage', 'default');
+          updateUI("loadingImage", "default");
           const imageSrc = await Utils.createImageUploader();
           if (!imageSrc) {
-            updateUI('colorsFound', 'success', {
+            updateUI("colorsFound", "success", {
               count: state.availableColors.length,
             });
             return;
@@ -9028,7 +10470,9 @@ localStorage.removeItem("lp");
           for (let i = 0; i < pixels.length; i += 4) {
             const isTransparent =
               !state.paintTransparentPixels &&
-              pixels[i + 3] < (state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD);
+              pixels[i + 3] <
+                (state.customTransparencyThreshold ||
+                  CONFIG.TRANSPARENCY_THRESHOLD);
             const isWhiteAndSkipped =
               !state.paintWhitePixels &&
               Utils.isWhitePixel(pixels[i], pixels[i + 1], pixels[i + 2]);
@@ -9054,7 +10498,7 @@ localStorage.removeItem("lp");
           // Reset session-specific flags when a new image is loaded
           state.preFilteringDone = false;
           state.progressResetDone = false;
-          console.log('🔄 Reset session flags for new image load');
+          console.log("🔄 Reset session flags for new image load");
 
           // Keep existing lastPosition to continue from where we left off
           // state.lastPosition = { x: 0, y: 0 }; // REMOVED: Don't reset position
@@ -9075,8 +10519,8 @@ localStorage.removeItem("lp");
           await overlayManager.setImage(imageBitmap);
           overlayManager.enable();
           toggleOverlayBtn.disabled = false;
-          toggleOverlayBtn.classList.add('active');
-          toggleOverlayBtn.setAttribute('aria-pressed', 'true');
+          toggleOverlayBtn.classList.add("active");
+          toggleOverlayBtn.setAttribute("aria-pressed", "true");
 
           // Only enable resize button if colors have also been captured
           if (state.colorsChecked) {
@@ -9086,7 +10530,7 @@ localStorage.removeItem("lp");
 
           // ⚠️ IMPORTANT: Disable position selection until image is processed
           selectPosBtn.disabled = true;
-          selectPosBtn.title = Utils.t('imageNeedsProcessing');
+          selectPosBtn.title = Utils.t("imageNeedsProcessing");
 
           // Disable start button since position can't be set yet
           if (state.startPosition) {
@@ -9097,83 +10541,105 @@ localStorage.removeItem("lp");
           updateDataButtons();
 
           // Show warning alert to process image first
-          Utils.showAlert(Utils.t('processImageFirst'), 'warning');
-          updateUI('imageLoaded', 'success', { count: totalValidPixels });
+          Utils.showAlert(Utils.t("processImageFirst"), "warning");
+          updateUI("imageLoaded", "success", { count: totalValidPixels });
         } catch {
-          updateUI('imageError', 'error');
+          updateUI("imageError", "error");
         }
       });
     }
 
     // Load Extracted button event listener - for loading Art-Extractor JSON files
-    const loadExtractedBtn = document.getElementById('loadExtractedBtn');
+    const loadExtractedBtn = document.getElementById("loadExtractedBtn");
     if (loadExtractedBtn) {
-      loadExtractedBtn.addEventListener('click', async () => {
+      loadExtractedBtn.addEventListener("click", async () => {
         try {
           // Auto-open color palette if not already open
           Utils.openColorPalette();
 
-          updateUI('loadingImage', 'default');
+          updateUI("loadingImage", "default");
           const fileData = await Utils.loadExtractedFileData();
 
           if (!fileData) {
-            updateUI('ready', 'default');
+            updateUI("ready", "default");
             return;
           }
 
-          console.log('📁 Loading extracted artwork from Art-Extractor...');
-          console.log('🔍 [DEBUG] Loaded file data structure:', {
+          console.log("📁 Loading extracted artwork from Art-Extractor...");
+          console.log("🔍 [DEBUG] Loaded file data structure:", {
             hasState: !!fileData.state,
             hasImageData: !!fileData.imageData,
             topLevelKeys: Object.keys(fileData),
-            stateKeys: fileData.state ? Object.keys(fileData.state) : 'N/A',
-            imageDataKeys: fileData.imageData ? Object.keys(fileData.imageData) : 'N/A',
+            stateKeys: fileData.state ? Object.keys(fileData.state) : "N/A",
+            imageDataKeys: fileData.imageData
+              ? Object.keys(fileData.imageData)
+              : "N/A",
             fileDataType: typeof fileData,
             stateType: typeof fileData.state,
-            imageDataType: typeof fileData.imageData
+            imageDataType: typeof fileData.imageData,
           });
 
           // Validate the data structure before restoring
-          if (!fileData || typeof fileData !== 'object') {
-            throw new Error('Invalid file format: File data is not a valid object');
+          if (!fileData || typeof fileData !== "object") {
+            throw new Error(
+              "Invalid file format: File data is not a valid object"
+            );
           }
 
-          if (!fileData.state || typeof fileData.state !== 'object') {
-            console.error('❌ State validation failed. FileData:', fileData);
-            throw new Error('Invalid file format: Missing or invalid state object. Please ensure you exported from Art-Extractor correctly.');
+          if (!fileData.state || typeof fileData.state !== "object") {
+            console.error("❌ State validation failed. FileData:", fileData);
+            throw new Error(
+              "Invalid file format: Missing or invalid state object. Please ensure you exported from Art-Extractor correctly."
+            );
           }
 
-          if (!fileData.imageData || typeof fileData.imageData !== 'object') {
-            console.error('❌ ImageData validation failed. FileData:', fileData);
-            throw new Error('Invalid file format: Missing or invalid imageData object. Please ensure you completed the area scan in Art-Extractor.');
+          if (!fileData.imageData || typeof fileData.imageData !== "object") {
+            console.error(
+              "❌ ImageData validation failed. FileData:",
+              fileData
+            );
+            throw new Error(
+              "Invalid file format: Missing or invalid imageData object. Please ensure you completed the area scan in Art-Extractor."
+            );
           }
 
-          if (!fileData.imageData.pixels || !Array.isArray(fileData.imageData.pixels) || fileData.imageData.pixels.length === 0) {
-            console.error('❌ Pixel data validation failed. ImageData:', fileData.imageData);
-            throw new Error('Invalid file format: No pixel data found. Please scan an area in Art-Extractor before exporting.');
+          if (
+            !fileData.imageData.pixels ||
+            !Array.isArray(fileData.imageData.pixels) ||
+            fileData.imageData.pixels.length === 0
+          ) {
+            console.error(
+              "❌ Pixel data validation failed. ImageData:",
+              fileData.imageData
+            );
+            throw new Error(
+              "Invalid file format: No pixel data found. Please scan an area in Art-Extractor before exporting."
+            );
           }
 
           // Ensure critical fields are present for Art-Extractor compatibility
           if (!fileData.state.availableColors) {
-            console.warn('⚠️ No availableColors in file, using defaults');
+            console.warn("⚠️ No availableColors in file, using defaults");
             fileData.state.availableColors = [];
           }
 
           // Reset session-specific flags when loading extracted file data
           state.preFilteringDone = false;
           state.progressResetDone = false;
-          console.log('🔄 Reset session flags for extracted file load');
+          console.log("🔄 Reset session flags for extracted file load");
 
           // Use the existing restoreProgress function but with special handling
           const restoreSuccess = await Utils.restoreProgress(fileData);
 
           if (!restoreSuccess) {
-            throw new Error('Failed to restore progress data');
+            throw new Error("Failed to restore progress data");
           }
 
           // After loading, we need to enter position selection mode like when uploading images
           if (state.imageLoaded) {
-            console.log('🎯 Extracted artwork loaded, entering position selection mode...');
+            console.log(
+              "🎯 Extracted artwork loaded, entering position selection mode..."
+            );
 
             // Clear position data since Art-Extractor exports may have null positions for manual placement
             state.startPosition = null;
@@ -9189,10 +10655,10 @@ localStorage.removeItem("lp");
             if (state.imageData && !state.imageData.processor) {
               try {
                 // Create a temporary canvas to generate a data URL for the processor
-                const canvas = document.createElement('canvas');
+                const canvas = document.createElement("canvas");
                 canvas.width = state.imageData.width;
                 canvas.height = state.imageData.height;
-                const ctx = canvas.getContext('2d');
+                const ctx = canvas.getContext("2d");
 
                 // Create image data from pixels
                 const imageData = new ImageData(
@@ -9204,38 +10670,51 @@ localStorage.removeItem("lp");
 
                 // Create processor with canvas data URL using the correct class
                 const dataUrl = canvas.toDataURL();
-                state.imageData.processor = new window.WPlaceImageProcessor(dataUrl);
+                state.imageData.processor = new window.WPlaceImageProcessor(
+                  dataUrl
+                );
 
                 // CRITICAL: Load the processor before using it
                 await state.imageData.processor.load();
-                console.log('🔧 Created and loaded WPlaceImageProcessor for extracted artwork');
+                console.log(
+                  "🔧 Created and loaded WPlaceImageProcessor for extracted artwork"
+                );
               } catch (error) {
-                console.error('❌ Failed to create image processor for extracted artwork:', error);
+                console.error(
+                  "❌ Failed to create image processor for extracted artwork:",
+                  error
+                );
                 // Fallback: use global processor if available
                 if (window.globalImageProcessor) {
-                  console.log('🔄 Using global image processor as fallback');
+                  console.log("🔄 Using global image processor as fallback");
                   state.imageData.processor = window.globalImageProcessor;
                 }
               }
             }
 
-            console.log('🎨 Force-enabled all flags for extracted JSON to access resize panel');
+            console.log(
+              "🎨 Force-enabled all flags for extracted JSON to access resize panel"
+            );
 
             // For extracted images, ensure overlay is enabled but don't set position yet
             try {
               if (overlayManager && state.imageData) {
-                console.log('🖼️ Creating overlay from loaded pixel data:', {
+                console.log("🖼️ Creating overlay from loaded pixel data:", {
                   width: state.imageData.width,
                   height: state.imageData.height,
                   pixelCount: state.imageData.pixels?.length,
                   firstPixels: state.imageData.pixels?.slice(0, 12), // First 3 pixels (RGBA)
-                  isUint8ClampedArray: state.imageData.pixels instanceof Uint8ClampedArray,
-                  isArray: Array.isArray(state.imageData.pixels)
+                  isUint8ClampedArray:
+                    state.imageData.pixels instanceof Uint8ClampedArray,
+                  isArray: Array.isArray(state.imageData.pixels),
                 });
 
                 // Create image bitmap from the restored image data
-                const canvas = new OffscreenCanvas(state.imageData.width, state.imageData.height);
-                const ctx = canvas.getContext('2d');
+                const canvas = new OffscreenCanvas(
+                  state.imageData.width,
+                  state.imageData.height
+                );
+                const ctx = canvas.getContext("2d");
                 const imageData = new ImageData(
                   new Uint8ClampedArray(state.imageData.pixels),
                   state.imageData.width,
@@ -9246,7 +10725,9 @@ localStorage.removeItem("lp");
 
                 await overlayManager.setImage(imageBitmap);
                 overlayManager.enable();
-                console.log('✅ Overlay enabled for extracted artwork - should show PROCESSED pixels');
+                console.log(
+                  "✅ Overlay enabled for extracted artwork - should show PROCESSED pixels"
+                );
 
                 // ✅ Loaded files already contain processed pixels - no need to reprocess
                 // Mark as processed since the overlay is showing the correct processed data
@@ -9254,30 +10735,38 @@ localStorage.removeItem("lp");
 
                 // Enable position selection immediately
                 selectPosBtn.disabled = false;
-                selectPosBtn.title = Utils.t('selectPosition') || 'Select starting position on canvas';
+                selectPosBtn.title =
+                  Utils.t("selectPosition") ||
+                  "Select starting position on canvas";
 
                 // Update data buttons (Save/Load/SaveToFile/LoadFromFile) after loading extracted artwork
                 updateDataButtons();
               }
             } catch (overlayError) {
-              console.warn('⚠️ Could not set overlay for extracted artwork:', overlayError);
+              console.warn(
+                "⚠️ Could not set overlay for extracted artwork:",
+                overlayError
+              );
             }
 
             // For extracted images, don't try to set overlay position until user selects one
             // The overlay should already be enabled from the restoreProgress function
 
             // Update UI with custom message for extracted artwork
-            Utils.showAlert('🎨 Extracted artwork loaded! Please click on the canvas to select where to place it.', 'info');
-            updateUI('ready', 'default'); // Use 'ready' instead of 'waitingPosition' to avoid translation issues
+            Utils.showAlert(
+              "🎨 Extracted artwork loaded! Please click on the canvas to select where to place it.",
+              "info"
+            );
+            updateUI("ready", "default"); // Use 'ready' instead of 'waitingPosition' to avoid translation issues
 
             // Enable relevant buttons
             selectPosBtn.disabled = false;
             // Always enable resize button for extracted files since they have image processor
             resizeBtn.disabled = false;
-            console.log('🔧 Resize button enabled for extracted artwork');
+            console.log("🔧 Resize button enabled for extracted artwork");
 
             // Enable move artwork button (will be fully enabled after position is set)
-            const moveArtworkBtn = document.getElementById('moveArtworkBtn');
+            const moveArtworkBtn = document.getElementById("moveArtworkBtn");
             if (moveArtworkBtn) {
               moveArtworkBtn.disabled = false;
             }
@@ -9285,10 +10774,10 @@ localStorage.removeItem("lp");
             // Set up position selection like the regular selectPosBtn
             const tempFetch = async (url, options) => {
               if (
-                typeof url === 'string' &&
-                url.includes('/s0/pixel/') &&
+                typeof url === "string" &&
+                url.includes("/s0/pixel/") &&
                 options &&
-                options.method === 'POST'
+                options.method === "POST"
               ) {
                 let coords;
                 try {
@@ -9298,7 +10787,9 @@ localStorage.removeItem("lp");
                   return window.originalFetch(url, options);
                 }
 
-                const tileMatches = url.match(/\/s0\/pixel\/(\-?\d+)\/(\-?\d+)/);
+                const tileMatches = url.match(
+                  /\/s0\/pixel\/(\-?\d+)\/(\-?\d+)/
+                );
                 if (tileMatches && coords && coords.length >= 2) {
                   const tileX = parseInt(tileMatches[1]);
                   const tileY = parseInt(tileMatches[2]);
@@ -9309,9 +10800,9 @@ localStorage.removeItem("lp");
                   state.region = { x: tileX, y: tileY };
                   state.selectingPosition = false;
 
-                  console.log('🎯 Position selected for extracted artwork:', {
+                  console.log("🎯 Position selected for extracted artwork:", {
                     startPosition: state.startPosition,
-                    region: state.region
+                    region: state.region,
                   });
 
                   // Restore original fetch
@@ -9320,26 +10811,38 @@ localStorage.removeItem("lp");
                   // Update overlay position with validation
                   try {
                     if (state.startPosition && state.region && overlayManager) {
-                      await overlayManager.setPosition(state.startPosition, state.region);
-                      console.log('✅ Overlay position updated successfully');
+                      await overlayManager.setPosition(
+                        state.startPosition,
+                        state.region
+                      );
+                      console.log("✅ Overlay position updated successfully");
                     } else {
-                      console.warn('⚠️ Cannot set overlay position: missing startPosition or region');
+                      console.warn(
+                        "⚠️ Cannot set overlay position: missing startPosition or region"
+                      );
                     }
                   } catch (positionError) {
-                    console.error('❌ Failed to set overlay position:', positionError);
+                    console.error(
+                      "❌ Failed to set overlay position:",
+                      positionError
+                    );
                   }
 
                   startBtn.disabled = false;
-                  selectPosBtn.textContent = Utils.t('selectPosition');
+                  selectPosBtn.textContent = Utils.t("selectPosition");
 
                   // Enable Move Artwork button when position is set
-                  const moveArtworkBtn = document.getElementById('moveArtworkBtn');
+                  const moveArtworkBtn =
+                    document.getElementById("moveArtworkBtn");
                   if (moveArtworkBtn) {
                     moveArtworkBtn.disabled = false;
                   }
 
-                  updateUI('ready', 'success');
-                  Utils.showAlert('Position selected! Ready to start painting.', 'success');
+                  updateUI("ready", "success");
+                  Utils.showAlert(
+                    "Position selected! Ready to start painting.",
+                    "success"
+                  );
                 }
               }
               return window.originalFetch(url, options);
@@ -9351,51 +10854,62 @@ localStorage.removeItem("lp");
             }
             window.fetch = tempFetch;
           }
-
         } catch (error) {
-          console.error('❌ Failed to load extracted artwork:', error);
-          Utils.showAlert(`Failed to load extracted artwork: ${error.message}`, 'error');
-          updateUI('ready', 'default');
+          console.error("❌ Failed to load extracted artwork:", error);
+          Utils.showAlert(
+            `Failed to load extracted artwork: ${error.message}`,
+            "error"
+          );
+          updateUI("ready", "default");
         }
       });
     }
 
     if (resizeBtn) {
-      resizeBtn.addEventListener('click', () => {
-        console.log('🔍 [DEBUG] Resize button clicked. State check:', {
+      resizeBtn.addEventListener("click", () => {
+        console.log("🔍 [DEBUG] Resize button clicked. State check:", {
           imageLoaded: state.imageLoaded,
           hasProcessor: !!(state.imageData && state.imageData.processor),
           colorsChecked: state.colorsChecked,
-          hasAvailableColors: !!(state.availableColors && state.availableColors.length > 0)
+          hasAvailableColors: !!(
+            state.availableColors && state.availableColors.length > 0
+          ),
         });
 
         if (state.imageLoaded && state.imageData && state.imageData.processor) {
-          showResizeDialog(state.imageData.processor, false);  // false = reopening panel, preserve settings
+          showResizeDialog(state.imageData.processor, false); // false = reopening panel, preserve settings
         } else {
-          let message = 'Please upload an image and check colors first.';
-          if (!state.imageLoaded) message = 'Please upload an image first.';
-          else if (!state.imageData || !state.imageData.processor) message = 'Image processor not available. Please reload the image.';
-          Utils.showAlert(message, 'warning');
+          let message = "Please upload an image and check colors first.";
+          if (!state.imageLoaded) message = "Please upload an image first.";
+          else if (!state.imageData || !state.imageData.processor)
+            message = "Image processor not available. Please reload the image.";
+          Utils.showAlert(message, "warning");
         }
       });
     }
 
     // Move Artwork button event listener
-    const moveArtworkBtn = document.getElementById('moveArtworkBtn');
+    const moveArtworkBtn = document.getElementById("moveArtworkBtn");
     if (moveArtworkBtn) {
-      moveArtworkBtn.addEventListener('click', () => {
-        if (state.imageLoaded && (state.startPosition || state.selectingPosition)) {
+      moveArtworkBtn.addEventListener("click", () => {
+        if (
+          state.imageLoaded &&
+          (state.startPosition || state.selectingPosition)
+        ) {
           showMoveArtworkPanel();
         } else if (!state.imageLoaded) {
-          Utils.showAlert('Please upload or load an image first', 'warning');
+          Utils.showAlert("Please upload or load an image first", "warning");
         } else {
-          Utils.showAlert('Please select a position for the artwork first', 'warning');
+          Utils.showAlert(
+            "Please select a position for the artwork first",
+            "warning"
+          );
         }
       });
     }
 
     if (selectPosBtn) {
-      selectPosBtn.addEventListener('click', async () => {
+      selectPosBtn.addEventListener("click", async () => {
         if (state.selectingPosition) return;
 
         state.selectingPosition = true;
@@ -9404,19 +10918,19 @@ localStorage.removeItem("lp");
         startBtn.disabled = true;
 
         // Disable Move Artwork button when selecting new position
-        const moveArtworkBtn = document.getElementById('moveArtworkBtn');
+        const moveArtworkBtn = document.getElementById("moveArtworkBtn");
         if (moveArtworkBtn) {
           moveArtworkBtn.disabled = true;
         }
 
-        Utils.showAlert(Utils.t('selectPositionAlert'), 'info');
-        updateUI('waitingPosition', 'default');
+        Utils.showAlert(Utils.t("selectPositionAlert"), "info");
+        updateUI("waitingPosition", "default");
 
         const tempFetch = async (url, options) => {
           if (
-            typeof url === 'string' &&
-            url.includes('https://backend.wplace.live/s0/pixel/') &&
-            options?.method?.toUpperCase() === 'POST'
+            typeof url === "string" &&
+            url.includes("https://backend.wplace.live/s0/pixel/") &&
+            options?.method?.toUpperCase() === "POST"
           ) {
             try {
               const response = await originalFetch(url, options);
@@ -9444,20 +10958,31 @@ localStorage.removeItem("lp");
                   // Update overlay position with validation
                   try {
                     if (state.startPosition && state.region && overlayManager) {
-                      await overlayManager.setPosition(state.startPosition, state.region);
-                      console.log('✅ Regular overlay position updated successfully');
+                      await overlayManager.setPosition(
+                        state.startPosition,
+                        state.region
+                      );
+                      console.log(
+                        "✅ Regular overlay position updated successfully"
+                      );
                     } else {
-                      console.warn('⚠️ Cannot set regular overlay position: missing startPosition or region');
+                      console.warn(
+                        "⚠️ Cannot set regular overlay position: missing startPosition or region"
+                      );
                     }
                   } catch (positionError) {
-                    console.error('❌ Failed to set regular overlay position:', positionError);
+                    console.error(
+                      "❌ Failed to set regular overlay position:",
+                      positionError
+                    );
                   }
 
                   if (state.imageLoaded) {
                     startBtn.disabled = false;
 
                     // Enable Move Artwork button when position is set
-                    const moveArtworkBtn = document.getElementById('moveArtworkBtn');
+                    const moveArtworkBtn =
+                      document.getElementById("moveArtworkBtn");
                     if (moveArtworkBtn) {
                       moveArtworkBtn.disabled = false;
                     }
@@ -9465,7 +10990,7 @@ localStorage.removeItem("lp");
 
                   window.fetch = originalFetch;
                   state.selectingPosition = false;
-                  updateUI('positionSet', 'success');
+                  updateUI("positionSet", "success");
                 }
               }
 
@@ -9484,8 +11009,8 @@ localStorage.removeItem("lp");
           if (state.selectingPosition) {
             window.fetch = originalFetch;
             state.selectingPosition = false;
-            updateUI('positionTimeout', 'error');
-            Utils.showAlert(Utils.t('positionTimeout'), 'error');
+            updateUI("positionTimeout", "error");
+            Utils.showAlert(Utils.t("positionTimeout"), "error");
           }
         }, 120000);
       });
@@ -9493,7 +11018,7 @@ localStorage.removeItem("lp");
 
     async function startPainting() {
       if (!state.imageLoaded || !state.startPosition || !state.region) {
-        updateUI('missingRequirements', 'error');
+        updateUI("missingRequirements", "error");
         return;
       }
       await ensureToken();
@@ -9502,14 +11027,18 @@ localStorage.removeItem("lp");
       // Only perform progressive pixel detection on first start of session
       if (!state.preFilteringDone) {
         // Perform progressive pixel detection from top-left to bottom-right
-        console.log('🔍 Starting progressive pixel detection from top-left to bottom-right...');
+        console.log(
+          "🔍 Starting progressive pixel detection from top-left to bottom-right..."
+        );
         await performProgressivePixelDetection();
-        
+
         // Mark pre-filtering as done to prevent duplicate scanning
         state.preFilteringDone = true;
-        console.log('✅ Pre-filtering marked as complete - will not scan again this session');
+        console.log(
+          "✅ Pre-filtering marked as complete - will not scan again this session"
+        );
       } else {
-        console.log('🔄 Continuing session - pre-filtering already done');
+        console.log("🔄 Continuing session - pre-filtering already done");
       }
 
       state.running = true;
@@ -9522,14 +11051,14 @@ localStorage.removeItem("lp");
       saveBtn.disabled = true;
       toggleOverlayBtn.disabled = true;
 
-      updateUI('startPaintingMsg', 'success');
+      updateUI("startPaintingMsg", "success");
 
       try {
         await getAccounts();
         await processImage();
       } catch (e) {
-        console.error('Unexpected error:', e);
-        updateUI('paintingError', 'error');
+        console.error("Unexpected error:", e);
+        updateUI("paintingError", "error");
       } finally {
         state.running = false;
         stopBtn.disabled = true;
@@ -9540,7 +11069,7 @@ localStorage.removeItem("lp");
         } else {
           startBtn.disabled = true;
           uploadBtn.disabled = false;
-          const loadExtractedBtn = document.getElementById('loadExtractedBtn');
+          const loadExtractedBtn = document.getElementById("loadExtractedBtn");
           if (loadExtractedBtn) loadExtractedBtn.disabled = false;
           selectPosBtn.disabled = false;
           resizeBtn.disabled = false;
@@ -9553,28 +11082,32 @@ localStorage.removeItem("lp");
     function updateStartButtonState() {
       if (!startBtn) return;
 
-      if (state.paintingMode === 'assist') {
+      if (state.paintingMode === "assist") {
         startBtn.disabled = true;
-        startBtn.title = 'Start button is disabled in Assist mode. Manually place pixels with overlay guidance.';
+        startBtn.title =
+          "Start button is disabled in Assist mode. Manually place pixels with overlay guidance.";
       } else {
-        startBtn.disabled = !state.imageLoaded || state.running || !state.startPosition;
-        startBtn.title = '';
+        startBtn.disabled =
+          !state.imageLoaded || state.running || !state.startPosition;
+        startBtn.title = "";
       }
     }
 
     if (startBtn) {
-      startBtn.addEventListener('click', startPainting);
+      startBtn.addEventListener("click", startPainting);
     }
 
     // Painting Mode Toggle
-    const paintingModeToggle = container.querySelector('#paintingModeToggle');
+    const paintingModeToggle = container.querySelector("#paintingModeToggle");
     if (paintingModeToggle) {
       // Initialize toggle state - MUST be unchecked for auto mode (default)
-      paintingModeToggle.checked = state.paintingMode === 'assist';
-      console.log(`🎨 [Painting Mode] Initial state: ${state.paintingMode}, Toggle checked: ${paintingModeToggle.checked}`);
+      paintingModeToggle.checked = state.paintingMode === "assist";
+      console.log(
+        `🎨 [Painting Mode] Initial state: ${state.paintingMode}, Toggle checked: ${paintingModeToggle.checked}`
+      );
 
-      paintingModeToggle.addEventListener('change', () => {
-        state.paintingMode = paintingModeToggle.checked ? 'assist' : 'auto';
+      paintingModeToggle.addEventListener("change", () => {
+        state.paintingMode = paintingModeToggle.checked ? "assist" : "auto";
 
         // Update start button state
         updateStartButtonState();
@@ -9582,13 +11115,16 @@ localStorage.removeItem("lp");
         // NOTE: We don't save paintingMode - it always resets to 'auto' on page load
 
         // Show notification
-        const modeName = state.paintingMode === 'assist' ? 'Assist' : 'Auto';
-        const modeDesc = state.paintingMode === 'assist'
-          ? 'Overlay will guide your manual pixel placement'
-          : 'Bot will automatically paint pixels';
-        Utils.showAlert(`Painting Mode: ${modeName}\n${modeDesc}`, 'info');
+        const modeName = state.paintingMode === "assist" ? "Assist" : "Auto";
+        const modeDesc =
+          state.paintingMode === "assist"
+            ? "Overlay will guide your manual pixel placement"
+            : "Bot will automatically paint pixels";
+        Utils.showAlert(`Painting Mode: ${modeName}\n${modeDesc}`, "info");
 
-        console.log(`🎨 [Painting Mode] Switched to ${modeName.toUpperCase()} mode`);
+        console.log(
+          `🎨 [Painting Mode] Switched to ${modeName.toUpperCase()} mode`
+        );
       });
 
       // Initial state update
@@ -9596,15 +11132,15 @@ localStorage.removeItem("lp");
     }
 
     if (stopBtn) {
-      stopBtn.addEventListener('click', () => {
+      stopBtn.addEventListener("click", () => {
         state.stopFlag = true;
         state.running = false;
         stopBtn.disabled = true;
-        updateUI('paintingStoppedByUser', 'warning');
+        updateUI("paintingStoppedByUser", "warning");
 
         if (state.imageLoaded && state.paintedPixels > 0) {
           Utils.saveProgress();
-          Utils.showAlert(Utils.t('autoSaved'), 'success');
+          Utils.showAlert(Utils.t("autoSaved"), "success");
         }
       });
     }
@@ -9618,60 +11154,77 @@ localStorage.removeItem("lp");
         );
 
         Utils.showAlert(
-          `${Utils.t('savedDataFound')}\n\n` +
-          `Saved: ${savedDate}\n` +
-          `Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels (${progress}%)\n` +
-          `${Utils.t('clickLoadToContinue')}`,
-          'info'
+          `${Utils.t("savedDataFound")}\n\n` +
+            `Saved: ${savedDate}\n` +
+            `Progress: ${savedData.state.paintedPixels}/${savedData.state.totalPixels} pixels (${progress}%)\n` +
+            `${Utils.t("clickLoadToContinue")}`,
+          "info"
         );
       }
     };
 
     setTimeout(checkSavedProgress, 1000);
 
-    if (cooldownSlider && cooldownInput && cooldownValue && cooldownDecrease && cooldownIncrease) {
+    if (
+      cooldownSlider &&
+      cooldownInput &&
+      cooldownValue &&
+      cooldownDecrease &&
+      cooldownIncrease
+    ) {
       const updateCooldown = (newValue) => {
-        const threshold = Math.max(1, Math.min(state.maxCharges || 999, parseInt(newValue)));
+        const threshold = Math.max(
+          1,
+          Math.min(state.maxCharges || 999, parseInt(newValue))
+        );
         state.cooldownChargeThreshold = threshold;
 
         // Update both controls (value shows in input, label shows unit only)
         cooldownSlider.value = threshold;
         cooldownInput.value = threshold;
-        cooldownValue.textContent = `${Utils.t('charges')}`;
+        cooldownValue.textContent = `${Utils.t("charges")}`;
 
         saveBotSettings();
         NotificationManager.resetEdgeTracking(); // prevent spurious notify after threshold change
       };
 
       // Slider event listener
-      cooldownSlider.addEventListener('input', (e) => {
+      cooldownSlider.addEventListener("input", (e) => {
         updateCooldown(e.target.value);
       });
 
       // Number input event listener
-      cooldownInput.addEventListener('input', (e) => {
+      cooldownInput.addEventListener("input", (e) => {
         updateCooldown(e.target.value);
       });
 
       // Decrease button
-      cooldownDecrease.addEventListener('click', () => {
+      cooldownDecrease.addEventListener("click", () => {
         updateCooldown(parseInt(cooldownInput.value) - 1);
       });
 
       // Increase button
-      cooldownIncrease.addEventListener('click', () => {
+      cooldownIncrease.addEventListener("click", () => {
         updateCooldown(parseInt(cooldownInput.value) + 1);
       });
 
       // Add scroll-to-adjust for cooldown slider
-      Utils.createScrollToAdjust(cooldownSlider, updateCooldown, 1, state.maxCharges, 1);
+      Utils.createScrollToAdjust(
+        cooldownSlider,
+        updateCooldown,
+        1,
+        state.maxCharges,
+        1
+      );
 
       // Skip cooldown button event handler
-      const skipCooldownBtn = document.getElementById('skipCooldownBtn');
+      const skipCooldownBtn = document.getElementById("skipCooldownBtn");
       if (skipCooldownBtn) {
-        skipCooldownBtn.addEventListener('click', () => {
+        skipCooldownBtn.addEventListener("click", () => {
           if (state.preciseCurrentCharges < state.cooldownChargeThreshold) {
-            console.log(`[Auto-Image] Skip cooldown requested - resetting to account index 0`);
+            console.log(
+              `[Auto-Image] Skip cooldown requested - resetting to account index 0`
+            );
 
             // Reset to account index 0 (start new cycle)
             state.currentActiveIndex = 0;
@@ -9679,34 +11232,51 @@ localStorage.removeItem("lp");
 
             // Reset charges to threshold to bypass cooldown
             state.preciseCurrentCharges = state.cooldownChargeThreshold;
-            console.log(`[Auto-Image] Cooldown skipped! Charges set to threshold: ${state.cooldownChargeThreshold}`);
+            console.log(
+              `[Auto-Image] Cooldown skipped! Charges set to threshold: ${state.cooldownChargeThreshold}`
+            );
 
             // Switch to first account if we have multiple accounts
             if (accountManager.getAccountCount() > 1) {
               const firstAccountInfo = accountManager.getAccountByIndex(0);
               if (firstAccountInfo && firstAccountInfo.token) {
-                console.log(`🔄 Switching to first account: index 0 (${firstAccountInfo.displayName})`);
+                console.log(
+                  `🔄 Switching to first account: index 0 (${firstAccountInfo.displayName})`
+                );
                 // Get accounts array for the switch
-                const accounts = JSON.parse(localStorage.getItem("accounts")) || [];
+                const accounts =
+                  JSON.parse(localStorage.getItem("accounts")) || [];
                 if (accounts.length > 0) {
-                  switchToSpecificAccount(firstAccountInfo.token, firstAccountInfo.displayName).then(() => {
-                    console.log(`✅ Successfully switched to account index 0 after cooldown skip`);
-                    // Update UI immediately
-                    updateChargesThresholdUI(0);
-                    // Trigger immediate check for painting
-                    if (state.isEnabled && !state.stopFlag) {
-                      setTimeout(() => {
-                        checkAndPaint();
-                      }, 100);
-                    }
-                  }).catch(err => {
-                    console.error(`❌ Failed to switch to account index 0:`, err);
-                  });
+                  switchToSpecificAccount(
+                    firstAccountInfo.token,
+                    firstAccountInfo.displayName
+                  )
+                    .then(() => {
+                      console.log(
+                        `✅ Successfully switched to account index 0 after cooldown skip`
+                      );
+                      // Update UI immediately
+                      updateChargesThresholdUI(0);
+                      // Trigger immediate check for painting
+                      if (state.isEnabled && !state.stopFlag) {
+                        setTimeout(() => {
+                          checkAndPaint();
+                        }, 100);
+                      }
+                    })
+                    .catch((err) => {
+                      console.error(
+                        `❌ Failed to switch to account index 0:`,
+                        err
+                      );
+                    });
                 } else {
                   console.warn(`⚠️ No accounts available for switching`);
                 }
               } else {
-                console.warn(`⚠️ First account info not found or missing token`);
+                console.warn(
+                  `⚠️ First account info not found or missing token`
+                );
               }
             } else {
               console.log(`📝 Single account mode - no switching needed`);
@@ -9730,9 +11300,11 @@ localStorage.removeItem("lp");
 
     // Sync painting mode toggle with loaded state
     if (paintingModeToggle) {
-      paintingModeToggle.checked = state.paintingMode === 'assist';
+      paintingModeToggle.checked = state.paintingMode === "assist";
       updateStartButtonState();
-      console.log(`🔄 [Painting Mode] Synced after load: ${state.paintingMode}, Toggle checked: ${paintingModeToggle.checked}`);
+      console.log(
+        `🔄 [Painting Mode] Synced after load: ${state.paintingMode}, Toggle checked: ${paintingModeToggle.checked}`
+      );
     }
   }
 
@@ -9754,8 +11326,8 @@ localStorage.removeItem("lp");
     const timeText = Utils.msToTimeText(remainingMs);
 
     updateUI(
-      'noChargesThreshold',
-      'warning',
+      "noChargesThreshold",
+      "warning",
       {
         threshold,
         current: state.displayCharges,
@@ -9765,20 +11337,21 @@ localStorage.removeItem("lp");
     );
 
     // Update skip cooldown button state
-    const skipCooldownBtn = document.getElementById('skipCooldownBtn');
+    const skipCooldownBtn = document.getElementById("skipCooldownBtn");
     if (skipCooldownBtn) {
-      const isInCooldown = state.preciseCurrentCharges < threshold && remainingMs > 0;
+      const isInCooldown =
+        state.preciseCurrentCharges < threshold && remainingMs > 0;
       skipCooldownBtn.disabled = !isInCooldown;
       skipCooldownBtn.title = isInCooldown
         ? `Skip cooldown (${timeText} remaining)`
-        : 'Skip cooldown (only available during cooldown)';
+        : "Skip cooldown (only available during cooldown)";
     }
   }
 
   // Fast tile-based pixel detection from top-left to bottom-right
   async function performProgressivePixelDetection() {
     if (!state.imageLoaded || !state.imageData) {
-      console.log('⚠️ No image loaded, skipping pixel detection');
+      console.log("⚠️ No image loaded, skipping pixel detection");
       return;
     }
 
@@ -9792,9 +11365,15 @@ localStorage.removeItem("lp");
     let detectedPixels = 0;
     let totalChecked = 0;
 
-    console.log(`🚀 Fast scanning ${width}x${height} image from top-left (0,0) to bottom-right (${width - 1},${height - 1})...`);
+    console.log(
+      `🚀 Fast scanning ${width}x${height} image from top-left (0,0) to bottom-right (${
+        width - 1
+      },${height - 1})...`
+    );
 
-    updateUI('pixelDetection', 'info', { message: 'Fast detecting already painted pixels...' });
+    updateUI("pixelDetection", "info", {
+      message: "Fast detecting already painted pixels...",
+    });
 
     // Calculate affected tiles
     const worldX1 = startX;
@@ -9807,7 +11386,9 @@ localStorage.removeItem("lp");
     const endTileX = Math.floor(worldX2 / 1000);
     const endTileY = Math.floor(worldY2 / 1000);
 
-    console.log(`📄 Processing tiles from (${startTileX},${startTileY}) to (${endTileX},${endTileY})`);
+    console.log(
+      `📄 Processing tiles from (${startTileX},${startTileY}) to (${endTileX},${endTileY})`
+    );
 
     // Cache for downloaded tile data
     const tileDataCache = new Map();
@@ -9821,20 +11402,27 @@ localStorage.removeItem("lp");
         const tileKey = `${absoluteTileX},${absoluteTileY}`;
 
         tilePromises.push(
-          downloadTileImageData(absoluteTileX, absoluteTileY).then(imageData => {
-            if (imageData) {
-              tileDataCache.set(tileKey, imageData);
-            }
-          }).catch(e => {
-            console.warn(`⚠️ Failed to download tile ${absoluteTileX},${absoluteTileY}:`, e.message);
-          })
+          downloadTileImageData(absoluteTileX, absoluteTileY)
+            .then((imageData) => {
+              if (imageData) {
+                tileDataCache.set(tileKey, imageData);
+              }
+            })
+            .catch((e) => {
+              console.warn(
+                `⚠️ Failed to download tile ${absoluteTileX},${absoluteTileY}:`,
+                e.message
+              );
+            })
         );
       }
     }
 
     // Wait for all tiles to download
     await Promise.all(tilePromises);
-    console.log(`📦 Downloaded ${tileDataCache.size} tiles for fast pixel checking`);
+    console.log(
+      `📦 Downloaded ${tileDataCache.size} tiles for fast pixel checking`
+    );
 
     // Fast pixel detection using cached tile data
     for (let y = 0; y < height; y++) {
@@ -9875,7 +11463,12 @@ localStorage.removeItem("lp");
             const data = tileImageData.data;
 
             // Ensure pixel coordinates are within tile bounds
-            if (pixelX >= 0 && pixelX < tileWidth && pixelY >= 0 && pixelY < tileHeight) {
+            if (
+              pixelX >= 0 &&
+              pixelX < tileWidth &&
+              pixelY >= 0 &&
+              pixelY < tileHeight
+            ) {
               const pixelIndex = (pixelY * tileWidth + pixelX) * 4;
               const r = data[pixelIndex];
               const g = data[pixelIndex + 1];
@@ -9883,18 +11476,23 @@ localStorage.removeItem("lp");
               const a = data[pixelIndex + 3];
 
               // Check alpha threshold
-              const alphaThresh = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
+              const alphaThresh =
+                state.customTransparencyThreshold ||
+                CONFIG.TRANSPARENCY_THRESHOLD;
               if (a >= alphaThresh) {
                 const existingMappedColor = Utils.resolveColor(
                   [r, g, b],
                   state.availableColors,
                   !state.paintUnavailablePixels
                 );
-                const isAlreadyPainted = existingMappedColor.id === targetPixelInfo.mappedColorId;
+                const isAlreadyPainted =
+                  existingMappedColor.id === targetPixelInfo.mappedColorId;
 
                 if (isAlreadyPainted) {
                   // Check if pixel is already marked as painted to avoid double counting
-                  if (!Utils.isPixelPainted(x, y, absoluteTileX, absoluteTileY)) {
+                  if (
+                    !Utils.isPixelPainted(x, y, absoluteTileX, absoluteTileY)
+                  ) {
                     // Mark as painted in the map but DO NOT increment progress counter
                     // Progress counter should only reflect actual painting sequence position
                     Utils.markPixelPainted(x, y, absoluteTileX, absoluteTileY);
@@ -9915,11 +11513,11 @@ localStorage.removeItem("lp");
         // Update progress periodically
         if (totalChecked % 2500 === 0) {
           const progress = Math.round((totalChecked / (width * height)) * 100);
-          updateUI('pixelDetection', 'info', {
-            message: `Fast detecting... ${progress}% (Found: ${detectedPixels})`
+          updateUI("pixelDetection", "info", {
+            message: `Fast detecting... ${progress}% (Found: ${detectedPixels})`,
           });
           // Yield control briefly to prevent UI blocking
-          await new Promise(resolve => setTimeout(resolve, 0));
+          await new Promise((resolve) => setTimeout(resolve, 0));
         }
       }
     }
@@ -9928,13 +11526,19 @@ localStorage.removeItem("lp");
     console.log(`🏁 Fast pixel detection complete in ${processingTime}ms:`);
     console.log(`  - Total pixels checked: ${totalChecked}`);
     console.log(`  - Already painted pixels found: ${detectedPixels}`);
-    console.log(`  - Updated progress: ${state.paintedPixels}/${state.totalPixels}`);
-    console.log(`  - Performance: ${Math.round(totalChecked / (processingTime / 1000))} pixels/second`);
+    console.log(
+      `  - Updated progress: ${state.paintedPixels}/${state.totalPixels}`
+    );
+    console.log(
+      `  - Performance: ${Math.round(
+        totalChecked / (processingTime / 1000)
+      )} pixels/second`
+    );
 
     // Update progress display
     await updateStats();
-    updateUI('pixelDetectionComplete', 'success', {
-      message: `Found ${detectedPixels} already painted pixels in ${processingTime}ms`
+    updateUI("pixelDetectionComplete", "success", {
+      message: `Found ${detectedPixels} already painted pixels in ${processingTime}ms`,
     });
   }
 
@@ -9959,8 +11563,8 @@ localStorage.removeItem("lp");
   async function processTileBlob(blob) {
     try {
       const img = new Image();
-      const canvas = document.createElement('canvas');
-      const ctx = canvas.getContext('2d');
+      const canvas = document.createElement("canvas");
+      const ctx = canvas.getContext("2d");
 
       return new Promise((resolve, reject) => {
         img.onload = () => {
@@ -9971,38 +11575,48 @@ localStorage.removeItem("lp");
           const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height);
           resolve(imageData);
         };
-        img.onerror = () => reject(new Error('Failed to load image'));
+        img.onerror = () => reject(new Error("Failed to load image"));
         img.src = URL.createObjectURL(blob);
       });
     } catch (error) {
-      console.error('Error processing tile blob:', error);
+      console.error("Error processing tile blob:", error);
       return null;
     }
   }
 
-  function generateCoordinates(width, height, mode, direction, snake, blockWidth, blockHeight, startFromX = 0, startFromY = 0) {
+  function generateCoordinates(
+    width,
+    height,
+    mode,
+    direction,
+    snake,
+    blockWidth,
+    blockHeight,
+    startFromX = 0,
+    startFromY = 0
+  ) {
     const coords = [];
     console.log(
-      'Generating coordinates with \n  mode:',
+      "Generating coordinates with \n  mode:",
       mode,
-      '\n  direction:',
+      "\n  direction:",
       direction,
-      '\n  snake:',
+      "\n  snake:",
       snake,
-      '\n  blockWidth:',
+      "\n  blockWidth:",
       blockWidth,
-      '\n  blockHeight:',
+      "\n  blockHeight:",
       blockHeight,
-      '\n  startFromX:',
+      "\n  startFromX:",
       startFromX,
-      '\n  startFromY:',
+      "\n  startFromY:",
       startFromY
     );
     // --------- Standard 4 corners traversal ----------
     let xStart, xEnd, xStep;
     let yStart, yEnd, yStep;
     switch (direction) {
-      case 'top-left':
+      case "top-left":
         xStart = 0;
         xEnd = width;
         xStep = 1;
@@ -10010,7 +11624,7 @@ localStorage.removeItem("lp");
         yEnd = height;
         yStep = 1;
         break;
-      case 'top-right':
+      case "top-right":
         xStart = width - 1;
         xEnd = -1;
         xStep = -1;
@@ -10018,7 +11632,7 @@ localStorage.removeItem("lp");
         yEnd = height;
         yStep = 1;
         break;
-      case 'bottom-left':
+      case "bottom-left":
         xStart = 0;
         xEnd = width;
         xStep = 1;
@@ -10026,7 +11640,7 @@ localStorage.removeItem("lp");
         yEnd = -1;
         yStep = -1;
         break;
-      case 'bottom-right':
+      case "bottom-right":
         xStart = width - 1;
         xEnd = -1;
         xStep = -1;
@@ -10039,7 +11653,7 @@ localStorage.removeItem("lp");
     }
 
     // --------- Traversal modes ----------
-    if (mode === 'rows') {
+    if (mode === "rows") {
       let rowIndex = 0;
       for (let y = yStart; y !== yEnd; y += yStep) {
         if (snake && rowIndex % 2 !== 0) {
@@ -10053,7 +11667,7 @@ localStorage.removeItem("lp");
         }
         rowIndex++;
       }
-    } else if (mode === 'columns') {
+    } else if (mode === "columns") {
       let colIndex = 0;
       for (let x = xStart; x !== xEnd; x += xStep) {
         if (snake && colIndex % 2 !== 0) {
@@ -10067,7 +11681,7 @@ localStorage.removeItem("lp");
         }
         colIndex++;
       }
-    } else if (mode === 'circle-out') {
+    } else if (mode === "circle-out") {
       const cx = Math.floor(width / 2);
       const cy = Math.floor(height / 2);
       const maxRadius = Math.ceil(Math.sqrt(cx * cx + cy * cy));
@@ -10082,7 +11696,7 @@ localStorage.removeItem("lp");
           }
         }
       }
-    } else if (mode === 'circle-in') {
+    } else if (mode === "circle-in") {
       const cx = Math.floor(width / 2);
       const cy = Math.floor(height / 2);
       const maxRadius = Math.ceil(Math.sqrt(cx * cx + cy * cy));
@@ -10097,7 +11711,7 @@ localStorage.removeItem("lp");
           }
         }
       }
-    } else if (mode === 'blocks' || mode === 'shuffle-blocks') {
+    } else if (mode === "blocks" || mode === "shuffle-blocks") {
       const blocks = [];
       for (let by = 0; by < height; by += blockHeight) {
         for (let bx = 0; bx < width; bx += blockWidth) {
@@ -10111,7 +11725,7 @@ localStorage.removeItem("lp");
         }
       }
 
-      if (mode === 'shuffle-blocks') {
+      if (mode === "shuffle-blocks") {
         // Simple Fisher-Yates shuffle
         for (let i = blocks.length - 1; i > 0; i--) {
           const j = Math.floor(Math.random() * (i + 1));
@@ -10131,7 +11745,9 @@ localStorage.removeItem("lp");
 
     // Filter coordinates to start from the specified position
     if (startFromX > 0 || startFromY > 0) {
-      console.log(`🔄 Filtering coordinates to resume from position (${startFromX}, ${startFromY})`);
+      console.log(
+        `🔄 Filtering coordinates to resume from position (${startFromX}, ${startFromY})`
+      );
       let startIndex = -1;
 
       // Find the starting position in the coordinate list
@@ -10146,10 +11762,14 @@ localStorage.removeItem("lp");
       if (startIndex >= 0) {
         // Resume from the found position (skip all previous coordinates)
         const filteredCoords = coords.slice(startIndex);
-        console.log(`✂️ Resuming: skipped ${startIndex} coordinates, continuing with ${filteredCoords.length} remaining`);
+        console.log(
+          `✂️ Resuming: skipped ${startIndex} coordinates, continuing with ${filteredCoords.length} remaining`
+        );
         return filteredCoords;
       } else {
-        console.warn(`⚠️ Resume position (${startFromX}, ${startFromY}) not found in coordinate list, starting from beginning`);
+        console.warn(
+          `⚠️ Resume position (${startFromX}, ${startFromY}) not found in coordinate list, starting from beginning`
+        );
       }
     }
 
@@ -10172,32 +11792,49 @@ localStorage.removeItem("lp");
       // Only increment progress for actually painted pixels to prevent multiplication
       const actuallyPaintedCount = pixelBatch.pixels.length;
       state.paintedPixels += actuallyPaintedCount;
-      console.log(`📊 Added ${actuallyPaintedCount} painted pixels to progress (total: ${state.paintedPixels})`);
+      console.log(
+        `📊 Added ${actuallyPaintedCount} painted pixels to progress (total: ${state.paintedPixels})`
+      );
 
       pixelBatch.pixels.forEach((p) => {
-        Utils.markPixelPainted(p.x, p.y, pixelBatch.regionX, pixelBatch.regionY);
+        Utils.markPixelPainted(
+          p.x,
+          p.y,
+          pixelBatch.regionX,
+          pixelBatch.regionY
+        );
       });
 
       // Update last painted position to the last pixel in the successful batch
       if (pixelBatch.pixels.length > 0) {
         const lastPixel = pixelBatch.pixels[pixelBatch.pixels.length - 1];
         // FIXED: Use localX/localY (image-relative coordinates) instead of x/y (absolute canvas coordinates)
-        state.lastPaintedPosition = { x: lastPixel.localX, y: lastPixel.localY };
+        state.lastPaintedPosition = {
+          x: lastPixel.localX,
+          y: lastPixel.localY,
+        };
       }
 
       // Track painted pixels since last account switch to avoid flip-flop
-      state.paintedSinceSwitch = (state.paintedSinceSwitch || 0) + actuallyPaintedCount;
+      state.paintedSinceSwitch =
+        (state.paintedSinceSwitch || 0) + actuallyPaintedCount;
 
       // IMPORTANT: Decrement charges locally to match Acc-Switch.js behavior
       state.displayCharges = Math.max(0, state.displayCharges - batchSize);
-      state.preciseCurrentCharges = Math.max(0, state.preciseCurrentCharges - batchSize);
+      state.preciseCurrentCharges = Math.max(
+        0,
+        state.preciseCurrentCharges - batchSize
+      );
       // Also update the global local charge model per account with bonus logic
       try {
         const tok = accountManager.getCurrentAccount()?.token;
         const after = ChargeModel.decrement(tok, batchSize);
         state.displayCharges = Math.floor(after);
         state.preciseCurrentCharges = after;
-        if (tok) accountManager.updateAccountData(tok, { Charges: state.displayCharges });
+        if (tok)
+          accountManager.updateAccountData(tok, {
+            Charges: state.displayCharges,
+          });
       } catch {}
 
       state.fullChargeData = {
@@ -10212,9 +11849,11 @@ localStorage.removeItem("lp");
 
       // Painting speed delay removed - bot now uses all available charges immediately
     } else {
-      console.error(`❌ Batch failed permanently after retries. Stopping painting.`);
+      console.error(
+        `❌ Batch failed permanently after retries. Stopping painting.`
+      );
       state.stopFlag = true;
-      updateUI('paintingBatchFailed', 'error');
+      updateUI("paintingBatchFailed", "error");
     }
 
     pixelBatch.pixels = [];
@@ -10222,74 +11861,86 @@ localStorage.removeItem("lp");
   }
 
   async function processImage() {
-    console.log('🚀 Starting auto-swap enabled painting workflow');
+    console.log("🚀 Starting auto-swap enabled painting workflow");
 
     try {
       // Main painting cycle - repeats until image complete or stopped
       while (!state.stopFlag) {
-        console.log('📋 Phase 1: Starting painting session');
+        console.log("📋 Phase 1: Starting painting session");
         const paintingResult = await executePaintingSession();
 
-        if (paintingResult === 'completed') {
-          console.log('🎉 Image painting completed!');
+        if (paintingResult === "completed") {
+          console.log("🎉 Image painting completed!");
           state.currentPaintingColor = null; // Reset color tracking
           break;
         }
 
-        if (paintingResult === 'stopped') {
-          console.log('⏹️ Painting stopped by user');
+        if (paintingResult === "stopped") {
+          console.log("⏹️ Painting stopped by user");
           break;
         }
 
-        if (paintingResult === 'charges_depleted') {
-          if (CONFIG.autoBuyToggle && CONFIG.autoBuy != 'none') {
-            console.log('Trying to buy more charges before swapping account...');
+        if (paintingResult === "charges_depleted") {
+          if (CONFIG.autoBuyToggle && CONFIG.autoBuy != "none") {
+            console.log(
+              "Trying to buy more charges before swapping account..."
+            );
             const purchaseResult = await purchase(CONFIG.autoBuy);
             if (purchaseResult == 2) {
-              console.log('✅ Purchase successful, continuing painting');
+              console.log("✅ Purchase successful, continuing painting");
               await updateStats();
               await updateCurrentAccountInList();
-              if (CONFIG.autoBuy == 'paint_charges') continue;
+              if (CONFIG.autoBuy == "paint_charges") continue;
+            } else if (purchaseResult == 1) {
+              console.log(
+                "😭 Not enough droplets to buy more charges, swapping account."
+              );
+            } else {
+              console.log("🤔 Purchase failed.");
             }
-            else if (purchaseResult == 1) {
-              console.log('😭 Not enough droplets to buy more charges, swapping account.');
-            }
-            else {
-              console.log('🤔 Purchase failed.');
-            }
-          }
-          else console.log('🤫 Auto buy is disabled, wait for cooldown or swapping account.');
+          } else
+            console.log(
+              "🤫 Auto buy is disabled, wait for cooldown or swapping account."
+            );
           if (!CONFIG.autoSwap) {
             // Original workflow: cooldown period
-            console.log('⏱️ Phase 2: Entering cooldown period (auto-swap disabled)');
+            console.log(
+              "⏱️ Phase 2: Entering cooldown period (auto-swap disabled)"
+            );
             const cooldownResult = await executeCooldownPeriod();
 
-            if (cooldownResult === 'stopped') {
-              console.log('⏹️ Cooldown stopped by user');
+            if (cooldownResult === "stopped") {
+              console.log("⏹️ Cooldown stopped by user");
               break;
             }
 
             // Phase 3: Regenerate token for next painting session
-            console.log('🔑 Phase 3: Regenerating token for next session');
+            console.log("🔑 Phase 3: Regenerating token for next session");
             const tokenResult = await regenerateTokenForNewSession();
 
             if (!tokenResult) {
-              console.log('❌ Failed to regenerate token, stopping');
+              console.log("❌ Failed to regenerate token, stopping");
               state.stopFlag = true;
               break;
             }
           } else {
             // Auto-swap workflow: simplified logic
-            console.log('🔄 Auto-swap enabled: checking account switching options');
+            console.log(
+              "🔄 Auto-swap enabled: checking account switching options"
+            );
 
             // Retrieve fresh accounts list each time to avoid stale data
             const accounts = JSON.parse(localStorage.getItem("accounts")) || [];
-            console.log(`📊 Retrieved ${accounts.length} accounts from localStorage`);
+            console.log(
+              `📊 Retrieved ${accounts.length} accounts from localStorage`
+            );
 
             if (accounts.length <= 1) {
-              console.log('📋 Only one account available, using standard cooldown');
+              console.log(
+                "📋 Only one account available, using standard cooldown"
+              );
               const cooldownResult = await executeCooldownPeriod();
-              if (cooldownResult === 'stopped') break;
+              if (cooldownResult === "stopped") break;
 
               const tokenResult = await regenerateTokenForNewSession();
               if (!tokenResult) {
@@ -10298,23 +11949,34 @@ localStorage.removeItem("lp");
               }
             } else {
               // Try to find an account with enough charges to continue painting
-              const minRequired = Math.max(1, state.cooldownChargeThreshold || 1);
-              console.log(`🔎 Searching for account with ≥${minRequired} charges...`);
-              const switched = await selectAndSwitchToAccountWithCharges(minRequired);
+              const minRequired = Math.max(
+                1,
+                state.cooldownChargeThreshold || 1
+              );
+              console.log(
+                `🔎 Searching for account with ≥${minRequired} charges...`
+              );
+              const switched = await selectAndSwitchToAccountWithCharges(
+                minRequired
+              );
               if (switched) {
-                console.log('✅ Switched to an account with sufficient charges, continuing painting immediately');
+                console.log(
+                  "✅ Switched to an account with sufficient charges, continuing painting immediately"
+                );
                 continue;
               }
               // If none had enough charges, enter cooldown on the best available account
-              console.log('🕒 No accounts have enough charges. Entering cooldown on the account with the soonest recharge...');
+              console.log(
+                "🕒 No accounts have enough charges. Entering cooldown on the account with the soonest recharge..."
+              );
               const cooldownResult = await executeCooldownPeriod();
-              if (cooldownResult === 'stopped') break;
+              if (cooldownResult === "stopped") break;
               continue;
             }
           }
         }
 
-        console.log('🔄 Cycle complete, starting next painting session');
+        console.log("🔄 Cycle complete, starting next painting session");
       }
     } finally {
       await finalizePaintingProcess();
@@ -10323,13 +11985,16 @@ localStorage.removeItem("lp");
 
   // Phase 1: Execute a complete painting session using all available charges
   async function executePaintingSession() {
-    console.log('🎨 Starting painting session - using all charges until 0');
+    console.log("🎨 Starting painting session - using all charges until 0");
     const { width, height, pixels } = state.imageData;
     const { x: startX, y: startY } = state.startPosition;
     const { x: regionX, y: regionY } = state.region;
 
     // Check if we're working with restored data by looking for existing availableColors
-    const isRestoredData = state.availableColors && state.availableColors.length > 0 && state.colorsChecked;
+    const isRestoredData =
+      state.availableColors &&
+      state.availableColors.length > 0 &&
+      state.colorsChecked;
 
     if (!isRestoredData) {
       // Wait for original tiles to load if needed
@@ -10344,9 +12009,9 @@ localStorage.removeItem("lp");
       );
 
       if (!tilesReady) {
-        updateUI('overlayTilesNotLoaded', 'error');
+        updateUI("overlayTilesNotLoaded", "error");
         state.stopFlag = true;
-        return 'stopped';
+        return "stopped";
       }
     }
 
@@ -10360,7 +12025,7 @@ localStorage.removeItem("lp");
 
     // IMPORTANT: Check charges once at start, then paint until depleted
     // Use local charge model to avoid extra API calls
-    console.log('🔋 Checking initial charges for painting session');
+    console.log("🔋 Checking initial charges for painting session");
     const currentToken = accountManager.getCurrentAccount()?.token;
     let node = ChargeModel.get(currentToken);
     // One-time sync for current account if never synced
@@ -10376,8 +12041,8 @@ localStorage.removeItem("lp");
     state.cooldown = CONFIG.COOLDOWN_DEFAULT;
     await updateStats();
     if (state.displayCharges <= 0) {
-      console.log('⚡ No charges available (local), skipping painting session');
-      return 'charges_depleted';
+      console.log("⚡ No charges available (local), skipping painting session");
+      return "charges_depleted";
     }
 
     // If current account has less than threshold charges but another account
@@ -10385,24 +12050,31 @@ localStorage.removeItem("lp");
     try {
       const threshold = Math.max(1, state.cooldownChargeThreshold || 1);
       if (CONFIG.autoSwap && state.displayCharges < threshold) {
-        console.log(`🛑 Current charges (${state.displayCharges}) < threshold (${threshold}). Checking other accounts before painting...`);
+        console.log(
+          `🛑 Current charges (${state.displayCharges}) < threshold (${threshold}). Checking other accounts before painting...`
+        );
         const switched = await selectAndSwitchToAccountWithCharges(threshold);
         if (switched) {
-          console.log('🔀 Switched to an account that met the threshold before painting. Restarting cycle...');
-          return 'charges_depleted';
+          console.log(
+            "🔀 Switched to an account that met the threshold before painting. Restarting cycle..."
+          );
+          return "charges_depleted";
         }
       }
     } catch (e) {
-      console.warn('⚠️ Pre-paint switch guard failed:', e);
+      console.warn("⚠️ Pre-paint switch guard failed:", e);
     }
 
-    console.log(`🔋 Starting with ${state.displayCharges} charges - painting until depleted`);
+    console.log(
+      `🔋 Starting with ${state.displayCharges} charges - painting until depleted`
+    );
 
     // Paint pixels until we run out of charges or complete the image
     try {
-
       // Generate the actual filtered coordinates for painting (resuming from last position)
-      console.log(`📍 Coordinate generation: mode=${state.coordinateMode}, direction=${state.coordinateDirection}, snake=${state.coordinateSnake}`);
+      console.log(
+        `📍 Coordinate generation: mode=${state.coordinateMode}, direction=${state.coordinateDirection}, snake=${state.coordinateSnake}`
+      );
       const coords = await generateCoordinatesAsync(
         width,
         height,
@@ -10420,15 +12092,16 @@ localStorage.removeItem("lp");
       let alreadyPaintedCount = 0;
 
       if (!state.preFilteringDone) {
-        console.log('🔍 Pre-filtering already painted pixels (one-time detection for this session)...');
+        console.log(
+          "🔍 Pre-filtering already painted pixels (one-time detection for this session)..."
+        );
 
         for (const [x, y] of coords) {
           const targetPixelInfo = checkPixelEligibility(x, y);
 
           if (!targetPixelInfo.eligible) {
-            if (targetPixelInfo.reason !== 'alreadyPainted') {
+            if (targetPixelInfo.reason !== "alreadyPainted") {
               skippedPixels[targetPixelInfo.reason]++;
-
             }
             continue;
           }
@@ -10453,14 +12126,20 @@ localStorage.removeItem("lp");
               const mappedCanvasColor = Utils.resolveColor(
                 tilePixelRGBA.slice(0, 3),
                 state.availableColors,
-                !state.paintUnavailablePixels  // Use same parameter as target pixel
+                !state.paintUnavailablePixels // Use same parameter as target pixel
               );
-              const isMatch = mappedCanvasColor.id === targetPixelInfo.mappedColorId;
+              const isMatch =
+                mappedCanvasColor.id === targetPixelInfo.mappedColorId;
               if (isMatch) {
                 alreadyPaintedCount++;
                 // Mark as painted in map but DO NOT increment progress counter
                 // Progress should only reflect actual painting sequence position
-                Utils.markPixelPainted(x, y, regionX + adderX, regionY + adderY);
+                Utils.markPixelPainted(
+                  x,
+                  y,
+                  regionX + adderX,
+                  regionY + adderY
+                );
                 continue; // Skip already painted pixels
               }
             }
@@ -10477,20 +12156,28 @@ localStorage.removeItem("lp");
 
         // Log pre-filtering results
         if (alreadyPaintedCount > 0) {
-          console.log(`✓ Pre-filter complete: ${alreadyPaintedCount} already painted pixels detected (not added to progress counter)`);
-          console.log('ℹ️ This detection will not happen again until a new image/save is loaded');
-          console.log('📊 Progress counter only reflects actual painting sequence position');
+          console.log(
+            `✓ Pre-filter complete: ${alreadyPaintedCount} already painted pixels detected (not added to progress counter)`
+          );
+          console.log(
+            "ℹ️ This detection will not happen again until a new image/save is loaded"
+          );
+          console.log(
+            "📊 Progress counter only reflects actual painting sequence position"
+          );
           // No need to update stats since progress wasn't changed
         }
         skippedPixels.alreadyPainted = alreadyPaintedCount;
       } else {
         // Pre-filtering already done this session, just filter for basic eligibility
-        console.log('🔍 Using existing pre-filter results (already done this session)');
+        console.log(
+          "🔍 Using existing pre-filter results (already done this session)"
+        );
         for (const [x, y] of coords) {
           const targetPixelInfo = checkPixelEligibility(x, y);
 
           if (!targetPixelInfo.eligible) {
-            if (targetPixelInfo.reason !== 'alreadyPainted') {
+            if (targetPixelInfo.reason !== "alreadyPainted") {
               skippedPixels[targetPixelInfo.reason]++;
             }
             continue;
@@ -10510,9 +12197,11 @@ localStorage.removeItem("lp");
 
       // Group pixels by color if color-by-color mode is enabled
       let pixelsToProcess = eligibleCoords;
-      if (state.paintingOrder === 'color-by-color') {
-        console.log('🎨 Color-by-color mode enabled - grouping pixels by color');
-        
+      if (state.paintingOrder === "color-by-color") {
+        console.log(
+          "🎨 Color-by-color mode enabled - grouping pixels by color"
+        );
+
         // Group pixels by color ID
         const colorGroups = new Map();
         for (const [x, y, targetPixelInfo] of eligibleCoords) {
@@ -10526,20 +12215,30 @@ localStorage.removeItem("lp");
         // Log color groups
         console.log(`📊 Found ${colorGroups.size} different colors to paint:`);
         for (const [colorId, pixels] of colorGroups.entries()) {
-          const colorInfo = Object.values(CONFIG.COLOR_MAP).find(c => c.id === colorId);
+          const colorInfo = Object.values(CONFIG.COLOR_MAP).find(
+            (c) => c.id === colorId
+          );
           const colorName = colorInfo ? colorInfo.name : `Color ${colorId}`;
-          console.log(`  🎨 ${colorName} (ID: ${colorId}): ${pixels.length} pixels`);
+          console.log(
+            `  🎨 ${colorName} (ID: ${colorId}): ${pixels.length} pixels`
+          );
         }
 
         // Process colors one by one
-        const sortedColorGroups = Array.from(colorGroups.entries()).sort((a, b) => a[0] - b[0]);
-        
+        const sortedColorGroups = Array.from(colorGroups.entries()).sort(
+          (a, b) => a[0] - b[0]
+        );
+
         // If we have a current painting color, resume from that color
         let startIndex = 0;
         if (state.currentPaintingColor !== null) {
-          startIndex = sortedColorGroups.findIndex(([colorId]) => colorId === state.currentPaintingColor);
+          startIndex = sortedColorGroups.findIndex(
+            ([colorId]) => colorId === state.currentPaintingColor
+          );
           if (startIndex === -1) startIndex = 0;
-          console.log(`🔄 Resuming from color ID ${state.currentPaintingColor} (index ${startIndex})`);
+          console.log(
+            `🔄 Resuming from color ID ${state.currentPaintingColor} (index ${startIndex})`
+          );
         }
 
         // Flatten the groups starting from the current color
@@ -10552,31 +12251,44 @@ localStorage.removeItem("lp");
           }
         }
 
-        console.log(`✅ Prepared ${pixelsToProcess.length} pixels for color-by-color painting`);
+        console.log(
+          `✅ Prepared ${pixelsToProcess.length} pixels for color-by-color painting`
+        );
       }
 
       // Paint eligible pixels (already pre-filtered, no duplicate checks)
       outerLoop: for (const [x, y, targetPixelInfo] of pixelsToProcess) {
         // Track current color being painted in color-by-color mode
-        if (state.paintingOrder === 'color-by-color') {
+        if (state.paintingOrder === "color-by-color") {
           if (state.currentPaintingColor !== targetPixelInfo.mappedColorId) {
             state.currentPaintingColor = targetPixelInfo.mappedColorId;
-            const colorInfo = Object.values(CONFIG.COLOR_MAP).find(c => c.id === state.currentPaintingColor);
-            const colorName = colorInfo ? colorInfo.name : `Color ${state.currentPaintingColor}`;
-            console.log(`🎨 Now painting: ${colorName} (ID: ${state.currentPaintingColor})`);
-            
+            const colorInfo = Object.values(CONFIG.COLOR_MAP).find(
+              (c) => c.id === state.currentPaintingColor
+            );
+            const colorName = colorInfo
+              ? colorInfo.name
+              : `Color ${state.currentPaintingColor}`;
+            console.log(
+              `🎨 Now painting: ${colorName} (ID: ${state.currentPaintingColor})`
+            );
+
             // Update UI to show current color
-            const statusDiv = document.getElementById('statusDiv');
+            const statusDiv = document.getElementById("statusDiv");
             if (statusDiv) {
-              const colorMessage = Utils.t('currentlyPaintingColor', { colorName });
-              const colorIndicator = document.getElementById('currentColorIndicator');
+              const colorMessage = Utils.t("currentlyPaintingColor", {
+                colorName,
+              });
+              const colorIndicator = document.getElementById(
+                "currentColorIndicator"
+              );
               if (colorIndicator) {
                 colorIndicator.textContent = colorMessage;
               } else {
-                const indicator = document.createElement('div');
-                indicator.id = 'currentColorIndicator';
+                const indicator = document.createElement("div");
+                indicator.id = "currentColorIndicator";
                 indicator.textContent = colorMessage;
-                indicator.style.cssText = 'margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.1); border-radius: 6px; font-weight: bold;';
+                indicator.style.cssText =
+                  "margin-top: 8px; padding: 8px; background: rgba(255,255,255,0.1); border-radius: 6px; font-weight: bold;";
                 statusDiv.appendChild(indicator);
               }
             }
@@ -10585,7 +12297,9 @@ localStorage.removeItem("lp");
 
         if (state.stopFlag) {
           if (pixelBatch && pixelBatch.pixels.length > 0) {
-            console.log(`🎯 Sending last batch before stop with ${pixelBatch.pixels.length} pixels`);
+            console.log(
+              `🎯 Sending last batch before stop with ${pixelBatch.pixels.length} pixels`
+            );
             await flushPixelBatch(pixelBatch);
           }
           state.lastPosition = { x, y };
@@ -10593,9 +12307,11 @@ localStorage.removeItem("lp");
           // Use last painted position if available, otherwise use current position
           const pausedX = state.lastPaintedPosition.x || x;
           const pausedY = state.lastPaintedPosition.y || y;
-          updateUI('paintingPaused', 'warning', { x: pausedX, y: pausedY });
-          console.log(`⏸️ Painting paused after last painted coordinates (${pausedX}, ${pausedY})`);
-          return 'stopped';
+          updateUI("paintingPaused", "warning", { x: pausedX, y: pausedY });
+          console.log(
+            `⏸️ Painting paused after last painted coordinates (${pausedX}, ${pausedY})`
+          );
+          return "stopped";
         }
 
         // Check if we have charges left (local count, no API call)
@@ -10604,13 +12320,17 @@ localStorage.removeItem("lp");
           // await purchase("paint_charges");
           await updateStats();
           if (state.displayCharges <= 0) {
-            console.log('⚡ No charges left (local count), ending painting session');
+            console.log(
+              "⚡ No charges left (local count), ending painting session"
+            );
             if (pixelBatch && pixelBatch.pixels.length > 0) {
-              console.log(`🎯 Sending final batch with ${pixelBatch.pixels.length} pixels`);
+              console.log(
+                `🎯 Sending final batch with ${pixelBatch.pixels.length} pixels`
+              );
               await flushPixelBatch(pixelBatch);
             }
             state.lastPosition = { x, y };
-            return 'charges_depleted';
+            return "charges_depleted";
           }
           // else {
           //   console.log(`🔋 Charges after purchase: ${state.displayCharges}, continuing painting`);
@@ -10627,18 +12347,22 @@ localStorage.removeItem("lp");
 
         // CRITICAL FIX: Always check if pixel is already painted (both locally and on canvas)
         if (Utils.isPixelPainted(x, y, regionX + adderX, regionY + adderY)) {
-          console.log(`⏭️ Skipping already painted pixel at (${x}, ${y}) - marked in local map`);
+          console.log(
+            `⏭️ Skipping already painted pixel at (${x}, ${y}) - marked in local map`
+          );
           continue; // Skip already painted pixels
         }
 
         // REAL-TIME CANVAS CHECK: Verify against actual canvas state to prevent overpainting
         try {
-          const existingColorRGBA = await overlayManager.getTilePixelColor(
-            regionX + adderX,
-            regionY + adderY,
-            pixelX,
-            pixelY
-          ).catch(() => null);
+          const existingColorRGBA = await overlayManager
+            .getTilePixelColor(
+              regionX + adderX,
+              regionY + adderY,
+              pixelX,
+              pixelY
+            )
+            .catch(() => null);
 
           if (existingColorRGBA && Array.isArray(existingColorRGBA)) {
             const [er, eg, eb] = existingColorRGBA;
@@ -10647,10 +12371,13 @@ localStorage.removeItem("lp");
               state.availableColors,
               !state.paintUnavailablePixels
             );
-            const isAlreadyCorrect = existingMappedColor.id === targetPixelInfo.mappedColorId;
+            const isAlreadyCorrect =
+              existingMappedColor.id === targetPixelInfo.mappedColorId;
 
             if (isAlreadyCorrect) {
-              console.log(`✅ Pixel at (${x}, ${y}) already has correct color (${existingMappedColor.id}) - marking as painted`);
+              console.log(
+                `✅ Pixel at (${x}, ${y}) already has correct color (${existingMappedColor.id}) - marking as painted`
+              );
               // Mark it as painted in local map but DO NOT increment progress counter
               // Progress should only reflect actual painting sequence position
               Utils.markPixelPainted(x, y, regionX + adderX, regionY + adderY);
@@ -10659,7 +12386,10 @@ localStorage.removeItem("lp");
           }
         } catch (e) {
           // If we can't check the canvas, proceed with painting (better to attempt than skip)
-          console.warn(`⚠️ Could not verify canvas state for pixel (${x}, ${y}), proceeding with paint:`, e.message);
+          console.warn(
+            `⚠️ Could not verify canvas state for pixel (${x}, ${y}), proceeding with paint:`,
+            e.message
+          );
         }
 
         const targetMappedColorId = targetPixelInfo.mappedColorId;
@@ -10671,12 +12401,16 @@ localStorage.removeItem("lp");
           pixelBatch.regionY !== regionY + adderY
         ) {
           if (pixelBatch && pixelBatch.pixels.length > 0) {
-            console.log(`🌍 Sending region-change batch with ${pixelBatch.pixels.length} pixels`);
+            console.log(
+              `🌍 Sending region-change batch with ${pixelBatch.pixels.length} pixels`
+            );
             const success = await flushPixelBatch(pixelBatch);
             if (!success) {
-              console.error(`❌ Batch failed permanently after retries. Stopping painting.`);
+              console.error(
+                `❌ Batch failed permanently after retries. Stopping painting.`
+              );
               state.stopFlag = true;
-              return 'stopped';
+              return "stopped";
             }
             await updateStats();
           }
@@ -10700,12 +12434,16 @@ localStorage.removeItem("lp");
         // Send batch if it's full
         const maxBatchSize = calculateBatchSize();
         if (pixelBatch.pixels.length >= maxBatchSize) {
-          console.log(`📦 Sending batch with ${pixelBatch.pixels.length} pixels`);
+          console.log(
+            `📦 Sending batch with ${pixelBatch.pixels.length} pixels`
+          );
           const success = await flushPixelBatch(pixelBatch);
           if (!success) {
-            console.error(`❌ Batch failed permanently after retries. Stopping painting.`);
+            console.error(
+              `❌ Batch failed permanently after retries. Stopping painting.`
+            );
             state.stopFlag = true;
-            return 'stopped';
+            return "stopped";
           }
           pixelBatch.pixels = [];
           await updateStats();
@@ -10714,32 +12452,47 @@ localStorage.removeItem("lp");
 
       // Send final batch if any pixels remain
       if (pixelBatch && pixelBatch.pixels.length > 0 && !state.stopFlag) {
-        console.log(`🏁 Sending final batch with ${pixelBatch.pixels.length} pixels`);
+        console.log(
+          `🏁 Sending final batch with ${pixelBatch.pixels.length} pixels`
+        );
         const success = await flushPixelBatch(pixelBatch);
         if (!success) {
-          console.warn(`⚠️ Final batch failed with ${pixelBatch.pixels.length} pixels`);
+          console.warn(
+            `⚠️ Final batch failed with ${pixelBatch.pixels.length} pixels`
+          );
         }
       }
 
       // If we completed the entire coordinate loop, image is complete
-      return state.stopFlag ? 'stopped' : 'completed';
-
+      return state.stopFlag ? "stopped" : "completed";
     } finally {
       // Log skip statistics for this session
       console.log(`📊 Session Statistics:`);
-      console.log(`   New pixels painted: ${state.paintedPixels - (skippedPixels.alreadyPainted || 0)}`);
-      console.log(`   Already painted detected: ${skippedPixels.alreadyPainted}`);
+      console.log(
+        `   New pixels painted: ${
+          state.paintedPixels - (skippedPixels.alreadyPainted || 0)
+        }`
+      );
+      console.log(
+        `   Already painted detected: ${skippedPixels.alreadyPainted}`
+      );
       console.log(`   Total progress: ${state.paintedPixels}`);
-      console.log(`   Pre-filtered - Transparent: ${skippedPixels.transparent}`);
+      console.log(
+        `   Pre-filtered - Transparent: ${skippedPixels.transparent}`
+      );
       console.log(`   Pre-filtered - White: ${skippedPixels.white}`);
-      console.log(`   Pre-filtered - Color Unavailable: ${skippedPixels.colorUnavailable}`);
+      console.log(
+        `   Pre-filtered - Color Unavailable: ${skippedPixels.colorUnavailable}`
+      );
     }
   }
 
   // Phase 2: Execute cooldown period - wait for target charges (NO token regeneration)
   async function executeCooldownPeriod() {
-    console.log('⏱️ Entering cooldown period - waiting for target charges');
-    console.log('🚫 NO token regeneration during cooldown (even if expired/invalid)');
+    console.log("⏱️ Entering cooldown period - waiting for target charges");
+    console.log(
+      "🚫 NO token regeneration during cooldown (even if expired/invalid)"
+    );
 
     // Check initial charges to calculate wait time
     let chargeCheckCount = 0;
@@ -10767,11 +12520,13 @@ localStorage.removeItem("lp");
         console.log(`✅ Cooldown target reached locally (≥${threshold})`);
         NotificationManager.maybeNotifyChargesReached(true);
         await updateStats();
-        return 'target_reached';
+        return "target_reached";
       }
 
-      const waitMs = Number.isFinite(bestMs) ? Math.max(1000, Math.min(bestMs, 10000)) : 10000;
-      updateUI('noChargesThreshold', 'warning', {
+      const waitMs = Number.isFinite(bestMs)
+        ? Math.max(1000, Math.min(bestMs, 10000))
+        : 10000;
+      updateUI("noChargesThreshold", "warning", {
         time: Utils.msToTimeText(waitMs),
         threshold,
         current: currentCharges,
@@ -10780,33 +12535,33 @@ localStorage.removeItem("lp");
       await Utils.sleep(waitMs);
     }
 
-    return 'stopped';
+    return "stopped";
   }
 
   // Phase 3: Regenerate token for new painting session
   async function regenerateTokenForNewSession() {
-    console.log('🔑 Regenerating token for new painting session');
+    console.log("🔑 Regenerating token for new painting session");
 
     try {
       // Force regenerate token for new session
       await ensureToken(true); // forceRefresh = true
 
       if (!getTurnstileToken()) {
-        console.error('❌ Failed to generate token for new session');
+        console.error("❌ Failed to generate token for new session");
         return false;
       }
 
-      console.log('✅ Token regenerated successfully for new session');
+      console.log("✅ Token regenerated successfully for new session");
       return true;
     } catch (error) {
-      console.error('❌ Token regeneration failed:', error);
+      console.error("❌ Token regeneration failed:", error);
       return false;
     }
   }
 
   // Finalize painting process cleanup
   async function finalizePaintingProcess() {
-    console.log('🧹 Finalizing painting process');
+    console.log("🧹 Finalizing painting process");
 
     if (window._chargesInterval) {
       clearInterval(window._chargesInterval);
@@ -10817,13 +12572,13 @@ localStorage.removeItem("lp");
       // Save progress when stopped to preserve painted map
       Utils.saveProgress();
     } else {
-      updateUI('paintingComplete', 'success', { count: state.paintedPixels });
+      updateUI("paintingComplete", "success", { count: state.paintedPixels });
       state.lastPosition = { x: 0, y: 0 }; // Only reset when truly complete
       Utils.saveProgress(); // Save final complete state
       overlayManager.clear();
-      const toggleOverlayBtn = document.getElementById('toggleOverlayBtn');
+      const toggleOverlayBtn = document.getElementById("toggleOverlayBtn");
       if (toggleOverlayBtn) {
-        toggleOverlayBtn.classList.remove('active');
+        toggleOverlayBtn.classList.remove("active");
         toggleOverlayBtn.disabled = true;
       }
     }
@@ -10832,14 +12587,17 @@ localStorage.removeItem("lp");
   // Helper function to check pixel eligibility (shared by painting functions)
   function checkPixelEligibility(x, y) {
     const { width, height, pixels } = state.imageData;
-    const transparencyThreshold = state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
+    const transparencyThreshold =
+      state.customTransparencyThreshold || CONFIG.TRANSPARENCY_THRESHOLD;
 
     // CRITICAL FIX: Check module availability before processing
-    if (!Utils || typeof Utils.isWhitePixel !== 'function') {
-      console.error('❌ Utils module not available for pixel eligibility check');
+    if (!Utils || typeof Utils.isWhitePixel !== "function") {
+      console.error(
+        "❌ Utils module not available for pixel eligibility check"
+      );
       return {
         eligible: false,
-        reason: 'moduleUnavailable',
+        reason: "moduleUnavailable",
       };
     }
 
@@ -10855,23 +12613,23 @@ localStorage.removeItem("lp");
     if (!state.paintTransparentPixels && isTransparent)
       return {
         eligible: false,
-        reason: 'transparent',
+        reason: "transparent",
       };
     if (!state.paintWhitePixels && Utils.isWhitePixel(r, g, b))
       return {
         eligible: false,
-        reason: 'white',
+        reason: "white",
       };
 
     // If paintTransparentPixels is enabled and pixel is transparent, use color ID 0 (Transparent)
     if (state.paintTransparentPixels && isTransparent) {
-      return { 
-        eligible: true, 
-        r: 0, 
-        g: 0, 
-        b: 0, 
-        a: 0, 
-        mappedColorId: 0  // ID 0 is the Transparent color
+      return {
+        eligible: true,
+        r: 0,
+        g: 0,
+        b: 0,
+        a: 0,
+        mappedColorId: 0, // ID 0 is the Transparent color
       };
     }
 
@@ -10888,7 +12646,7 @@ localStorage.removeItem("lp");
     if (!state.paintUnavailablePixels && !mappedTargetColorId.id) {
       return {
         eligible: false,
-        reason: 'colorUnavailable',
+        reason: "colorUnavailable",
         r,
         g,
         b,
@@ -10896,14 +12654,25 @@ localStorage.removeItem("lp");
         mappedColorId: mappedTargetColorId.id,
       };
     }
-    return { eligible: true, r, g, b, a, mappedColorId: mappedTargetColorId.id };
+    return {
+      eligible: true,
+      r,
+      g,
+      b,
+      a,
+      mappedColorId: mappedTargetColorId.id,
+    };
   }
 
   // Helper function to skip pixel and log the reason (minimized logging)
   function skipPixel(reason, id, rgb, x, y, skippedPixels) {
     // Minimize logging to prevent console flooding - only log non-routine skips
-    if (reason !== 'transparent' && reason !== 'alreadyPainted') {
-      console.log(`Skipped pixel for ${reason} (id: ${id}, (${rgb.join(', ')})) at (${x}, ${y})`);
+    if (reason !== "transparent" && reason !== "alreadyPainted") {
+      console.log(
+        `Skipped pixel for ${reason} (id: ${id}, (${rgb.join(
+          ", "
+        )})) at (${x}, ${y})`
+      );
     }
     skippedPixels[reason]++;
   }
@@ -10911,13 +12680,20 @@ localStorage.removeItem("lp");
     // Bot now always uses ALL available charges for maximum speed
     const availableCharges = state.displayCharges;
     const finalBatchSize = Math.max(1, availableCharges);
-    
-    console.log(`� Batch size: ${finalBatchSize} (using all available charges)`);
+
+    console.log(
+      `� Batch size: ${finalBatchSize} (using all available charges)`
+    );
     return finalBatchSize;
   }
 
   // Helper function to retry batch until success with exponential backoff
-  async function sendBatchWithRetry(pixels, regionX, regionY, maxRetries = MAX_BATCH_RETRIES) {
+  async function sendBatchWithRetry(
+    pixels,
+    regionX,
+    regionY,
+    maxRetries = MAX_BATCH_RETRIES
+  ) {
     let attempt = 0;
     while (attempt < maxRetries && !state.stopFlag) {
       attempt++;
@@ -10930,36 +12706,49 @@ localStorage.removeItem("lp");
       if (result === true) {
         console.log(`✅ Batch succeeded on attempt ${attempt}`);
         return true;
-      } else if (result === 'token_error') {
-        console.log(`🔑 Token error on attempt ${attempt} - no token available during processing`);
-        console.log(`❌ Stopping batch processing - tokens must be generated at startup/start button only`);
-        updateUI('captchaFailed', 'error');
+      } else if (result === "token_error") {
+        console.log(
+          `🔑 Token error on attempt ${attempt} - no token available during processing`
+        );
+        console.log(
+          `❌ Stopping batch processing - tokens must be generated at startup/start button only`
+        );
+        updateUI("captchaFailed", "error");
         await Utils.sleep(2000); // Wait longer before retrying after token failure
         continue; // Continue to retry until maxRetries reached
-      } else if (result === 'token_regenerated') {
-        console.log(`🔄 Token regenerated on attempt ${attempt} after 403 error - retrying batch`);
+      } else if (result === "token_regenerated") {
+        console.log(
+          `🔄 Token regenerated on attempt ${attempt} after 403 error - retrying batch`
+        );
         const pausedX = state.lastPaintedPosition.x;
         const pausedY = state.lastPaintedPosition.y;
-        updateUI('paintingPaused', 'warning', { x: pausedX, y: pausedY });
+        updateUI("paintingPaused", "warning", { x: pausedX, y: pausedY });
         // Don't count token regeneration as a failed attempt, retry immediately
         attempt--;
         await Utils.sleep(500); // Brief pause before retry
         continue;
-      } else if (result === 'token_regeneration_failed') {
-        console.log(`❌ Token regeneration failed on attempt ${attempt} after 403 error`);
-        updateUI('captchaFailed', 'error');
+      } else if (result === "token_regeneration_failed") {
+        console.log(
+          `❌ Token regeneration failed on attempt ${attempt} after 403 error`
+        );
+        updateUI("captchaFailed", "error");
         return false; // Stop processing if we can't get a valid token
-      } else if (result === 'invalid_token_error') {
-        console.log(`🔑 Invalid token detected on attempt ${attempt}, regenerating...`);
-        updateUI('captchaSolving', 'warning');
+      } else if (result === "invalid_token_error") {
+        console.log(
+          `🔑 Invalid token detected on attempt ${attempt}, regenerating...`
+        );
+        updateUI("captchaSolving", "warning");
         try {
           await handleCaptcha(true); // Allow generation for invalid token cases
           // Don't count token regeneration as a failed attempt
           attempt--;
           continue;
         } catch (e) {
-          console.error(`❌ Token regeneration failed after invalid token on attempt ${attempt}:`, e);
-          updateUI('captchaFailed', 'error');
+          console.error(
+            `❌ Token regeneration failed after invalid token on attempt ${attempt}:`,
+            e
+          );
+          updateUI("captchaFailed", "error");
           // Wait longer before retrying after token failure
           await Utils.sleep(5000);
         }
@@ -10976,7 +12765,7 @@ localStorage.removeItem("lp");
       console.error(
         `❌ Batch failed after ${maxRetries} attempts (MAX_BATCH_RETRIES=${MAX_BATCH_RETRIES}). This will stop painting to prevent infinite loops.`
       );
-      updateUI('paintingError', 'error');
+      updateUI("paintingError", "error");
       return false;
     }
 
@@ -10988,8 +12777,10 @@ localStorage.removeItem("lp");
 
     // Don't auto-generate tokens during processing - return error if no token available
     if (!token) {
-      console.warn('⚠️ No token available and auto-generation disabled during processing');
-      return 'token_error';
+      console.warn(
+        "⚠️ No token available and auto-generation disabled during processing"
+      );
+      return "token_error";
     }
 
     const coords = new Array(pixelBatch.length * 2);
@@ -11004,40 +12795,52 @@ localStorage.removeItem("lp");
     try {
       const payload = { coords, colors, t: token, fp: fpStr32 };
       var wasmtoken = await createWasmToken(regionX, regionY, payload);
-      const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
-        method: 'POST',
-        headers: { 'Content-Type': 'text/plain;charset=UTF-8', "x-pawtect-token": wasmtoken },
-        credentials: 'include',
-        body: JSON.stringify(payload),
-      });
+      const res = await fetch(
+        `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "text/plain;charset=UTF-8",
+            "x-pawtect-token": wasmtoken,
+          },
+          credentials: "include",
+          body: JSON.stringify(payload),
+        }
+      );
 
       if (res.status === 403) {
         let data = null;
         try {
           data = await res.json();
-        } catch (_) { }
-        console.error('❌ 403 Forbidden. Token invalid during painting - regeneration allowed.');
+        } catch (_) {}
+        console.error(
+          "❌ 403 Forbidden. Token invalid during painting - regeneration allowed."
+        );
 
         // 403 errors during painting allow token regeneration per workflow requirements
-        console.log('� Token invalid (403) during painting - regenerating token as allowed by workflow');
+        console.log(
+          "� Token invalid (403) during painting - regenerating token as allowed by workflow"
+        );
         setTurnstileToken(null);
         createTokenPromise();
 
         // Attempt to regenerate token immediately
         const newToken = await ensureToken(true);
         if (newToken) {
-          console.log('✅ Token regenerated after 403 error, returning regenerate signal');
-          return 'token_regenerated';
+          console.log(
+            "✅ Token regenerated after 403 error, returning regenerate signal"
+          );
+          return "token_regenerated";
         } else {
-          console.error('❌ Failed to regenerate token after 403 error');
-          return 'token_regeneration_failed';
+          console.error("❌ Failed to regenerate token after 403 error");
+          return "token_regeneration_failed";
         }
       }
 
       const data = await res.json();
       return data?.painted === pixelBatch.length;
     } catch (e) {
-      console.error('Batch paint request failed:', e);
+      console.error("Batch paint request failed:", e);
       return false;
     }
   }
@@ -11052,7 +12855,8 @@ localStorage.removeItem("lp");
         autoLoadProgress: state.autoLoadProgress,
         minimized: state.minimized,
         overlayOpacity: state.overlayOpacity,
-        blueMarbleEnabled: document.getElementById('enableBlueMarbleToggle')?.checked,
+        blueMarbleEnabled: document.getElementById("enableBlueMarbleToggle")
+          ?.checked,
         // NOTE: Dithering, pre-processing, post-processing, and color correction settings are NOT saved
         // They are session-specific and reset for each new image upload
         colorMatchingAlgorithm: state.colorMatchingAlgorithm,
@@ -11071,13 +12875,14 @@ localStorage.removeItem("lp");
         blockHeight: state.blockHeight, // Save ignore mask (as base64) with its dimensions
         resizeIgnoreMask:
           state.resizeIgnoreMask &&
-            state.resizeSettings &&
-            state.resizeSettings.width * state.resizeSettings.height === state.resizeIgnoreMask.length
+          state.resizeSettings &&
+          state.resizeSettings.width * state.resizeSettings.height ===
+            state.resizeIgnoreMask.length
             ? {
-              w: state.resizeSettings.width,
-              h: state.resizeSettings.height,
-              data: btoa(String.fromCharCode(...state.resizeIgnoreMask)),
-            }
+                w: state.resizeSettings.width,
+                h: state.resizeSettings.height,
+                data: btoa(String.fromCharCode(...state.resizeIgnoreMask)),
+              }
             : null, // Notifications
         notificationsEnabled: state.notificationsEnabled,
         notifyOnChargesReached: state.notifyOnChargesReached,
@@ -11094,15 +12899,15 @@ localStorage.removeItem("lp");
       CONFIG.PAINTING_SPEED_ENABLED = settings.paintingSpeedEnabled;
       // AUTO_CAPTCHA_ENABLED is always true - no need to save/load
 
-      localStorage.setItem('wplace-bot-settings', JSON.stringify(settings));
+      localStorage.setItem("wplace-bot-settings", JSON.stringify(settings));
     } catch (e) {
-      console.warn('Could not save bot settings:', e);
+      console.warn("Could not save bot settings:", e);
     }
   }
 
   function loadBotSettings() {
     try {
-      const saved = localStorage.getItem('wplace-bot-settings');
+      const saved = localStorage.getItem("wplace-bot-settings");
       if (!saved) return;
       const settings = JSON.parse(saved);
 
@@ -11114,59 +12919,73 @@ localStorage.removeItem("lp");
       state.minimized = settings.minimized ?? false;
       state.autoLoadProgress = settings.autoLoadProgress ?? false;
       CONFIG.AUTO_CAPTCHA_ENABLED = settings.autoCaptchaEnabled ?? false;
-      state.overlayOpacity = settings.overlayOpacity ?? CONFIG.OVERLAY.OPACITY_DEFAULT;
+      state.overlayOpacity =
+        settings.overlayOpacity ?? CONFIG.OVERLAY.OPACITY_DEFAULT;
 
       // MIGRATION: Force enable blue marble for existing users if not explicitly set
       // This ensures the new default (blue marble ON) is applied to existing users
       if (settings.blueMarbleMigrated !== true) {
         state.blueMarbleEnabled = true;
-        console.log('🔄 Migrated: Blue Marble enabled (new default)');
+        console.log("🔄 Migrated: Blue Marble enabled (new default)");
         // Save the migration flag
         settings.blueMarbleMigrated = true;
-        localStorage.setItem('wplace-bot-settings', JSON.stringify(settings));
+        localStorage.setItem("wplace-bot-settings", JSON.stringify(settings));
       } else {
-        state.blueMarbleEnabled = settings.blueMarbleEnabled ?? CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT;
+        state.blueMarbleEnabled =
+          settings.blueMarbleEnabled ?? CONFIG.OVERLAY.BLUE_MARBLE_DEFAULT;
       }
 
       // NOTE: Processing settings (dithering, pre-blur, sharpen, post-processing, color correction)
       // are NOT loaded from localStorage - they always start fresh per session
       // This ensures processing settings don't persist across different image uploads
 
-      state.colorMatchingAlgorithm = settings.colorMatchingAlgorithm || 'lab';
+      state.colorMatchingAlgorithm = settings.colorMatchingAlgorithm || "lab";
       state.enableChromaPenalty = settings.enableChromaPenalty ?? true;
       state.chromaPenaltyWeight = settings.chromaPenaltyWeight ?? 0.15;
-      state.resamplingMethod = settings.resamplingMethod || 'nearest'; // Restore resampling method
+      state.resamplingMethod = settings.resamplingMethod || "nearest"; // Restore resampling method
       state.customTransparencyThreshold =
         settings.customTransparencyThreshold ?? CONFIG.TRANSPARENCY_THRESHOLD;
-      state.customWhiteThreshold = settings.customWhiteThreshold ?? CONFIG.WHITE_THRESHOLD;
+      state.customWhiteThreshold =
+        settings.customWhiteThreshold ?? CONFIG.WHITE_THRESHOLD;
       state.paintWhitePixels = settings.paintWhitePixels ?? true;
       state.paintTransparentPixels = settings.paintTransparentPixels ?? false;
       state.resizeSettings = settings.resizeSettings ?? null;
       state.originalImage = settings.originalImage ?? null;
-      state.paintUnavailablePixels = settings.paintUnavailablePixels ?? CONFIG.PAINT_UNAVAILABLE;
+      state.paintUnavailablePixels =
+        settings.paintUnavailablePixels ?? CONFIG.PAINT_UNAVAILABLE;
       state.coordinateMode = settings.coordinateMode ?? CONFIG.COORDINATE_MODE;
-      state.coordinateDirection = settings.coordinateDirection ?? CONFIG.COORDINATE_DIRECTION;
-      state.coordinateSnake = settings.coordinateSnake ?? CONFIG.COORDINATE_SNAKE;
+      state.coordinateDirection =
+        settings.coordinateDirection ?? CONFIG.COORDINATE_DIRECTION;
+      state.coordinateSnake =
+        settings.coordinateSnake ?? CONFIG.COORDINATE_SNAKE;
       state.blockWidth = settings.blockWidth ?? CONFIG.COORDINATE_BLOCK_WIDTH;
-      state.blockHeight = settings.blockHeight ?? CONFIG.COORDINATE_BLOCK_HEIGHT;
+      state.blockHeight =
+        settings.blockHeight ?? CONFIG.COORDINATE_BLOCK_HEIGHT;
       // Notifications
-      state.notificationsEnabled = settings.notificationsEnabled ?? CONFIG.NOTIFICATIONS.ENABLED;
+      state.notificationsEnabled =
+        settings.notificationsEnabled ?? CONFIG.NOTIFICATIONS.ENABLED;
       state.notifyOnChargesReached =
-        settings.notifyOnChargesReached ?? CONFIG.NOTIFICATIONS.ON_CHARGES_REACHED;
+        settings.notifyOnChargesReached ??
+        CONFIG.NOTIFICATIONS.ON_CHARGES_REACHED;
       state.notifyOnlyWhenUnfocused =
-        settings.notifyOnlyWhenUnfocused ?? CONFIG.NOTIFICATIONS.ONLY_WHEN_UNFOCUSED;
+        settings.notifyOnlyWhenUnfocused ??
+        CONFIG.NOTIFICATIONS.ONLY_WHEN_UNFOCUSED;
       state.notificationIntervalMinutes =
-        settings.notificationIntervalMinutes ?? CONFIG.NOTIFICATIONS.REPEAT_MINUTES;
+        settings.notificationIntervalMinutes ??
+        CONFIG.NOTIFICATIONS.REPEAT_MINUTES;
       // NOTE: paintingMode is NOT restored - always defaults to 'auto' on page load
 
       // Restore region and startPosition for assist mode coordinate calculations
       if (settings.region) {
         state.region = settings.region;
-        console.log('✅ Restored region from save file:', state.region);
+        console.log("✅ Restored region from save file:", state.region);
       }
       if (settings.startPosition) {
         state.startPosition = settings.startPosition;
-        console.log('✅ Restored startPosition from save file:', state.startPosition);
+        console.log(
+          "✅ Restored startPosition from save file:",
+          state.startPosition
+        );
       }
 
       // Restore ignore mask if dims match current resizeSettings
@@ -11189,19 +13008,31 @@ localStorage.removeItem("lp");
         state.resizeIgnoreMask = null;
       }
       // Initialize coordinate generation UI
-      const coordinateModeSelect = document.getElementById('coordinateModeSelect');
-      if (coordinateModeSelect) coordinateModeSelect.value = state.coordinateMode;
+      const coordinateModeSelect = document.getElementById(
+        "coordinateModeSelect"
+      );
+      if (coordinateModeSelect)
+        coordinateModeSelect.value = state.coordinateMode;
 
-      const coordinateDirectionSelect = document.getElementById('coordinateDirectionSelect');
-      if (coordinateDirectionSelect) coordinateDirectionSelect.value = state.coordinateDirection;
+      const coordinateDirectionSelect = document.getElementById(
+        "coordinateDirectionSelect"
+      );
+      if (coordinateDirectionSelect)
+        coordinateDirectionSelect.value = state.coordinateDirection;
 
-      const coordinateSnakeToggle = document.getElementById('coordinateSnakeToggle');
-      if (coordinateSnakeToggle) coordinateSnakeToggle.checked = state.coordinateSnake;
+      const coordinateSnakeToggle = document.getElementById(
+        "coordinateSnakeToggle"
+      );
+      if (coordinateSnakeToggle)
+        coordinateSnakeToggle.checked = state.coordinateSnake;
 
-      const settingsContainer = document.getElementById('wplace-settings-container');
-      const directionControls = settingsContainer.querySelector('#directionControls');
-      const snakeControls = settingsContainer.querySelector('#snakeControls');
-      const blockControls = settingsContainer.querySelector('#blockControls');
+      const settingsContainer = document.getElementById(
+        "wplace-settings-container"
+      );
+      const directionControls =
+        settingsContainer.querySelector("#directionControls");
+      const snakeControls = settingsContainer.querySelector("#snakeControls");
+      const blockControls = settingsContainer.querySelector("#blockControls");
       Utils.updateCoordinateUI({
         mode: state.coordinateMode,
         directionControls,
@@ -11209,12 +13040,16 @@ localStorage.removeItem("lp");
         blockControls,
       });
 
-      const paintUnavailablePixelsToggle = document.getElementById('paintUnavailablePixelsToggle');
+      const paintUnavailablePixelsToggle = document.getElementById(
+        "paintUnavailablePixelsToggle"
+      );
       if (paintUnavailablePixelsToggle) {
         paintUnavailablePixelsToggle.checked = state.paintUnavailablePixels;
       }
 
-      const settingsPaintWhiteToggle = settingsContainer.querySelector('#settingsPaintWhiteToggle');
+      const settingsPaintWhiteToggle = settingsContainer.querySelector(
+        "#settingsPaintWhiteToggle"
+      );
       if (settingsPaintWhiteToggle) {
         settingsPaintWhiteToggle.checked = state.paintWhitePixels;
       }
@@ -11224,87 +13059,129 @@ localStorage.removeItem("lp");
       // Batch controls removed from UI - bot now uses all available charges automatically
 
       // Painting order UI initialization
-      const paintingOrderSelect = document.getElementById('paintingOrderSelect');
+      const paintingOrderSelect = document.getElementById(
+        "paintingOrderSelect"
+      );
       if (paintingOrderSelect) paintingOrderSelect.value = state.paintingOrder;
 
       // AUTO_CAPTCHA_ENABLED is always true - no toggle to set
 
-      const cooldownSlider = document.getElementById('cooldownSlider');
-      const cooldownInput = document.getElementById('cooldownInput');
-      const cooldownValue = document.getElementById('cooldownValue');
+      const cooldownSlider = document.getElementById("cooldownSlider");
+      const cooldownInput = document.getElementById("cooldownInput");
+      const cooldownValue = document.getElementById("cooldownValue");
       if (cooldownSlider) cooldownSlider.value = state.cooldownChargeThreshold;
       if (cooldownInput) cooldownInput.value = state.cooldownChargeThreshold;
-      if (cooldownValue) cooldownValue.textContent = `${Utils.t('charges')}`;
+      if (cooldownValue) cooldownValue.textContent = `${Utils.t("charges")}`;
 
-      const overlayOpacitySlider = document.getElementById('overlayOpacitySlider');
-      if (overlayOpacitySlider) overlayOpacitySlider.value = state.overlayOpacity;
-      const overlayOpacityValue = document.getElementById('overlayOpacityValue');
+      const overlayOpacitySlider = document.getElementById(
+        "overlayOpacitySlider"
+      );
+      if (overlayOpacitySlider)
+        overlayOpacitySlider.value = state.overlayOpacity;
+      const overlayOpacityValue = document.getElementById(
+        "overlayOpacityValue"
+      );
       if (overlayOpacityValue)
-        overlayOpacityValue.textContent = `${Math.round(state.overlayOpacity * 100)}%`;
-      const enableBlueMarbleToggle = document.getElementById('enableBlueMarbleToggle');
-      if (enableBlueMarbleToggle) enableBlueMarbleToggle.checked = state.blueMarbleEnabled;
+        overlayOpacityValue.textContent = `${Math.round(
+          state.overlayOpacity * 100
+        )}%`;
+      const enableBlueMarbleToggle = document.getElementById(
+        "enableBlueMarbleToggle"
+      );
+      if (enableBlueMarbleToggle)
+        enableBlueMarbleToggle.checked = state.blueMarbleEnabled;
 
-      const tokenSourceSelect = document.getElementById('tokenSourceSelect');
+      const tokenSourceSelect = document.getElementById("tokenSourceSelect");
       if (tokenSourceSelect) tokenSourceSelect.value = state.tokenSource;
 
-      const colorAlgorithmSelect = document.getElementById('colorAlgorithmSelect');
-      if (colorAlgorithmSelect) colorAlgorithmSelect.value = state.colorMatchingAlgorithm;
-      const enableChromaPenaltyToggle = document.getElementById('enableChromaPenaltyToggle');
-      if (enableChromaPenaltyToggle) enableChromaPenaltyToggle.checked = state.enableChromaPenalty;
-      const chromaPenaltyWeightSlider = document.getElementById('chromaPenaltyWeightSlider');
-      if (chromaPenaltyWeightSlider) chromaPenaltyWeightSlider.value = state.chromaPenaltyWeight;
-      const chromaWeightValue = document.getElementById('chromaWeightValue');
-      if (chromaWeightValue) chromaWeightValue.textContent = state.chromaPenaltyWeight;
-      const transparencyThresholdInput = document.getElementById('transparencyThresholdInput');
+      const colorAlgorithmSelect = document.getElementById(
+        "colorAlgorithmSelect"
+      );
+      if (colorAlgorithmSelect)
+        colorAlgorithmSelect.value = state.colorMatchingAlgorithm;
+      const enableChromaPenaltyToggle = document.getElementById(
+        "enableChromaPenaltyToggle"
+      );
+      if (enableChromaPenaltyToggle)
+        enableChromaPenaltyToggle.checked = state.enableChromaPenalty;
+      const chromaPenaltyWeightSlider = document.getElementById(
+        "chromaPenaltyWeightSlider"
+      );
+      if (chromaPenaltyWeightSlider)
+        chromaPenaltyWeightSlider.value = state.chromaPenaltyWeight;
+      const chromaWeightValue = document.getElementById("chromaWeightValue");
+      if (chromaWeightValue)
+        chromaWeightValue.textContent = state.chromaPenaltyWeight;
+      const transparencyThresholdInput = document.getElementById(
+        "transparencyThresholdInput"
+      );
       if (transparencyThresholdInput)
         transparencyThresholdInput.value = state.customTransparencyThreshold;
-      const whiteThresholdInput = document.getElementById('whiteThresholdInput');
-      if (whiteThresholdInput) whiteThresholdInput.value = state.customWhiteThreshold;
+      const whiteThresholdInput = document.getElementById(
+        "whiteThresholdInput"
+      );
+      if (whiteThresholdInput)
+        whiteThresholdInput.value = state.customWhiteThreshold;
       // Notifications UI
-      const notifEnabledToggle = document.getElementById('notifEnabledToggle');
-      if (notifEnabledToggle) notifEnabledToggle.checked = state.notificationsEnabled;
-      const notifOnChargesToggle = document.getElementById('notifOnChargesToggle');
-      if (notifOnChargesToggle) notifOnChargesToggle.checked = state.notifyOnChargesReached;
-      const notifOnlyUnfocusedToggle = document.getElementById('notifOnlyUnfocusedToggle');
+      const notifEnabledToggle = document.getElementById("notifEnabledToggle");
+      if (notifEnabledToggle)
+        notifEnabledToggle.checked = state.notificationsEnabled;
+      const notifOnChargesToggle = document.getElementById(
+        "notifOnChargesToggle"
+      );
+      if (notifOnChargesToggle)
+        notifOnChargesToggle.checked = state.notifyOnChargesReached;
+      const notifOnlyUnfocusedToggle = document.getElementById(
+        "notifOnlyUnfocusedToggle"
+      );
       if (notifOnlyUnfocusedToggle)
         notifOnlyUnfocusedToggle.checked = state.notifyOnlyWhenUnfocused;
-      const notifIntervalInput = document.getElementById('notifIntervalInput');
-      if (notifIntervalInput) notifIntervalInput.value = state.notificationIntervalMinutes;
+      const notifIntervalInput = document.getElementById("notifIntervalInput");
+      if (notifIntervalInput)
+        notifIntervalInput.value = state.notificationIntervalMinutes;
       NotificationManager.resetEdgeTracking();
     } catch (e) {
-      console.warn('Could not load bot settings:', e);
+      console.warn("Could not load bot settings:", e);
     }
   }
 
   // Initialize Turnstile generator integration
-  console.log('🚀 WPlace Auto-Image with Turnstile Token Generator loaded');
-  console.log('🔑 Turnstile token generator: ALWAYS ENABLED (Background mode)');
-  console.log('🎯 Manual pixel captcha solving: Available as fallback/alternative');
-  console.log('📱 Turnstile widgets: DISABLED - pure background token generation only!');
+  console.log("🚀 WPlace Auto-Image with Turnstile Token Generator loaded");
+  console.log("🔑 Turnstile token generator: ALWAYS ENABLED (Background mode)");
+  console.log(
+    "🎯 Manual pixel captcha solving: Available as fallback/alternative"
+  );
+  console.log(
+    "📱 Turnstile widgets: DISABLED - pure background token generation only!"
+  );
 
   // Generate fingerprint string for requests
   if (!window.WPlaceTokenManager) {
-    console.error('❌ WPlaceTokenManager not available - dependency loading issue');
+    console.error(
+      "❌ WPlaceTokenManager not available - dependency loading issue"
+    );
     return;
   }
   const fpStr32 = tokenManager._randStr(32);
-  console.log('🔑 Generated fingerprint string for API requests');
+  console.log("🔑 Generated fingerprint string for API requests");
 
   // Function to auto-load saved progress after init if enabled
   async function attemptAutoLoadProgress() {
     // Check if auto-load is enabled
     if (!state.autoLoadProgress) {
-      console.log('⏭️ Auto-load progress is disabled, skipping');
+      console.log("⏭️ Auto-load progress is disabled, skipping");
       return;
     }
-    
+
     if (state._autoLoadAttempted) return;
     state._autoLoadAttempted = true;
     try {
       const savedData = Utils.loadProgress();
       if (!savedData) return;
 
-      const hasCompleteData = savedData.state && savedData.imageData &&
+      const hasCompleteData =
+        savedData.state &&
+        savedData.imageData &&
         savedData.state.availableColors &&
         savedData.state.availableColors.length > 0;
 
@@ -11314,23 +13191,27 @@ localStorage.removeItem("lp");
           state.initialSetupComplete = true;
         }
 
-        updateUI('dataLoaded', 'success');
-        Utils.showAlert(Utils.t('dataLoaded'), 'success');
+        updateUI("dataLoaded", "success");
+        Utils.showAlert(Utils.t("dataLoaded"), "success");
         updateDataButtons();
         await updateStats();
 
-        const statsContainer = document.getElementById('wplace-stats-container');
-        if (statsContainer && typeof updateStats === 'function') {
-          setTimeout(async () => { await updateStats(); }, 100);
+        const statsContainer = document.getElementById(
+          "wplace-stats-container"
+        );
+        if (statsContainer && typeof updateStats === "function") {
+          setTimeout(async () => {
+            await updateStats();
+          }, 100);
         }
 
         Utils.restoreOverlayFromData().catch((error) => {
-          console.error('Failed to restore overlay from localStorage:', error);
+          console.error("Failed to restore overlay from localStorage:", error);
         });
 
-        const uploadBtn = document.getElementById('uploadBtn');
-        const selectPosBtn = document.getElementById('selectPosBtn');
-        const loadExtractedBtn = document.getElementById('loadExtractedBtn');
+        const uploadBtn = document.getElementById("uploadBtn");
+        const selectPosBtn = document.getElementById("selectPosBtn");
+        const loadExtractedBtn = document.getElementById("loadExtractedBtn");
 
         if (!state.colorsChecked) {
           if (uploadBtn) uploadBtn.disabled = false;
@@ -11341,13 +13222,18 @@ localStorage.removeItem("lp");
           if (selectPosBtn) selectPosBtn.disabled = false;
         }
 
-        const startBtn = document.getElementById('startBtn');
-        if (state.imageLoaded && state.startPosition && state.region && state.colorsChecked) {
+        const startBtn = document.getElementById("startBtn");
+        if (
+          state.imageLoaded &&
+          state.startPosition &&
+          state.region &&
+          state.colorsChecked
+        ) {
           if (startBtn) startBtn.disabled = false;
         }
       }
     } catch (e) {
-      console.error('Auto-load progress failed:', e);
+      console.error("Auto-load progress failed:", e);
     }
   }
 
@@ -11355,53 +13241,53 @@ localStorage.removeItem("lp");
   function enableFileOperations() {
     state.initialSetupComplete = true;
 
-    const loadBtn = document.querySelector('#loadBtn');
-    const loadFromFileBtn = document.querySelector('#loadFromFileBtn');
-    const uploadBtn = document.querySelector('#uploadBtn');
+    const loadBtn = document.querySelector("#loadBtn");
+    const loadFromFileBtn = document.querySelector("#loadFromFileBtn");
+    const uploadBtn = document.querySelector("#uploadBtn");
 
     if (loadBtn) {
       loadBtn.disabled = false;
-      loadBtn.title = '';
+      loadBtn.title = "";
       // Add a subtle animation to indicate the button is now available
-      loadBtn.style.animation = 'pulse 0.6s ease-in-out';
+      loadBtn.style.animation = "pulse 0.6s ease-in-out";
       setTimeout(() => {
-        if (loadBtn) loadBtn.style.animation = '';
+        if (loadBtn) loadBtn.style.animation = "";
       }, 600);
-      console.log('✅ Load Progress button enabled after initial setup');
+      console.log("✅ Load Progress button enabled after initial setup");
     }
 
     if (loadFromFileBtn) {
       loadFromFileBtn.disabled = false;
-      loadFromFileBtn.title = '';
+      loadFromFileBtn.title = "";
       // Add a subtle animation to indicate the button is now available
-      loadFromFileBtn.style.animation = 'pulse 0.6s ease-in-out';
+      loadFromFileBtn.style.animation = "pulse 0.6s ease-in-out";
       setTimeout(() => {
-        if (loadFromFileBtn) loadFromFileBtn.style.animation = '';
+        if (loadFromFileBtn) loadFromFileBtn.style.animation = "";
       }, 600);
-      console.log('✅ Load from File button enabled after initial setup');
+      console.log("✅ Load from File button enabled after initial setup");
     }
 
     if (uploadBtn) {
       uploadBtn.disabled = false;
-      uploadBtn.title = '';
+      uploadBtn.title = "";
       // Add a subtle animation to indicate the button is now available
-      uploadBtn.style.animation = 'pulse 0.6s ease-in-out';
+      uploadBtn.style.animation = "pulse 0.6s ease-in-out";
       setTimeout(() => {
-        if (uploadBtn) uploadBtn.style.animation = '';
+        if (uploadBtn) uploadBtn.style.animation = "";
       }, 600);
-      console.log('✅ Upload Image button enabled after initial setup');
+      console.log("✅ Upload Image button enabled after initial setup");
     }
 
     // Enable Load Extracted button at the same time as Upload button
-    const loadExtractedBtn = document.getElementById('loadExtractedBtn');
+    const loadExtractedBtn = document.getElementById("loadExtractedBtn");
     if (loadExtractedBtn) {
       loadExtractedBtn.disabled = false;
-      loadExtractedBtn.title = '';
-      console.log('✅ Load Extracted button enabled after initial setup');
+      loadExtractedBtn.title = "";
+      console.log("✅ Load Extracted button enabled after initial setup");
     }
 
     // Show a notification that file operations are now available
-    Utils.showAlert(Utils.t('fileOperationsAvailable'), 'success');
+    Utils.showAlert(Utils.t("fileOperationsAvailable"), "success");
 
     // Auto-load feature disabled - user must manually load progress via Load Progress button
     // if (state.autoLoadProgress) {
@@ -11414,7 +13300,9 @@ localStorage.removeItem("lp");
   async function initializeTokenGenerator() {
     // This function is deprecated and no longer called at startup
     // Tokens are generated lazily when actually needed for painting
-    console.log('⚠️ initializeTokenGenerator called but is no longer used at startup');
+    console.log(
+      "⚠️ initializeTokenGenerator called but is no longer used at startup"
+    );
     enableFileOperations();
   }
 
@@ -11430,92 +13318,104 @@ localStorage.removeItem("lp");
   async function createWasmToken(regionX, regionY, payload) {
     try {
       // Load the Pawtect module and WASM
-      const mod = await import(new URL('/_app/immutable/chunks/' + pawtect_chunk, location.origin).href);
+      const mod = await import(
+        new URL("/_app/immutable/chunks/" + pawtect_chunk, location.origin).href
+      );
       let wasm;
       try {
         wasm = await mod._();
-        console.log('✅ WASM initialized successfully');
+        console.log("✅ WASM initialized successfully");
       } catch (wasmError) {
-        console.error('❌ WASM initialization failed:', wasmError);
+        console.error("❌ WASM initialization failed:", wasmError);
         return null;
       }
       try {
         try {
-          const me = await fetch(`https://backend.wplace.live/me`, { credentials: 'include' }).then(r => r.ok ? r.json() : null);
+          const me = await fetch(`https://backend.wplace.live/me`, {
+            credentials: "include",
+          }).then((r) => (r.ok ? r.json() : null));
           if (me?.id) {
             mod.i(me.id);
-            console.log('✅ user ID set:', me.id);
+            console.log("✅ user ID set:", me.id);
           }
-        } catch { }
+        } catch {}
       } catch (userIdError) {
-        console.log('⚠️ Error setting user ID:', userIdError.message);
+        console.log("⚠️ Error setting user ID:", userIdError.message);
       }
       try {
         const testUrl = `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`;
         if (mod.r) {
           mod.r(testUrl);
-          console.log('✅ Request URL set:', testUrl);
+          console.log("✅ Request URL set:", testUrl);
         } else {
-          console.log('⚠️ request_url function (mod.r) not available');
+          console.log("⚠️ request_url function (mod.r) not available");
         }
       } catch (urlError) {
-        console.log('⚠️ Error setting request URL:', urlError.message);
+        console.log("⚠️ Error setting request URL:", urlError.message);
       }
 
       // Create test payload
 
-      console.log('📝 payload:', payload);
+      console.log("📝 payload:", payload);
 
       // Encode payload
       const enc = new TextEncoder();
       const dec = new TextDecoder();
       const bodyStr = JSON.stringify(payload);
       const bytes = enc.encode(bodyStr);
-      console.log('📏 Payload size:', bytes.length, 'bytes');
-      console.log('📄 Payload string:', bodyStr);
+      console.log("📏 Payload size:", bytes.length, "bytes");
+      console.log("📄 Payload string:", bodyStr);
 
       // Allocate WASM memory with validation
       let inPtr;
       try {
         if (!wasm.__wbindgen_malloc) {
-          console.error('❌ __wbindgen_malloc function not found');
+          console.error("❌ __wbindgen_malloc function not found");
           return null;
         }
 
         inPtr = wasm.__wbindgen_malloc(bytes.length, 1);
-        console.log('✅ WASM memory allocated, pointer:', inPtr);
+        console.log("✅ WASM memory allocated, pointer:", inPtr);
 
         // Copy data to WASM memory
-        const wasmBuffer = new Uint8Array(wasm.memory.buffer, inPtr, bytes.length);
+        const wasmBuffer = new Uint8Array(
+          wasm.memory.buffer,
+          inPtr,
+          bytes.length
+        );
         wasmBuffer.set(bytes);
-        console.log('✅ Data copied to WASM memory');
+        console.log("✅ Data copied to WASM memory");
       } catch (memError) {
-        console.error('❌ Memory allocation error:', memError);
+        console.error("❌ Memory allocation error:", memError);
         return null;
       }
 
       // Call the WASM function
-      console.log('🚀 Calling get_pawtected_endpoint_payload...');
+      console.log("🚀 Calling get_pawtected_endpoint_payload...");
       let outPtr, outLen, token;
       try {
         const result = wasm.get_pawtected_endpoint_payload(inPtr, bytes.length);
-        console.log('✅ Function called, result type:', typeof result, result);
+        console.log("✅ Function called, result type:", typeof result, result);
 
         if (Array.isArray(result) && result.length === 2) {
           [outPtr, outLen] = result;
-          console.log('✅ Got output pointer:', outPtr, 'length:', outLen);
+          console.log("✅ Got output pointer:", outPtr, "length:", outLen);
 
           // Decode the result
-          const outputBuffer = new Uint8Array(wasm.memory.buffer, outPtr, outLen);
+          const outputBuffer = new Uint8Array(
+            wasm.memory.buffer,
+            outPtr,
+            outLen
+          );
           token = dec.decode(outputBuffer);
-          console.log('✅ Token decoded successfully');
+          console.log("✅ Token decoded successfully");
         } else {
-          console.error('❌ Unexpected function result format:', result);
+          console.error("❌ Unexpected function result format:", result);
           return null;
         }
       } catch (funcError) {
-        console.error('❌ Function call error:', funcError);
-        console.error('Stack trace:', funcError.stack);
+        console.error("❌ Function call error:", funcError);
+        console.error("Stack trace:", funcError.stack);
         return null;
       }
 
@@ -11523,43 +13423,47 @@ localStorage.removeItem("lp");
       try {
         if (wasm.__wbindgen_free && outPtr && outLen) {
           wasm.__wbindgen_free(outPtr, outLen, 1);
-          console.log('✅ Output memory freed');
+          console.log("✅ Output memory freed");
         }
         if (wasm.__wbindgen_free && inPtr) {
           wasm.__wbindgen_free(inPtr, bytes.length, 1);
-          console.log('✅ Input memory freed');
+          console.log("✅ Input memory freed");
         }
       } catch (cleanupError) {
-        console.log('⚠️ Cleanup warning:', cleanupError.message);
+        console.log("⚠️ Cleanup warning:", cleanupError.message);
       }
 
       // Display results
-      console.log('');
-      console.log('🎉 SUCCESS!');
-      console.log('🔑 Full token:');
+      console.log("");
+      console.log("🎉 SUCCESS!");
+      console.log("🔑 Full token:");
       console.log(token);
       return token;
     } catch (error) {
-      console.error('❌ Failed to generate fp parameter:', error);
+      console.error("❌ Failed to generate fp parameter:", error);
       return null;
     }
   }
 
   async function findTokenModule(str) {
-    console.log('🔎 Searching for wasm Module...');
-    const links = Array.from(document.querySelectorAll('link[rel="modulepreload"][href$=".js"]'));
+    console.log("🔎 Searching for wasm Module...");
+    const links = Array.from(
+      document.querySelectorAll('link[rel="modulepreload"][href$=".js"]')
+    );
 
     for (const link of links) {
       try {
         const url = new URL(link.getAttribute("href"), location.origin).href;
-        const code = await fetch(url).then(r => r.text());
+        const code = await fetch(url).then((r) => r.text());
         if (code.includes(str)) {
-          console.log('✅ Found wasm Module...');
-          return url.split('/').pop();
+          console.log("✅ Found wasm Module...");
+          return url.split("/").pop();
         }
-      } catch (e) { /* ignore individual fetch errors */ }
+      } catch (e) {
+        /* ignore individual fetch errors */
+      }
     }
-    console.error('❌ Could not find Pawtect chunk among preloaded modules');
+    console.error("❌ Could not find Pawtect chunk among preloaded modules");
     return null;
   }
 
@@ -11581,11 +13485,24 @@ localStorage.removeItem("lp");
     const accountData = await WPlaceService.getCharges();
     // Update the current account with the latest fetched info
     if (accountData) {
-      try { accountManager.updateAccountData(accountData); } catch (e) { console.warn('⚠️ Failed to update account manager from getCharges()', e); }
+      try {
+        accountManager.updateAccountData(accountData);
+      } catch (e) {
+        console.warn(
+          "⚠️ Failed to update account manager from getCharges()",
+          e
+        );
+      }
     }
     // Prefer droplets from the AccountManager (updated), fallback to fetched value
-    const current = typeof accountManager !== 'undefined' ? accountManager.getCurrentAccount() : null;
-    const droplets = (current && typeof current.Droplets === 'number') ? current.Droplets : (accountData?.droplets || 0);
+    const current =
+      typeof accountManager !== "undefined"
+        ? accountManager.getCurrentAccount()
+        : null;
+    const droplets =
+      current && typeof current.Droplets === "number"
+        ? current.Droplets
+        : accountData?.droplets || 0;
     console.log("There are currently : ", droplets, "droplets.");
     try {
       const amounts = Math.floor(droplets / 500);
@@ -11594,30 +13511,41 @@ localStorage.removeItem("lp");
         return 1;
       }
       const payload = {
-        "product": {
-          "id": id,
-          "amount": amounts
-        }
+        product: {
+          id: id,
+          amount: amounts,
+        },
       };
       const res = await fetch("https://backend.wplace.live/purchase", {
         method: "POST",
         headers: {
-          "Content-Type": "text/plain;charset=UTF-8"
+          "Content-Type": "text/plain;charset=UTF-8",
         },
         body: JSON.stringify(payload),
-        credentials: "include"
+        credentials: "include",
       });
       // POST request completed
       if (res.ok) {
-        console.log("Successfully bought", amounts * chargeMultiplier, type.replace('_', ' '), ".");
+        console.log(
+          "Successfully bought",
+          amounts * chargeMultiplier,
+          type.replace("_", " "),
+          "."
+        );
         // Update AccountManager and ChargeModel to reflect new limits/charges after successful purchase
         try {
-          const acc = (typeof accountManager !== 'undefined' && accountManager?.getCurrentAccount) ? accountManager.getCurrentAccount() : null;
+          const acc =
+            typeof accountManager !== "undefined" &&
+            accountManager?.getCurrentAccount
+              ? accountManager.getCurrentAccount()
+              : null;
           const token = acc?.token;
           if (acc) {
             if (type === "max_charges") {
-              const add = (amounts * chargeMultiplier);
-              const newMax = Math.floor((typeof acc.Max === 'number' ? acc.Max : 0) + add);
+              const add = amounts * chargeMultiplier;
+              const newMax = Math.floor(
+                (typeof acc.Max === "number" ? acc.Max : 0) + add
+              );
               accountManager.updateAccountData({ Max: newMax });
               // Keep local model in sync to avoid rollback by ChargeModel
               try {
@@ -11625,31 +13553,46 @@ localStorage.removeItem("lp");
                 if (node) {
                   node.max = Math.max(1, newMax);
                   // Ensure charges do not exceed the new max
-                  node.charges = Math.min(node.max, Math.max(0, Math.floor(node.charges || 0)));
+                  node.charges = Math.min(
+                    node.max,
+                    Math.max(0, Math.floor(node.charges || 0))
+                  );
                   node.lastSyncAt = Date.now();
                 }
               } catch {}
             } else if (type === "paint_charges") {
-              const add = (amounts * chargeMultiplier);
-              const currentCharges = (typeof acc.Charges === 'number' ? acc.Charges : 0);
-              const currentMax = (typeof acc.Max === 'number' ? acc.Max : 1);
-              const newCharges = Math.min(currentMax, Math.floor(currentCharges + add));
+              const add = amounts * chargeMultiplier;
+              const currentCharges =
+                typeof acc.Charges === "number" ? acc.Charges : 0;
+              const currentMax = typeof acc.Max === "number" ? acc.Max : 1;
+              const newCharges = Math.min(
+                currentMax,
+                Math.floor(currentCharges + add)
+              );
               accountManager.updateAccountData({ Charges: newCharges });
               // Keep local model in sync to avoid rollback by ChargeModel
               try {
                 const node = ChargeModel?.get(token);
                 if (node) {
                   node.max = Math.max(1, node.max || currentMax);
-                  node.charges = Math.min(node.max, Math.floor((node.charges || 0) + add));
+                  node.charges = Math.min(
+                    node.max,
+                    Math.floor((node.charges || 0) + add)
+                  );
                   node.lastSyncAt = Date.now();
                 }
               } catch {}
             }
             // Mirror to UI and other accounts via ChargeModel when available
-            try { ChargeModel?.syncToAccountManager?.(); } catch {}
+            try {
+              ChargeModel?.syncToAccountManager?.();
+            } catch {}
           }
         } catch (e) {
-          console.warn('⚠️ Failed to update account manager/charge model after purchase', e);
+          console.warn(
+            "⚠️ Failed to update account manager/charge model after purchase",
+            e
+          );
         }
         return 2;
       } else {
@@ -11664,29 +13607,41 @@ localStorage.removeItem("lp");
   async function swapAccountTrigger(token) {
     // STRICT GUARD: Only allow account switching during active painting sessions OR controlled refresh
     if (!state.running && !state.isFetchingAllAccounts) {
-      console.warn('🔒 Account switching blocked - only allowed during active painting or controlled refresh');
-      console.warn('🔒 Current state.running:', state.running, 'state.isFetchingAllAccounts:', state.isFetchingAllAccounts);
+      console.warn(
+        "🔒 Account switching blocked - only allowed during active painting or controlled refresh"
+      );
+      console.warn(
+        "🔒 Current state.running:",
+        state.running,
+        "state.isFetchingAllAccounts:",
+        state.isFetchingAllAccounts
+      );
       return false;
     }
 
     localStorage.removeItem("lp");
     if (!token) {
-      console.error('❌ Cannot swap account: token is null or undefined');
+      console.error("❌ Cannot swap account: token is null or undefined");
       return false;
     }
 
-    console.log(`🔄 Triggering account swap with token: ${token.substring(0, 20)}...`);
-    console.log('📤 Sending setCookie message to extension...');
+    console.log(
+      `🔄 Triggering account swap with token: ${token.substring(0, 20)}...`
+    );
+    console.log("📤 Sending setCookie message to extension...");
 
     try {
-      window.postMessage({
-        source: 'my-userscript',
-        type: 'setCookie',
-        value: token
-      }, '*');
-      console.log('✅ setCookie message sent successfully');
+      window.postMessage(
+        {
+          source: "my-userscript",
+          type: "setCookie",
+          value: token,
+        },
+        "*"
+      );
+      console.log("✅ setCookie message sent successfully");
     } catch (error) {
-      console.error('❌ Failed to send setCookie message:', error);
+      console.error("❌ Failed to send setCookie message:", error);
       return false;
     }
 
@@ -11696,29 +13651,29 @@ localStorage.removeItem("lp");
       const timer = setTimeout(() => {
         if (!settled) {
           settled = true;
-          console.warn('⚠️ cookieSet confirmation timeout');
+          console.warn("⚠️ cookieSet confirmation timeout");
           resolve(false);
         }
       }, 10000);
       function onMessage(event) {
         if (event.source !== window) return;
         const data = event.data || {};
-        if (data.type === 'cookieSet') {
+        if (data.type === "cookieSet") {
           if (!settled) {
             settled = true;
             clearTimeout(timer);
-            window.removeEventListener('message', onMessage);
+            window.removeEventListener("message", onMessage);
             resolve(true);
           }
         }
       }
-      window.addEventListener('message', onMessage);
+      window.addEventListener("message", onMessage);
     });
 
     if (confirmed) {
-      console.log('✅ Cookie set confirmed');
+      console.log("✅ Cookie set confirmed");
     } else {
-      console.warn('⚠️ Proceeding without cookie confirmation');
+      console.warn("⚠️ Proceeding without cookie confirmation");
     }
     return true;
   }
@@ -11727,10 +13682,13 @@ localStorage.removeItem("lp");
       console.log("Requesting accounts from extension...");
 
       // Ask extension for accounts
-      window.postMessage({
-        source: "my-userscript",
-        type: "getAccounts"
-      }, "*");
+      window.postMessage(
+        {
+          source: "my-userscript",
+          type: "getAccounts",
+        },
+        "*"
+      );
 
       function handler(event) {
         if (event.source !== window) return;
@@ -11740,8 +13698,14 @@ localStorage.removeItem("lp");
           window.removeEventListener("message", handler);
 
           try {
-            localStorage.setItem("accounts", JSON.stringify(event.data.accounts));
-            console.log("✅ Accounts saved to localStorage:", event.data.accounts);
+            localStorage.setItem(
+              "accounts",
+              JSON.stringify(event.data.accounts)
+            );
+            console.log(
+              "✅ Accounts saved to localStorage:",
+              event.data.accounts
+            );
           } catch (e) {
             console.error("❌ Failed to save accounts:", e);
           }
@@ -11752,7 +13716,6 @@ localStorage.removeItem("lp");
     });
   }
 
-
   async function fetchAllAccountDetails() {
     if (state.isFetchingAllAccounts) {
       Utils.showAlert("Already fetching account details.", "warning");
@@ -11761,13 +13724,13 @@ localStorage.removeItem("lp");
 
     state.isFetchingAllAccounts = true;
 
-    const refreshBtn = document.getElementById('refreshAllAccountsBtn');
+    const refreshBtn = document.getElementById("refreshAllAccountsBtn");
     if (refreshBtn) {
       refreshBtn.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
       refreshBtn.disabled = true;
     }
 
-    const accountsListArea = document.getElementById('accountsListArea');
+    const accountsListArea = document.getElementById("accountsListArea");
     if (accountsListArea) {
       accountsListArea.innerHTML = `<div class="wplace-stat-item" style="opacity: 0.5;">Loading accounts...</div>`;
     }
@@ -11777,23 +13740,33 @@ localStorage.removeItem("lp");
       console.log(`🔄 [FETCH] Requesting accounts from extension...`);
       try {
         await getAccounts();
-        console.log(`✅ [FETCH] Successfully retrieved accounts from extension`);
+        console.log(
+          `✅ [FETCH] Successfully retrieved accounts from extension`
+        );
       } catch (error) {
-        console.warn(`⚠️ [FETCH] Failed to get accounts from extension:`, error);
+        console.warn(
+          `⚠️ [FETCH] Failed to get accounts from extension:`,
+          error
+        );
         // Continue anyway in case we have cached accounts
       }
 
       // Load accounts using the new AccountManager
       await accountManager.loadAccounts();
 
-      console.log(`✅ [FETCH] Loaded ${accountManager.getAccountCount()} accounts from storage`);
+      console.log(
+        `✅ [FETCH] Loaded ${accountManager.getAccountCount()} accounts from storage`
+      );
 
       // Debug: Check if we actually have accounts
       if (accountManager.getAccountCount() === 0) {
-        console.warn(`⚠️ [FETCH] No accounts found in storage. Check localStorage 'accounts' and chrome.storage 'infoAccounts'`);
+        console.warn(
+          `⚠️ [FETCH] No accounts found in storage. Check localStorage 'accounts' and chrome.storage 'infoAccounts'`
+        );
 
         // Check localStorage for accounts
-        const localStorageAccounts = JSON.parse(localStorage.getItem("accounts")) || [];
+        const localStorageAccounts =
+          JSON.parse(localStorage.getItem("accounts")) || [];
         console.log(`📋 [DEBUG] localStorage accounts:`, localStorageAccounts);
 
         // Render empty state and return early
@@ -11804,18 +13777,26 @@ localStorage.removeItem("lp");
       // Now fetch fresh data for each account
       const accounts = accountManager.getAllAccounts();
       if (accounts.length > 0) {
-        console.log(`🔄 [FETCH] Fetching fresh data for ${accounts.length} accounts...`);
+        console.log(
+          `🔄 [FETCH] Fetching fresh data for ${accounts.length} accounts...`
+        );
 
         // Remember the current account so we can switch back
-        const originalCurrentAccount = accounts.find(acc => acc.isCurrent);
+        const originalCurrentAccount = accounts.find((acc) => acc.isCurrent);
 
         for (let i = 0; i < accounts.length; i++) {
           const account = accounts[i];
-          console.log(`📊 [FETCH] Fetching data for account ${i + 1}: ${account.displayName}`);
+          console.log(
+            `📊 [FETCH] Fetching data for account ${i + 1}: ${
+              account.displayName
+            }`
+          );
 
           try {
             // Switch to this account temporarily to fetch its data
-            console.log(`🔄 [FETCH] Switching to ${account.displayName} to fetch fresh data...`);
+            console.log(
+              `🔄 [FETCH] Switching to ${account.displayName} to fetch fresh data...`
+            );
             await switchToSpecificAccount(account.token, account.displayName);
             // await Utils.sleep(500); // Small delay to ensure switch takes effect
 
@@ -11829,47 +13810,72 @@ localStorage.removeItem("lp");
               Charges: Math.floor(accountData.charges || 0),
               Max: Math.floor(accountData.max || 0),
               Droplets: Math.floor(accountData.droplets || 0),
-              displayName: accountInfo.Username || accountInfo.name || account.displayName
+              displayName:
+                accountInfo.Username || accountInfo.name || account.displayName,
             });
 
-            console.log(`✅ [FETCH] Updated ${account.displayName}: ⚡${Math.floor(accountData.charges)}/${Math.floor(accountData.max)} 💧${Math.floor(accountData.droplets)}`);
-
+            console.log(
+              `✅ [FETCH] Updated ${account.displayName}: ⚡${Math.floor(
+                accountData.charges
+              )}/${Math.floor(accountData.max)} 💧${Math.floor(
+                accountData.droplets
+              )}`
+            );
           } catch (error) {
-            console.warn(`⚠️ [FETCH] Failed to fetch data for ${account.displayName}:`, error);
+            console.warn(
+              `⚠️ [FETCH] Failed to fetch data for ${account.displayName}:`,
+              error
+            );
           }
         }
 
         // Switch back to the original current account if there was one
         if (originalCurrentAccount) {
-          console.log(`🔙 [FETCH] Switching back to original current account: ${originalCurrentAccount.displayName}`);
+          console.log(
+            `🔙 [FETCH] Switching back to original current account: ${originalCurrentAccount.displayName}`
+          );
           try {
-            await switchToSpecificAccount(originalCurrentAccount.token, originalCurrentAccount.displayName);
+            await switchToSpecificAccount(
+              originalCurrentAccount.token,
+              originalCurrentAccount.displayName
+            );
             //await Utils.sleep(300);
 
             // Mark it as current again and sync index
             accountManager.updateAccountData(originalCurrentAccount.token, {
-              isCurrent: true
+              isCurrent: true,
             });
             const list = accountManager.getAllAccounts();
-            const idxOriginal = list.findIndex(acc => acc.token === originalCurrentAccount.token);
-            if (idxOriginal !== -1 && typeof accountManager.setCurrentIndex === 'function') {
+            const idxOriginal = list.findIndex(
+              (acc) => acc.token === originalCurrentAccount.token
+            );
+            if (
+              idxOriginal !== -1 &&
+              typeof accountManager.setCurrentIndex === "function"
+            ) {
               accountManager.setCurrentIndex(idxOriginal);
               state.accountIndex = idxOriginal;
             }
           } catch (error) {
-            console.warn(`⚠️ [FETCH] Failed to switch back to original account:`, error);
+            console.warn(
+              `⚠️ [FETCH] Failed to switch back to original account:`,
+              error
+            );
           }
         }
 
-        console.log(`🎯 [FETCH] Completed fetching fresh data for all accounts`);
-        try { ChargeModel.seedFromAccounts(accountManager.getAllAccounts()); } catch {}
+        console.log(
+          `🎯 [FETCH] Completed fetching fresh data for all accounts`
+        );
+        try {
+          ChargeModel.seedFromAccounts(accountManager.getAllAccounts());
+        } catch {}
       }
 
       // Render the accounts list with fresh data
       renderAccountsList();
-
     } catch (error) {
-      console.error('❌ [FETCH] Error fetching account details:', error);
+      console.error("❌ [FETCH] Error fetching account details:", error);
       if (accountsListArea) {
         accountsListArea.innerHTML = `<div class="wplace-stat-item" style="color: red;">Error loading accounts.</div>`;
       }
@@ -11898,12 +13904,12 @@ localStorage.removeItem("lp");
         accountManager.updateAccountData(current.token, {
           Charges: Math.floor(node.charges || 0),
           Max: Math.floor(live.max || node.max || current.Max || 0),
-          Droplets: Math.floor(live.droplets || 0)
+          Droplets: Math.floor(live.droplets || 0),
         });
       } catch {}
       renderAccountsList();
     } catch (e) {
-      console.warn('⚠️ updateCurrentAccountInList failed:', e);
+      console.warn("⚠️ updateCurrentAccountInList failed:", e);
     }
   }
 
@@ -11916,14 +13922,14 @@ localStorage.removeItem("lp");
       console.log(`🔍 Switched to account with ID: ${currentAccountData.id}`);
 
       const accounts = accountManager.getAllAccounts();
-      const idx = accounts.findIndex(acc => acc.ID === currentAccountData.id);
+      const idx = accounts.findIndex((acc) => acc.ID === currentAccountData.id);
 
       if (idx !== -1) {
         const currentAccount = accounts[idx];
         const currentAccountInfo = await WPlaceService.fetchCheck();
 
         // Sync manager index and flags to actual account
-        if (typeof accountManager.setCurrentIndex === 'function') {
+        if (typeof accountManager.setCurrentIndex === "function") {
           accountManager.setCurrentIndex(idx);
         } else {
           accounts.forEach((acc, i) => (acc.isCurrent = i === idx));
@@ -11934,7 +13940,10 @@ localStorage.removeItem("lp");
           Charges: Math.floor(currentAccountData.charges),
           Max: Math.floor(currentAccountData.max),
           Droplets: Math.floor(currentAccountData.droplets),
-          displayName: currentAccountInfo.Username || currentAccountInfo.name || currentAccount.displayName
+          displayName:
+            currentAccountInfo.Username ||
+            currentAccountInfo.name ||
+            currentAccount.displayName,
         });
 
         // Mirror to UI state for consistency
@@ -11944,31 +13953,40 @@ localStorage.removeItem("lp");
         state.accountIndex = idx;
 
         renderAccountsList();
-        console.log(`🎯 Updated current account spotlight: ${currentAccount.displayName}`);
+        console.log(
+          `🎯 Updated current account spotlight: ${currentAccount.displayName}`
+        );
       } else {
-        console.warn(`⚠️ Could not find switched account with ID ${currentAccountData.id} in account list`);
+        console.warn(
+          `⚠️ Could not find switched account with ID ${currentAccountData.id} in account list`
+        );
       }
 
       // Re-render the account list to show new current account
       renderAccountsList();
-
     } catch (error) {
-      console.warn('⚠️ Failed to update account spotlight:', error);
+      console.warn("⚠️ Failed to update account spotlight:", error);
     }
   }
 
   function renderAccountsList() {
-    const accountsListArea = document.getElementById('accountsListArea');
+    const accountsListArea = document.getElementById("accountsListArea");
     if (!accountsListArea) return;
 
-    accountsListArea.innerHTML = '';
+    accountsListArea.innerHTML = "";
 
     const accounts = accountManager.getAllAccounts();
     console.log(`🔍 [RENDER] Rendering ${accounts.length} accounts`);
 
     // Debug: Log account data to see what we're working with
     accounts.forEach((account, index) => {
-      console.log(`📊 [RENDER] Account ${index + 1}: ${account.displayName} - ⚡${account.Charges}/${account.Max} 💧${account.Droplets} ${account.isCurrent ? '(CURRENT)' : ''}`);
+      console.log(
+        `📊 [RENDER] Account ${index + 1}: ${account.displayName} - ⚡${
+          account.Charges
+        }/${account.Max} 💧${account.Droplets} ${
+          account.isCurrent ? "(CURRENT)" : ""
+        }`
+      );
     });
 
     if (accounts.length === 0) {
@@ -11982,59 +14000,66 @@ localStorage.removeItem("lp");
       accountsListArea.appendChild(item);
     });
 
-    console.log(`✅ [RENDER] Successfully rendered ${accounts.length} accounts`);
+    console.log(
+      `✅ [RENDER] Successfully rendered ${accounts.length} accounts`
+    );
   }
 
   function createAccountItem(account, index) {
-    const item = document.createElement('div');
+    const item = document.createElement("div");
 
     // Determine if this is the current account
     const isCurrentAccount = account.isCurrent;
-    const isNextInSequence = accountManager.currentIndex !== -1 &&
-      ((accountManager.currentIndex + 1) % accountManager.getAccountCount()) === index;
+    const isNextInSequence =
+      accountManager.currentIndex !== -1 &&
+      (accountManager.currentIndex + 1) % accountManager.getAccountCount() ===
+        index;
 
-    let itemClasses = 'wplace-account-item';
+    let itemClasses = "wplace-account-item";
     if (isCurrentAccount) {
-      itemClasses += ' current';
+      itemClasses += " current";
     } else if (isNextInSequence) {
-      itemClasses += ' next-in-sequence';
+      itemClasses += " next-in-sequence";
     }
 
     item.className = itemClasses;
 
     // Create ordering number element with 1-based index for user display
-    const orderNumber = document.createElement('div');
-    orderNumber.className = 'wplace-account-number';
+    const orderNumber = document.createElement("div");
+    orderNumber.className = "wplace-account-number";
     orderNumber.textContent = index + 1; // Show 1-based index for user-friendly display
 
     // Add visual indicator for current position in sequence
     if (isCurrentAccount) {
-      orderNumber.style.background = '#2ecc71'; // Green color
-      orderNumber.style.color = 'white';
-      orderNumber.style.boxShadow = '0 0 10px rgba(46, 204, 113, 0.8)';
+      orderNumber.style.background = "#2ecc71"; // Green color
+      orderNumber.style.color = "white";
+      orderNumber.style.boxShadow = "0 0 10px rgba(46, 204, 113, 0.8)";
     } else if (isNextInSequence) {
-      orderNumber.style.background = '#f39c12'; // Orange color for next
-      orderNumber.style.color = 'white';
-      orderNumber.style.boxShadow = '0 0 8px rgba(243, 156, 18, 0.6)';
+      orderNumber.style.background = "#f39c12"; // Orange color for next
+      orderNumber.style.color = "white";
+      orderNumber.style.boxShadow = "0 0 8px rgba(243, 156, 18, 0.6)";
     }
 
     // Create account details
-    const details = document.createElement('div');
-    details.className = 'wplace-account-details';
+    const details = document.createElement("div");
+    details.className = "wplace-account-details";
 
-    const accountName = document.createElement('div');
-    accountName.className = 'wplace-account-name';
-    const displayName = account.displayName || account.name || `Account ${index + 1}`;
+    const accountName = document.createElement("div");
+    accountName.className = "wplace-account-name";
+    const displayName =
+      account.displayName || account.name || `Account ${index + 1}`;
     accountName.textContent = displayName;
     accountName.title = displayName;
 
-    const accountStats = document.createElement('div');
-    accountStats.className = 'wplace-account-stats';
+    const accountStats = document.createElement("div");
+    accountStats.className = "wplace-account-stats";
 
     // Safely handle undefined values
-    const charges = account.Charges !== undefined ? Math.floor(account.Charges) : 0;
+    const charges =
+      account.Charges !== undefined ? Math.floor(account.Charges) : 0;
     const max = account.Max !== undefined ? Math.floor(account.Max) : 0;
-    const droplets = account.Droplets !== undefined ? Math.floor(account.Droplets) : 0;
+    const droplets =
+      account.Droplets !== undefined ? Math.floor(account.Droplets) : 0;
 
     accountStats.innerHTML = `
       <span><i class="fas fa-bolt"></i> ${charges}/${max}</span>
@@ -12045,12 +14070,14 @@ localStorage.removeItem("lp");
     details.appendChild(accountStats);
 
     // Add status indicators
-    const status = document.createElement('div');
-    status.className = 'wplace-account-status';
+    const status = document.createElement("div");
+    status.className = "wplace-account-status";
     if (isCurrentAccount) {
-      status.innerHTML = '<i class="fas fa-play-circle" style="color: #2ecc71;" title="Current Account"></i>';
+      status.innerHTML =
+        '<i class="fas fa-play-circle" style="color: #2ecc71;" title="Current Account"></i>';
     } else if (isNextInSequence) {
-      status.innerHTML = '<i class="fas fa-arrow-right" style="color: #f39c12;" title="Next Account"></i>';
+      status.innerHTML =
+        '<i class="fas fa-arrow-right" style="color: #f39c12;" title="Next Account"></i>';
     }
 
     item.appendChild(orderNumber);
@@ -12071,14 +14098,18 @@ localStorage.removeItem("lp");
       const minGap = state.minMsBetweenSwitches || 3000;
       const painted = state.paintedSinceSwitch || 0;
       if (now - last < minGap && painted === 0) {
-        console.log(`⏳ [SWITCH] Debounced rapid switch (Δ${now - last}ms < ${minGap}ms and paintedSinceSwitch=${painted}).`);
+        console.log(
+          `⏳ [SWITCH] Debounced rapid switch (Δ${
+            now - last
+          }ms < ${minGap}ms and paintedSinceSwitch=${painted}).`
+        );
         return false;
       }
     } catch {}
 
     // Validate we have accounts
     if (accountManager.getAccountCount() === 0) {
-      console.error('❌ No accounts available for switching');
+      console.error("❌ No accounts available for switching");
       return false;
     }
 
@@ -12089,11 +14120,13 @@ localStorage.removeItem("lp");
     // Get next account using simplified manager
     const nextAccount = accountManager.switchToNext();
     if (!nextAccount) {
-      console.error('❌ Failed to get next account');
+      console.error("❌ Failed to get next account");
       return false;
     }
 
-    console.log(`🎯 [SWITCH] Switching to: ${nextAccount.displayName} (index ${accountManager.currentIndex})`);
+    console.log(
+      `🎯 [SWITCH] Switching to: ${nextAccount.displayName} (index ${accountManager.currentIndex})`
+    );
 
     // Ensure token exists
     if (!nextAccount.token) {
@@ -12101,7 +14134,9 @@ localStorage.removeItem("lp");
       return false;
     }
 
-    console.log(`� [SWITCH] Using token: ${nextAccount.token.substring(0, 20)}...`);
+    console.log(
+      `� [SWITCH] Using token: ${nextAccount.token.substring(0, 20)}...`
+    );
 
     // Perform the account switch
     try {
@@ -12110,7 +14145,9 @@ localStorage.removeItem("lp");
       // Update account index for backward compatibility
       state.accountIndex = accountManager.currentIndex;
 
-      console.log(`✅ [SWITCH] Successfully switched to ${nextAccount.displayName}`);
+      console.log(
+        `✅ [SWITCH] Successfully switched to ${nextAccount.displayName}`
+      );
 
       // Verify backend reflects the new account to avoid stale reads
       // Strategy: poll /me until we see an ID different from the pre-switch account's ID
@@ -12126,7 +14163,9 @@ localStorage.removeItem("lp");
           }
 
           if (previousKnownId && curId === previousKnownId) {
-            console.log(`⏳ [SWITCH] Still seeing previous ID ${curId} (attempt ${attempt}/8), waiting...`);
+            console.log(
+              `⏳ [SWITCH] Still seeing previous ID ${curId} (attempt ${attempt}/8), waiting...`
+            );
             await Utils.sleep(500);
             continue;
           }
@@ -12134,7 +14173,9 @@ localStorage.removeItem("lp");
           // If we had a stored ID for the target and it's different from what we see now,
           // prefer the live value (curId) and update the stored ID.
           if (nextAccount.ID && nextAccount.ID !== curId) {
-            console.log(`🔁 [SWITCH] Updating stored ID for ${nextAccount.displayName}: ${nextAccount.ID} → ${curId}`);
+            console.log(
+              `🔁 [SWITCH] Updating stored ID for ${nextAccount.displayName}: ${nextAccount.ID} → ${curId}`
+            );
           }
 
           verifiedId = curId;
@@ -12145,11 +14186,15 @@ localStorage.removeItem("lp");
       }
 
       if (!verifiedId) {
-        console.warn('⚠️ [SWITCH] Could not verify account change via /me after cookie set; skipping ID update but proceeding cautiously.');
+        console.warn(
+          "⚠️ [SWITCH] Could not verify account change via /me after cookie set; skipping ID update but proceeding cautiously."
+        );
       } else {
         // Persist verified ID for the next account
         if (nextAccount.ID !== verifiedId) {
-          accountManager.updateAccountData(nextAccount.token, { ID: verifiedId });
+          accountManager.updateAccountData(nextAccount.token, {
+            ID: verifiedId,
+          });
         }
       }
 
@@ -12162,14 +14207,16 @@ localStorage.removeItem("lp");
 
       return true;
     } catch (error) {
-      console.error('❌ [SWITCH] Account switch failed:', error);
+      console.error("❌ [SWITCH] Account switch failed:", error);
       return false;
     }
   }
 
   // SIMPLIFIED helper function for specific account switching
   async function switchToSpecificAccount(token, accountName) {
-    console.log(`🔄 [SPECIFIC SWITCH] Attempting to switch to account: ${accountName}`);
+    console.log(
+      `🔄 [SPECIFIC SWITCH] Attempting to switch to account: ${accountName}`
+    );
 
     // Debounce rapid consecutive switches when no painting happened
     try {
@@ -12178,16 +14225,22 @@ localStorage.removeItem("lp");
       const minGap = state.minMsBetweenSwitches || 3000;
       const painted = state.paintedSinceSwitch || 0;
       if (now - last < minGap && painted === 0) {
-        console.log(`⏳ [SPECIFIC SWITCH] Debounced rapid switch (Δ${now - last}ms < ${minGap}ms and paintedSinceSwitch=${painted}).`);
+        console.log(
+          `⏳ [SPECIFIC SWITCH] Debounced rapid switch (Δ${
+            now - last
+          }ms < ${minGap}ms and paintedSinceSwitch=${painted}).`
+        );
         return false;
       }
     } catch {}
 
     if (!token) {
-      console.error('❌ [SPECIFIC SWITCH] Missing token');
+      console.error("❌ [SPECIFIC SWITCH] Missing token");
       return false;
     }
-    console.log(`🔑 [SPECIFIC SWITCH] Using token: ${token.substring(0, 20)}...`);
+    console.log(
+      `🔑 [SPECIFIC SWITCH] Using token: ${token.substring(0, 20)}...`
+    );
 
     // Capture previous account ID to detect stale responses
     let previousId = null;
@@ -12198,7 +14251,7 @@ localStorage.removeItem("lp");
 
     const ok = await swapAccountTrigger(token);
     if (!ok) {
-      console.error('❌ [SPECIFIC SWITCH] Cookie confirmation failed');
+      console.error("❌ [SPECIFIC SWITCH] Cookie confirmation failed");
       return false;
     }
 
@@ -12213,7 +14266,9 @@ localStorage.removeItem("lp");
           continue;
         }
         if (previousId && curId === previousId) {
-          console.log(`⏳ [SPECIFIC SWITCH] Still seeing previous ID ${curId} (attempt ${attempt}/8), waiting...`);
+          console.log(
+            `⏳ [SPECIFIC SWITCH] Still seeing previous ID ${curId} (attempt ${attempt}/8), waiting...`
+          );
           await Utils.sleep(500);
           continue;
         }
@@ -12225,25 +14280,36 @@ localStorage.removeItem("lp");
     }
 
     if (!verifiedId) {
-      console.warn('⚠️ [SPECIFIC SWITCH] Could not verify account change via /me; proceeding.');
+      console.warn(
+        "⚠️ [SPECIFIC SWITCH] Could not verify account change via /me; proceeding."
+      );
     } else {
       // Persist ID and mark as current in AccountManager
-      accountManager.updateAccountData(token, { ID: verifiedId, isCurrent: true });
+      accountManager.updateAccountData(token, {
+        ID: verifiedId,
+        isCurrent: true,
+      });
     }
 
     // Sync manager index to the token we explicitly switched to
     try {
       const list = accountManager.getAllAccounts();
-      const idxByToken = list.findIndex(acc => acc.token === token);
-      if (idxByToken !== -1 && typeof accountManager.setCurrentIndex === 'function') {
+      const idxByToken = list.findIndex((acc) => acc.token === token);
+      if (
+        idxByToken !== -1 &&
+        typeof accountManager.setCurrentIndex === "function"
+      ) {
         accountManager.setCurrentIndex(idxByToken);
         state.accountIndex = idxByToken;
       }
     } catch {}
 
     // Fetch fresh stats for UI/state
-    const { charges, cooldown, droplets, max } = await WPlaceService.getCharges();
-    try { ChargeModel.setFromServer(token, charges, max); } catch {}
+    const { charges, cooldown, droplets, max } =
+      await WPlaceService.getCharges();
+    try {
+      ChargeModel.setFromServer(token, charges, max);
+    } catch {}
     state.displayCharges = Math.floor(charges);
     state.preciseCurrentCharges = charges;
     state.cooldown = cooldown;
@@ -12253,7 +14319,11 @@ localStorage.removeItem("lp");
     // Update the account status and UI after successful switch
     await updateCurrentAccountSpotlight();
 
-    console.log(`✅ [SPECIFIC SWITCH] Switched to ${accountName} with ${Math.floor(charges)} charges`);
+    console.log(
+      `✅ [SPECIFIC SWITCH] Switched to ${accountName} with ${Math.floor(
+        charges
+      )} charges`
+    );
     return true;
   }
 
@@ -12268,7 +14338,7 @@ localStorage.removeItem("lp");
         utilsManager: window.globalUtilsManager,
         imageProcessor: window.globalImageProcessor,
         overlayManager: window.globalOverlayManager,
-        tokenManager: window.globalTokenManager
+        tokenManager: window.globalTokenManager,
       };
 
       const missingManagers = Object.entries(managers)
@@ -12276,22 +14346,28 @@ localStorage.removeItem("lp");
         .map(([name]) => name);
 
       if (missingManagers.length === 0) {
-        console.log('✅ All global managers are available, initializing UI...');
+        console.log("✅ All global managers are available, initializing UI...");
         break;
       }
 
-      console.log(`⏳ Waiting for managers: ${missingManagers.join(', ')} (attempt ${attempts + 1}/${maxAttempts})`);
-      await new Promise(resolve => setTimeout(resolve, 100));
+      console.log(
+        `⏳ Waiting for managers: ${missingManagers.join(", ")} (attempt ${
+          attempts + 1
+        }/${maxAttempts})`
+      );
+      await new Promise((resolve) => setTimeout(resolve, 100));
       attempts++;
     }
 
     if (attempts >= maxAttempts) {
-      console.warn('⚠️ Some global managers not available after waiting, proceeding anyway...');
-      console.log('Available managers:', {
+      console.warn(
+        "⚠️ Some global managers not available after waiting, proceeding anyway..."
+      );
+      console.log("Available managers:", {
         utilsManager: !!window.globalUtilsManager,
         imageProcessor: !!window.globalImageProcessor,
         overlayManager: !!window.globalOverlayManager,
-        tokenManager: !!window.globalTokenManager
+        tokenManager: !!window.globalTokenManager,
       });
     }
 
@@ -12316,7 +14392,11 @@ localStorage.removeItem("lp");
         const node = ChargeModel.get(acc.token);
         const localCharges = Math.floor(node?.charges || 0);
 
-        console.log(`🔍 [SEARCH] Checking locally ${acc.displayName}: ⚡${localCharges}/${node?.max ?? 0}`);
+        console.log(
+          `🔍 [SEARCH] Checking locally ${acc.displayName}: ⚡${localCharges}/${
+            node?.max ?? 0
+          }`
+        );
         if (localCharges >= threshold) {
           candidate = { token: acc.token, name: acc.displayName, idx };
           break;
@@ -12330,34 +14410,47 @@ localStorage.removeItem("lp");
       }
 
       if (candidate && ChargeModel.get(candidate.token)?.charges >= threshold) {
-        console.log(`✅ [SEARCH] Local model found eligible account: ${candidate.name}`);
-        console.log('⏳ [SEARCH] Waiting 4 seconds before switching accounts...');
+        console.log(
+          `✅ [SEARCH] Local model found eligible account: ${candidate.name}`
+        );
+        console.log(
+          "⏳ [SEARCH] Waiting 4 seconds before switching accounts..."
+        );
         await Utils.sleep(4000); // 4-second delay before auto-switching
-        const ok = await switchToSpecificAccount(candidate.token, candidate.name);
+        const ok = await switchToSpecificAccount(
+          candidate.token,
+          candidate.name
+        );
         return !!ok;
       }
 
       // None eligible yet – do not switch now. Caller may enter cooldown.
       if (candidate) {
-        console.log(`🕒 [SEARCH] No accounts meet threshold. Best candidate: ${candidate.name} in ~${Utils.msToTimeText(bestWait)}`);
+        console.log(
+          `🕒 [SEARCH] No accounts meet threshold. Best candidate: ${
+            candidate.name
+          } in ~${Utils.msToTimeText(bestWait)}`
+        );
       } else {
-        console.log('🕒 [SEARCH] No candidate accounts available.');
+        console.log("🕒 [SEARCH] No candidate accounts available.");
       }
       return false;
     } catch (e) {
-      console.warn('⚠️ selectAndSwitchToAccountWithCharges failed:', e);
+      console.warn("⚠️ selectAndSwitchToAccountWithCharges failed:", e);
       return false;
     }
   }
 
   waitForDependenciesAndInitialize().then(() => {
     // Enable file operations immediately - no need to wait for turnstile
-    console.log('✅ Enabling file operations immediately (turnstile removed from startup)');
+    console.log(
+      "✅ Enabling file operations immediately (turnstile removed from startup)"
+    );
     enableFileOperations();
-    
+
     // Quick initial account load from cache
     setTimeout(async () => {
-      console.log('🔄 Initial account load from cache...');
+      console.log("🔄 Initial account load from cache...");
       try {
         await accountManager.loadAccounts();
         // Seed and start local charge model regardless of count
@@ -12365,64 +14458,72 @@ localStorage.removeItem("lp");
           state.chargeModel = ChargeModel;
           ChargeModel.seedFromAccounts(accountManager.getAllAccounts());
           ChargeModel.start();
-          console.log('⚡ Local ChargeModel started (tick +1 per 30s for all accounts)');
-        } catch (e) { console.warn('ChargeModel init failed:', e); }
+          console.log(
+            "⚡ Local ChargeModel started (tick +1 per 30s for all accounts)"
+          );
+        } catch (e) {
+          console.warn("ChargeModel init failed:", e);
+        }
 
         if (accountManager.getAccountCount() > 0) {
-          console.log(`✅ Loaded ${accountManager.getAccountCount()} cached accounts`);
+          console.log(
+            `✅ Loaded ${accountManager.getAccountCount()} cached accounts`
+          );
           renderAccountsList();
         } else {
-          console.log('📭 No cached accounts found');
+          console.log("📭 No cached accounts found");
         }
       } catch (error) {
-        console.warn('⚠️ Initial account load failed:', error);
+        console.warn("⚠️ Initial account load failed:", error);
       }
     }, 500);
 
     // Auto-refresh account list on startup (with extension communication)
     setTimeout(() => {
-      console.log('🔄 Auto-refreshing account list on startup...');
+      console.log("🔄 Auto-refreshing account list on startup...");
       fetchAllAccountDetails();
     }, 2000);
 
     // Attach advanced color matching listeners (resize dialog)
     const advancedInit = () => {
-      const chromaSlider = document.getElementById('chromaPenaltyWeightSlider');
-      const chromaValue = document.getElementById('chromaWeightValue');
-      const resetBtn = document.getElementById('resetAdvancedColorBtn');
-      const algoSelect = document.getElementById('colorAlgorithmSelect');
-      const chromaToggle = document.getElementById('enableChromaPenaltyToggle');
-      const transInput = document.getElementById('transparencyThresholdInput');
-      const whiteInput = document.getElementById('whiteThresholdInput');
-      const ditherToggle = document.getElementById('enableDitheringToggle');
+      const chromaSlider = document.getElementById("chromaPenaltyWeightSlider");
+      const chromaValue = document.getElementById("chromaWeightValue");
+      const resetBtn = document.getElementById("resetAdvancedColorBtn");
+      const algoSelect = document.getElementById("colorAlgorithmSelect");
+      const chromaToggle = document.getElementById("enableChromaPenaltyToggle");
+      const transInput = document.getElementById("transparencyThresholdInput");
+      const whiteInput = document.getElementById("whiteThresholdInput");
+      const ditherToggle = document.getElementById("enableDitheringToggle");
 
       // Ensure dithering checkbox matches state (explicit sync on init)
       if (ditherToggle) {
         ditherToggle.checked = state.ditheringEnabled;
-        console.log(`🎨 Dithering initialized: ${state.ditheringEnabled ? 'ON' : 'OFF'}`);
+        console.log(
+          `🎨 Dithering initialized: ${state.ditheringEnabled ? "ON" : "OFF"}`
+        );
       }
 
       if (algoSelect)
-        algoSelect.addEventListener('change', (e) => {
+        algoSelect.addEventListener("change", (e) => {
           state.colorMatchingAlgorithm = e.target.value;
           saveBotSettings();
           _updateResizePreview();
         });
       if (chromaToggle)
-        chromaToggle.addEventListener('change', (e) => {
+        chromaToggle.addEventListener("change", (e) => {
           state.enableChromaPenalty = e.target.checked;
           saveBotSettings();
           _updateResizePreview();
         });
       if (chromaSlider && chromaValue)
-        chromaSlider.addEventListener('change', (e) => {
+        chromaSlider.addEventListener("change", (e) => {
           state.chromaPenaltyWeight = parseFloat(e.target.value) || 0.15;
           chromaValue.textContent = state.chromaPenaltyWeight.toFixed(2);
           saveBotSettings();
           _updateResizePreview();
         });
       if (transInput)
-        transInput.addEventListener('change', (e) => {
+        transInput.addEventListener("change", (e) => {
           const v = parseInt(e.target.value, 10);
           if (!isNaN(v) && v >= 0 && v <= 255) {
             state.customTransparencyThreshold = v;
@@ -12432,7 +14533,7 @@ localStorage.removeItem("lp");
           }
         });
       if (whiteInput)
-        whiteInput.addEventListener('change', (e) => {
+        whiteInput.addEventListener("change", (e) => {
           const v = parseInt(e.target.value, 10);
           if (!isNaN(v) && v >= 200 && v <= 255) {
             state.customWhiteThreshold = v;
@@ -12442,76 +14543,107 @@ localStorage.removeItem("lp");
           }
         });
       if (ditherToggle) {
-        ditherToggle.addEventListener('change', (e) => {
+        ditherToggle.addEventListener("change", (e) => {
           state.ditheringEnabled = e.target.checked;
-          
+
           // Show/hide dithering controls
-          const methodControl = document.getElementById('ditheringMethodControl');
-          const posterizeControl = document.getElementById('posterizeLevelsControl');
-          if (methodControl) methodControl.style.display = state.ditheringEnabled ? 'block' : 'none';
-          if (posterizeControl) posterizeControl.style.display = state.ditheringEnabled ? 'block' : 'none';
-          
+          const methodControl = document.getElementById(
+            "ditheringMethodControl"
+          );
+          const posterizeControl = document.getElementById(
+            "posterizeLevelsControl"
+          );
+          if (methodControl)
+            methodControl.style.display = state.ditheringEnabled
+              ? "block"
+              : "none";
+          if (posterizeControl)
+            posterizeControl.style.display = state.ditheringEnabled
+              ? "block"
+              : "none";
+
           // Update strength visibility based on method
           updateDitheringStrengthVisibility();
-          
+
           saveBotSettings();
           _updateResizePreview();
         });
       }
-      
+
       // Dithering method select
-      const ditheringMethodSelect = document.getElementById('ditheringMethodSelect');
+      const ditheringMethodSelect = document.getElementById(
+        "ditheringMethodSelect"
+      );
       if (ditheringMethodSelect) {
         ditheringMethodSelect.value = state.ditheringMethod;
-        console.log('🎨 Dithering method initialized:', state.ditheringMethod);
-        ditheringMethodSelect.addEventListener('change', (e) => {
+        console.log("🎨 Dithering method initialized:", state.ditheringMethod);
+        ditheringMethodSelect.addEventListener("change", (e) => {
           state.ditheringMethod = e.target.value;
-          console.log('🎨 Dithering method changed to:', e.target.value);
-          
+          console.log("🎨 Dithering method changed to:", e.target.value);
+
           // Auto-enable dithering if a method is selected and dithering is OFF
           if (!state.ditheringEnabled) {
             state.ditheringEnabled = true;
-            const ditherToggle = document.getElementById('enableDitheringToggle');
+            const ditherToggle = document.getElementById(
+              "enableDitheringToggle"
+            );
             if (ditherToggle) {
               ditherToggle.checked = true;
-              console.log('✨ Dithering AUTO-ENABLED');
+              console.log("✨ Dithering AUTO-ENABLED");
             }
             // Show dithering controls
-            const methodControl = document.getElementById('ditheringMethodControl');
-            const posterizeControl = document.getElementById('posterizeLevelsControl');
-            if (methodControl) methodControl.style.display = 'block';
-            if (posterizeControl) posterizeControl.style.display = 'block';
-            
+            const methodControl = document.getElementById(
+              "ditheringMethodControl"
+            );
+            const posterizeControl = document.getElementById(
+              "posterizeLevelsControl"
+            );
+            if (methodControl) methodControl.style.display = "block";
+            if (posterizeControl) posterizeControl.style.display = "block";
+
             // Set visible strength value for ordered methods
-            const orderedMethods = ['bayer2', 'bayer4', 'bayer8', 'random'];
+            const orderedMethods = ["bayer2", "bayer4", "bayer8", "random"];
             if (orderedMethods.includes(state.ditheringMethod)) {
-              if (state.ditheringStrength === 0.5) { // Still at default
+              if (state.ditheringStrength === 0.5) {
+                // Still at default
                 state.ditheringStrength = 0.75; // Set to visible value (75%)
-                const ditheringStrengthSlider = document.getElementById('ditheringStrengthSlider');
-                const ditheringStrengthValue = document.getElementById('ditheringStrengthValue');
+                const ditheringStrengthSlider = document.getElementById(
+                  "ditheringStrengthSlider"
+                );
+                const ditheringStrengthValue = document.getElementById(
+                  "ditheringStrengthValue"
+                );
                 if (ditheringStrengthSlider && ditheringStrengthValue) {
                   ditheringStrengthSlider.value = 75;
-                  ditheringStrengthValue.textContent = '75%';
+                  ditheringStrengthValue.textContent = "75%";
                 }
               }
             }
           }
-          
+
           updateDitheringStrengthVisibility();
           saveBotSettings();
           _updateResizePreview();
         });
       } else {
-        console.warn('⚠️ Dithering method select not found');
+        console.warn("⚠️ Dithering method select not found");
       }
-      
+
       // Dithering strength slider
-      const ditheringStrengthSlider = document.getElementById('ditheringStrengthSlider');
-      const ditheringStrengthValue = document.getElementById('ditheringStrengthValue');
+      const ditheringStrengthSlider = document.getElementById(
+        "ditheringStrengthSlider"
+      );
+      const ditheringStrengthValue = document.getElementById(
+        "ditheringStrengthValue"
+      );
       if (ditheringStrengthSlider && ditheringStrengthValue) {
-        ditheringStrengthSlider.value = Math.round(state.ditheringStrength * 100);
-        ditheringStrengthValue.textContent = `${Math.round(state.ditheringStrength * 100)}%`;
-        ditheringStrengthSlider.addEventListener('change', (e) => {
+        ditheringStrengthSlider.value = Math.round(
+          state.ditheringStrength * 100
+        );
+        ditheringStrengthValue.textContent = `${Math.round(
+          state.ditheringStrength * 100
+        )}%`;
+        ditheringStrengthSlider.addEventListener("change", (e) => {
           const strength = parseInt(e.target.value, 10) / 100;
           state.ditheringStrength = strength;
           ditheringStrengthValue.textContent = `${Math.round(strength * 100)}%`;
@@ -12519,298 +14651,353 @@ localStorage.removeItem("lp");
           _updateResizePreview();
         });
       }
-      
+
       // Posterize levels slider
-      const posterizeLevelsSlider = document.getElementById('posterizeLevelsSlider');
-      const posterizeLevelsValue = document.getElementById('posterizeLevelsValue');
+      const posterizeLevelsSlider = document.getElementById(
+        "posterizeLevelsSlider"
+      );
+      const posterizeLevelsValue = document.getElementById(
+        "posterizeLevelsValue"
+      );
       if (posterizeLevelsSlider && posterizeLevelsValue) {
         posterizeLevelsSlider.value = state.posterizeLevels;
-        posterizeLevelsValue.textContent = state.posterizeLevels === 0 ? 'Disabled' : state.posterizeLevels;
-        posterizeLevelsSlider.addEventListener('change', (e) => {
+        posterizeLevelsValue.textContent =
+          state.posterizeLevels === 0 ? "Disabled" : state.posterizeLevels;
+        posterizeLevelsSlider.addEventListener("change", (e) => {
           const levels = parseInt(e.target.value, 10);
           state.posterizeLevels = levels;
-          posterizeLevelsValue.textContent = levels === 0 ? 'Disabled' : levels;
+          posterizeLevelsValue.textContent = levels === 0 ? "Disabled" : levels;
           saveBotSettings();
           _updateResizePreview();
         });
       }
-      
+
       // Helper function to show/hide strength control based on method
       function updateDitheringStrengthVisibility() {
-        const strengthControl = document.getElementById('ditheringStrengthControl');
-        const orderedMethods = ['bayer2', 'bayer4', 'bayer8', 'random'];
+        const strengthControl = document.getElementById(
+          "ditheringStrengthControl"
+        );
+        const orderedMethods = ["bayer2", "bayer4", "bayer8", "random"];
         const isOrdered = orderedMethods.includes(state.ditheringMethod);
         if (strengthControl) {
-          strengthControl.style.display = (state.ditheringEnabled && isOrdered) ? 'block' : 'none';
+          strengthControl.style.display =
+            state.ditheringEnabled && isOrdered ? "block" : "none";
         }
       }
-      
+
       // Initial visibility update
       updateDitheringStrengthVisibility();
-      
+
       // ====== POST-PROCESSING Listeners ======
-      const enableEdgeOverlayToggle = document.getElementById('enableEdgeOverlayToggle');
-      const edgeAlgorithmControl = document.getElementById('edgeAlgorithmControl');
-      const edgeThresholdControl = document.getElementById('edgeThresholdControl');
-      const edgeThicknessControl = document.getElementById('edgeThicknessControl');
-      const edgeThinControl = document.getElementById('edgeThinControl');
-      
+      const enableEdgeOverlayToggle = document.getElementById(
+        "enableEdgeOverlayToggle"
+      );
+      const edgeAlgorithmControl = document.getElementById(
+        "edgeAlgorithmControl"
+      );
+      const edgeThresholdControl = document.getElementById(
+        "edgeThresholdControl"
+      );
+      const edgeThicknessControl = document.getElementById(
+        "edgeThicknessControl"
+      );
+      const edgeThinControl = document.getElementById("edgeThinControl");
+
       function updateEdgeControlsVisibility() {
-        if (edgeAlgorithmControl) edgeAlgorithmControl.style.display = state.enableEdgeOverlay ? 'block' : 'none';
-        if (edgeThresholdControl) edgeThresholdControl.style.display = state.enableEdgeOverlay ? 'block' : 'none';
-        if (edgeThicknessControl) edgeThicknessControl.style.display = state.enableEdgeOverlay ? 'block' : 'none';
-        if (edgeThinControl) edgeThinControl.style.display = state.enableEdgeOverlay ? 'block' : 'none';
+        if (edgeAlgorithmControl)
+          edgeAlgorithmControl.style.display = state.enableEdgeOverlay
+            ? "block"
+            : "none";
+        if (edgeThresholdControl)
+          edgeThresholdControl.style.display = state.enableEdgeOverlay
+            ? "block"
+            : "none";
+        if (edgeThicknessControl)
+          edgeThicknessControl.style.display = state.enableEdgeOverlay
+            ? "block"
+            : "none";
+        if (edgeThinControl)
+          edgeThinControl.style.display = state.enableEdgeOverlay
+            ? "block"
+            : "none";
       }
-      
+
       if (enableEdgeOverlayToggle) {
         enableEdgeOverlayToggle.checked = state.enableEdgeOverlay;
-        enableEdgeOverlayToggle.addEventListener('change', (e) => {
+        enableEdgeOverlayToggle.addEventListener("change", (e) => {
           state.enableEdgeOverlay = e.target.checked;
           updateEdgeControlsVisibility();
           saveBotSettings();
           _updateResizePreview();
-          console.log(`🔲 Edge Overlay ${state.enableEdgeOverlay ? 'ON' : 'OFF'}`);
+          console.log(
+            `🔲 Edge Overlay ${state.enableEdgeOverlay ? "ON" : "OFF"}`
+          );
         });
         // Initial visibility
         updateEdgeControlsVisibility();
       }
-      
+
       // Edge Detection Algorithm selector
-      const edgeDetectionAlgorithmSelect = document.getElementById('edgeDetectionAlgorithmSelect');
+      const edgeDetectionAlgorithmSelect = document.getElementById(
+        "edgeDetectionAlgorithmSelect"
+      );
       if (edgeDetectionAlgorithmSelect) {
         edgeDetectionAlgorithmSelect.value = state.edgeDetectionAlgorithm;
-        edgeDetectionAlgorithmSelect.addEventListener('change', (e) => {
+        edgeDetectionAlgorithmSelect.addEventListener("change", (e) => {
           state.edgeDetectionAlgorithm = e.target.value;
           saveBotSettings();
           _updateResizePreview();
-          console.log(`🎯 Edge Detection Algorithm: ${state.edgeDetectionAlgorithm}`);
+          console.log(
+            `🎯 Edge Detection Algorithm: ${state.edgeDetectionAlgorithm}`
+          );
         });
       }
-      
+
       // Edge Threshold slider
-      const edgeThresholdSlider = document.getElementById('edgeThresholdSlider');
-      const edgeThresholdValue = document.getElementById('edgeThresholdValue');
+      const edgeThresholdSlider = document.getElementById(
+        "edgeThresholdSlider"
+      );
+      const edgeThresholdValue = document.getElementById("edgeThresholdValue");
       if (edgeThresholdSlider && edgeThresholdValue) {
         edgeThresholdSlider.value = state.edgeThreshold;
         edgeThresholdValue.textContent = state.edgeThreshold;
-        edgeThresholdSlider.addEventListener('input', (e) => {
+        edgeThresholdSlider.addEventListener("input", (e) => {
           state.edgeThreshold = parseInt(e.target.value, 10);
           edgeThresholdValue.textContent = state.edgeThreshold;
         });
-        edgeThresholdSlider.addEventListener('change', (e) => {
+        edgeThresholdSlider.addEventListener("change", (e) => {
           state.edgeThreshold = parseInt(e.target.value, 10);
           saveBotSettings();
           _updateResizePreview();
         });
       }
-      
+
       // Edge Thickness slider
-      const edgeThicknessSlider = document.getElementById('edgeThicknessSlider');
-      const edgeThicknessValue = document.getElementById('edgeThicknessValue');
+      const edgeThicknessSlider = document.getElementById(
+        "edgeThicknessSlider"
+      );
+      const edgeThicknessValue = document.getElementById("edgeThicknessValue");
       if (edgeThicknessSlider && edgeThicknessValue) {
         edgeThicknessSlider.value = state.edgeThickness;
         edgeThicknessValue.textContent = state.edgeThickness;
-        edgeThicknessSlider.addEventListener('input', (e) => {
+        edgeThicknessSlider.addEventListener("input", (e) => {
           state.edgeThickness = parseInt(e.target.value, 10);
           edgeThicknessValue.textContent = state.edgeThickness;
         });
-        edgeThicknessSlider.addEventListener('change', (e) => {
+        edgeThicknessSlider.addEventListener("change", (e) => {
           state.edgeThickness = parseInt(e.target.value, 10);
           saveBotSettings();
           _updateResizePreview();
         });
       }
-      
+
       // Edge Thin toggle
-      const edgeThinToggle = document.getElementById('edgeThinToggle');
+      const edgeThinToggle = document.getElementById("edgeThinToggle");
       if (edgeThinToggle) {
         edgeThinToggle.checked = state.edgeThin;
-        edgeThinToggle.addEventListener('change', (e) => {
+        edgeThinToggle.addEventListener("change", (e) => {
           state.edgeThin = e.target.checked;
           saveBotSettings();
           _updateResizePreview();
-          console.log(`✨ Edge Thin: ${state.edgeThin ? 'ON' : 'OFF'}`);
+          console.log(`✨ Edge Thin: ${state.edgeThin ? "ON" : "OFF"}`);
         });
       }
-      
+
       // Set initial visibility of edge algorithm control
       if (edgeAlgorithmControl) {
-        edgeAlgorithmControl.style.display = state.enableEdgeOverlay ? 'block' : 'none';
+        edgeAlgorithmControl.style.display = state.enableEdgeOverlay
+          ? "block"
+          : "none";
       }
-      
+
       // Outline Thickness
-      const outlineThicknessSlider = document.getElementById('outlineThicknessSlider');
-      const outlineThicknessValue = document.getElementById('outlineThicknessValue');
+      const outlineThicknessSlider = document.getElementById(
+        "outlineThicknessSlider"
+      );
+      const outlineThicknessValue = document.getElementById(
+        "outlineThicknessValue"
+      );
       if (outlineThicknessSlider && outlineThicknessValue) {
         outlineThicknessSlider.value = state.outlineThickness;
         outlineThicknessValue.textContent = state.outlineThickness;
-        outlineThicknessSlider.addEventListener('change', (e) => {
+        outlineThicknessSlider.addEventListener("change", (e) => {
           state.outlineThickness = parseInt(e.target.value, 10);
           outlineThicknessValue.textContent = state.outlineThickness;
           saveBotSettings();
           _updateResizePreview();
         });
       }
-      
+
       // Simplify Regions
-      const simplifyAreaSlider = document.getElementById('simplifyAreaSlider');
-      const simplifyAreaValue = document.getElementById('simplifyAreaValue');
+      const simplifyAreaSlider = document.getElementById("simplifyAreaSlider");
+      const simplifyAreaValue = document.getElementById("simplifyAreaValue");
       if (simplifyAreaSlider && simplifyAreaValue) {
         simplifyAreaSlider.value = state.simplifyArea;
         simplifyAreaValue.textContent = state.simplifyArea;
-        simplifyAreaSlider.addEventListener('change', (e) => {
+        simplifyAreaSlider.addEventListener("change", (e) => {
           state.simplifyArea = parseInt(e.target.value, 10);
           simplifyAreaValue.textContent = state.simplifyArea;
           saveBotSettings();
           _updateResizePreview();
         });
       }
-      
+
       // Erode Amount
-      const erodeAmountSlider = document.getElementById('erodeAmountSlider');
-      const erodeAmountValue = document.getElementById('erodeAmountValue');
+      const erodeAmountSlider = document.getElementById("erodeAmountSlider");
+      const erodeAmountValue = document.getElementById("erodeAmountValue");
       if (erodeAmountSlider && erodeAmountValue) {
         erodeAmountSlider.value = state.erodeAmount;
         erodeAmountValue.textContent = state.erodeAmount;
-        erodeAmountSlider.addEventListener('change', (e) => {
+        erodeAmountSlider.addEventListener("change", (e) => {
           state.erodeAmount = parseInt(e.target.value, 10);
           erodeAmountValue.textContent = state.erodeAmount;
           saveBotSettings();
           _updateResizePreview();
         });
       }
-      
+
       // Mode Filter Size
-      const modeFilterSlider = document.getElementById('modeFilterSlider');
-      const modeFilterValue = document.getElementById('modeFilterValue');
+      const modeFilterSlider = document.getElementById("modeFilterSlider");
+      const modeFilterValue = document.getElementById("modeFilterValue");
       if (modeFilterSlider && modeFilterValue) {
         modeFilterSlider.value = state.modeFilterSize;
         modeFilterValue.textContent = state.modeFilterSize;
-        modeFilterSlider.addEventListener('change', (e) => {
+        modeFilterSlider.addEventListener("change", (e) => {
           state.modeFilterSize = parseInt(e.target.value, 10);
           modeFilterValue.textContent = state.modeFilterSize;
           saveBotSettings();
           _updateResizePreview();
         });
       }
-      
+
       // ====== COLOR CORRECTION Listeners ======
-      const enableColorCorrectionToggle = document.getElementById('enableColorCorrectionToggle');
-      const colorCorrectionControls = document.getElementById('colorCorrectionControls');
-      
+      const enableColorCorrectionToggle = document.getElementById(
+        "enableColorCorrectionToggle"
+      );
+      const colorCorrectionControls = document.getElementById(
+        "colorCorrectionControls"
+      );
+
       if (enableColorCorrectionToggle) {
         enableColorCorrectionToggle.checked = state.enableColorCorrection;
-        enableColorCorrectionToggle.addEventListener('change', (e) => {
+        enableColorCorrectionToggle.addEventListener("change", (e) => {
           state.enableColorCorrection = e.target.checked;
           if (colorCorrectionControls) {
-            colorCorrectionControls.style.display = state.enableColorCorrection ? 'block' : 'none';
+            colorCorrectionControls.style.display = state.enableColorCorrection
+              ? "block"
+              : "none";
           }
           saveBotSettings();
           _updateResizePreview();
-          console.log(`🎨 Color Correction ${state.enableColorCorrection ? 'ON' : 'OFF'}`);
+          console.log(
+            `🎨 Color Correction ${state.enableColorCorrection ? "ON" : "OFF"}`
+          );
         });
       }
-      
+
       // Brightness slider
-      const brightnessSlider = document.getElementById('brightnessSlider');
-      const brightnessValue = document.getElementById('brightnessValue');
+      const brightnessSlider = document.getElementById("brightnessSlider");
+      const brightnessValue = document.getElementById("brightnessValue");
       if (brightnessSlider && brightnessValue) {
         brightnessSlider.value = state.brightness;
         brightnessValue.textContent = state.brightness;
-        brightnessSlider.addEventListener('change', (e) => {
+        brightnessSlider.addEventListener("change", (e) => {
           state.brightness = parseInt(e.target.value, 10);
           brightnessValue.textContent = state.brightness;
           saveBotSettings();
           _updateResizePreview();
         });
       }
-      
+
       // Contrast slider
-      const contrastSlider = document.getElementById('contrastSlider');
-      const contrastValue = document.getElementById('contrastValue');
+      const contrastSlider = document.getElementById("contrastSlider");
+      const contrastValue = document.getElementById("contrastValue");
       if (contrastSlider && contrastValue) {
         contrastSlider.value = state.contrast;
         contrastValue.textContent = state.contrast;
-        contrastSlider.addEventListener('change', (e) => {
+        contrastSlider.addEventListener("change", (e) => {
           state.contrast = parseInt(e.target.value, 10);
           contrastValue.textContent = state.contrast;
           saveBotSettings();
           _updateResizePreview();
         });
       }
-      
+
       // Saturation slider
-      const saturationSlider = document.getElementById('saturationSlider');
-      const saturationValue = document.getElementById('saturationValue');
+      const saturationSlider = document.getElementById("saturationSlider");
+      const saturationValue = document.getElementById("saturationValue");
       if (saturationSlider && saturationValue) {
         saturationSlider.value = state.saturation;
         saturationValue.textContent = state.saturation;
-        saturationSlider.addEventListener('change', (e) => {
+        saturationSlider.addEventListener("change", (e) => {
           state.saturation = parseInt(e.target.value, 10);
           saturationValue.textContent = state.saturation;
           saveBotSettings();
           _updateResizePreview();
         });
       }
-      
+
       // Hue slider
-      const hueSlider = document.getElementById('hueSlider');
-      const hueValue = document.getElementById('hueValue');
+      const hueSlider = document.getElementById("hueSlider");
+      const hueValue = document.getElementById("hueValue");
       if (hueSlider && hueValue) {
         hueSlider.value = state.hue;
-        hueValue.textContent = state.hue + '°';
-        hueSlider.addEventListener('change', (e) => {
+        hueValue.textContent = state.hue + "°";
+        hueSlider.addEventListener("change", (e) => {
           state.hue = parseInt(e.target.value, 10);
-          hueValue.textContent = state.hue + '°';
+          hueValue.textContent = state.hue + "°";
           saveBotSettings();
           _updateResizePreview();
         });
       }
-      
+
       // Gamma slider
-      const gammaSlider = document.getElementById('gammaSlider');
-      const gammaValue = document.getElementById('gammaValue');
+      const gammaSlider = document.getElementById("gammaSlider");
+      const gammaValue = document.getElementById("gammaValue");
       if (gammaSlider && gammaValue) {
         gammaSlider.value = state.gamma;
         gammaValue.textContent = state.gamma.toFixed(1);
-        gammaSlider.addEventListener('change', (e) => {
+        gammaSlider.addEventListener("change", (e) => {
           state.gamma = parseFloat(e.target.value);
           gammaValue.textContent = state.gamma.toFixed(1);
           saveBotSettings();
           _updateResizePreview();
         });
       }
-      
+
       // Set initial visibility of color correction controls
       if (colorCorrectionControls) {
-        colorCorrectionControls.style.display = state.enableColorCorrection ? 'block' : 'none';
+        colorCorrectionControls.style.display = state.enableColorCorrection
+          ? "block"
+          : "none";
       }
-      
+
       if (resetBtn)
-        resetBtn.addEventListener('click', () => {
-          state.colorMatchingAlgorithm = 'lab';
+        resetBtn.addEventListener("click", () => {
+          state.colorMatchingAlgorithm = "lab";
           state.enableChromaPenalty = true;
           state.chromaPenaltyWeight = 0.15;
-          state.customTransparencyThreshold = CONFIG.TRANSPARENCY_THRESHOLD = 100;
+          state.customTransparencyThreshold =
+            CONFIG.TRANSPARENCY_THRESHOLD = 100;
           state.customWhiteThreshold = CONFIG.WHITE_THRESHOLD = 250;
           saveBotSettings();
-          const a = document.getElementById('colorAlgorithmSelect');
-          if (a) a.value = 'lab';
-          const ct = document.getElementById('enableChromaPenaltyToggle');
+          const a = document.getElementById("colorAlgorithmSelect");
+          if (a) a.value = "lab";
+          const ct = document.getElementById("enableChromaPenaltyToggle");
           if (ct) ct.checked = true;
           if (chromaSlider) chromaSlider.value = 0.15;
-          if (chromaValue) chromaValue.textContent = '0.15';
+          if (chromaValue) chromaValue.textContent = "0.15";
           if (transInput) transInput.value = 100;
           if (whiteInput) whiteInput.value = 250;
           _updateResizePreview();
-          Utils.showAlert(Utils.t('advancedColorSettingsReset'), 'success');
+          Utils.showAlert(Utils.t("advancedColorSettingsReset"), "success");
         });
     };
     // Delay to ensure resize UI built
     setTimeout(advancedInit, 500);
 
     // Add cleanup on page unload
-    window.addEventListener('beforeunload', () => {
+    window.addEventListener("beforeunload", () => {
       Utils.cleanupTurnstile();
     });
   });
@@ -12829,7 +15016,7 @@ async function generateCoordinatesAsync(
   startFromY = 0
 ) {
   try {
-    if (typeof Worker === 'undefined') {
+    if (typeof Worker === "undefined") {
       // Environment does not support Web Workers – fall back
       return generateCoordinates(
         width,
@@ -12986,14 +15173,16 @@ async function generateCoordinatesAsync(
   }
 };`;
 
-    const blob = new Blob([workerCode], { type: 'application/javascript' });
+    const blob = new Blob([workerCode], { type: "application/javascript" });
     const url = URL.createObjectURL(blob);
 
     return await new Promise((resolve) => {
       const worker = new Worker(url);
       const cleanup = () => {
         URL.revokeObjectURL(url);
-        try { worker.terminate(); } catch (e) { }
+        try {
+          worker.terminate();
+        } catch (e) {}
       };
 
       worker.onmessage = (e) => {
@@ -13002,7 +15191,10 @@ async function generateCoordinatesAsync(
         if (ok && Array.isArray(coords)) {
           resolve(coords);
         } else {
-          console.warn('Coordinate worker failed, falling back to sync:', error);
+          console.warn(
+            "Coordinate worker failed, falling back to sync:",
+            error
+          );
           resolve(
             generateCoordinates(
               width,
@@ -13020,7 +15212,10 @@ async function generateCoordinatesAsync(
       };
 
       worker.onerror = (err) => {
-        console.warn('Coordinate worker error, falling back to sync:', err && (err.message || err));
+        console.warn(
+          "Coordinate worker error, falling back to sync:",
+          err && (err.message || err)
+        );
         cleanup();
         resolve(
           generateCoordinates(
@@ -13050,7 +15245,10 @@ async function generateCoordinatesAsync(
       });
     });
   } catch (e) {
-    console.warn('Failed to start coordinate worker, using sync generation:', e);
+    console.warn(
+      "Failed to start coordinate worker, using sync generation:",
+      e
+    );
     return generateCoordinates(
       width,
       height,
