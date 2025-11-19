@@ -10983,7 +10983,7 @@ localStorage.removeItem("lp");
     return false;
   }
 
-  async function sendPixelBatch(pixelBatch, regionX, regionY) {
+async function sendPixelBatch(pixelBatch, regionX, regionY) {
     let token = getTurnstileToken();
 
     // Don't auto-generate tokens during processing - return error if no token available
@@ -11002,7 +11002,9 @@ localStorage.removeItem("lp");
     }
 
     try {
-      const payload = { coords, colors, t: token, fp: fpStr32 };
+      // 原代码: const payload = { coords, colors, t: token, fp: fpStr32 };
+      // 修改后: 删掉了 "t: token"，保留了 "fp: fpStr32"
+      const payload = { coords, colors, fp: fpStr32 };
       var wasmtoken = await createWasmToken(regionX, regionY, payload);
       const res = await fetch(`https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`, {
         method: 'POST',
@@ -11427,120 +11429,75 @@ localStorage.removeItem("lp");
   //find module if pawtect_chunk is null
   pawtect_chunk ??= await findTokenModule("pawtect_wasm_bg.wasm");
 
-  async function createWasmToken(regionX, regionY, payload) {
+async function createWasmToken(regionX, regionY, payload) {
     try {
-      // Load the Pawtect module and WASM
-      const mod = await import(new URL('/_app/immutable/chunks/' + pawtect_chunk, location.origin).href);
-      let wasm;
-      try {
-        wasm = await mod._();
-        console.log('✅ WASM initialized successfully');
-      } catch (wasmError) {
-        console.error('❌ WASM initialization failed:', wasmError);
-        return null;
+      // 1. 加载模块 (使用已知的正确文件名)
+      // 如果 pawtect_chunk 变量存在则使用，否则回退到硬编码的 D1pWKeJi.js
+      const chunkName = (typeof pawtect_chunk !== 'undefined' && pawtect_chunk) ? pawtect_chunk : "D1pWKeJi.js";
+      const moduleUrl = new URL('/_app/immutable/chunks/' + chunkName, location.origin).href;
+      
+      const mod = await import(moduleUrl);
+
+      // 2. 检查 API 客户端是否存在
+      if (!mod.a) {
+          console.error("❌ createWasmToken: API Client (mod.a) not found");
+          return null;
       }
-      try {
-        try {
-          const me = await fetch(`https://backend.wplace.live/me`, { credentials: 'include' }).then(r => r.ok ? r.json() : null);
-          if (me?.id) {
-            mod.i(me.id);
-            console.log('✅ user ID set:', me.id);
+
+      // 3. 准备数据：将 payload 转换为 paint() 需要的参数格式
+      // payload.coords 是 [x1, y1, x2, y2...]
+      // payload.colors 是 [c1, c2...]
+      // 我们需要把它们还原成对象数组，这样 mod.a.paint 才能正确处理
+      const paintPixels = [];
+      const count = payload.colors.length;
+      
+      for (let i = 0; i < count; i++) {
+          paintPixels.push({
+              tile: [regionX, regionY],
+              pixel: [payload.coords[i * 2], payload.coords[i * 2 + 1]],
+              season: mod.C, // 使用模块导出的当前赛季常量
+              colorIdx: payload.colors[i]
+          });
+      }
+
+      // 4. 劫持 (Hook) request 方法
+      // 我们不真的发送请求，只是为了骗取 Token
+      const originalRequest = mod.a.request.bind(mod.a);
+      let capturedToken = null;
+
+      mod.a.request = async function(url, options) {
+          // 监听包含 x-pawtect-token 的请求
+          if (options && options.headers && options.headers['x-pawtect-token']) {
+              capturedToken = options.headers['x-pawtect-token'];
+              // 返回一个假的成功响应，让 paint() 以为发送成功了，从而不报错
+              return { status: 200, json: async () => ({}) };
           }
-        } catch { }
-      } catch (userIdError) {
-        console.log('⚠️ Error setting user ID:', userIdError.message);
-      }
+          // 其他请求放行 (比如 /me 获取用户信息)
+          return originalRequest(url, options);
+      };
+
+      // 5. 触发 Token 生成
       try {
-        const testUrl = `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`;
-        if (mod.r) {
-          mod.r(testUrl);
-          console.log('✅ Request URL set:', testUrl);
-        } else {
-          console.log('⚠️ request_url function (mod.r) not available');
-        }
-      } catch (urlError) {
-        console.log('⚠️ Error setting request URL:', urlError.message);
+          // 调用官方的 paint 方法，它会自动处理 UserID、URL 和 WASM 交互
+          await mod.a.paint(paintPixels, payload.fp);
+      } catch (e) {
+          // 忽略可能的错误，我们只关心 token 是否拿到
+      } finally {
+          // 6. 还原 request 方法 (清理现场，非常重要！)
+          mod.a.request = originalRequest;
       }
 
-      // Create test payload
-
-      console.log('📝 payload:', payload);
-
-      // Encode payload
-      const enc = new TextEncoder();
-      const dec = new TextDecoder();
-      const bodyStr = JSON.stringify(payload);
-      const bytes = enc.encode(bodyStr);
-      console.log('📏 Payload size:', bytes.length, 'bytes');
-      console.log('📄 Payload string:', bodyStr);
-
-      // Allocate WASM memory with validation
-      let inPtr;
-      try {
-        if (!wasm.__wbindgen_malloc) {
-          console.error('❌ __wbindgen_malloc function not found');
+      // 7. 返回结果
+      if (capturedToken) {
+          // console.log('🎉 Token generated via hooking');
+          return capturedToken;
+      } else {
+          console.error("❌ Failed to capture token via hooking");
           return null;
-        }
-
-        inPtr = wasm.__wbindgen_malloc(bytes.length, 1);
-        console.log('✅ WASM memory allocated, pointer:', inPtr);
-
-        // Copy data to WASM memory
-        const wasmBuffer = new Uint8Array(wasm.memory.buffer, inPtr, bytes.length);
-        wasmBuffer.set(bytes);
-        console.log('✅ Data copied to WASM memory');
-      } catch (memError) {
-        console.error('❌ Memory allocation error:', memError);
-        return null;
       }
 
-      // Call the WASM function
-      console.log('🚀 Calling get_pawtected_endpoint_payload...');
-      let outPtr, outLen, token;
-      try {
-        const result = wasm.get_pawtected_endpoint_payload(inPtr, bytes.length);
-        console.log('✅ Function called, result type:', typeof result, result);
-
-        if (Array.isArray(result) && result.length === 2) {
-          [outPtr, outLen] = result;
-          console.log('✅ Got output pointer:', outPtr, 'length:', outLen);
-
-          // Decode the result
-          const outputBuffer = new Uint8Array(wasm.memory.buffer, outPtr, outLen);
-          token = dec.decode(outputBuffer);
-          console.log('✅ Token decoded successfully');
-        } else {
-          console.error('❌ Unexpected function result format:', result);
-          return null;
-        }
-      } catch (funcError) {
-        console.error('❌ Function call error:', funcError);
-        console.error('Stack trace:', funcError.stack);
-        return null;
-      }
-
-      // Cleanup memory
-      try {
-        if (wasm.__wbindgen_free && outPtr && outLen) {
-          wasm.__wbindgen_free(outPtr, outLen, 1);
-          console.log('✅ Output memory freed');
-        }
-        if (wasm.__wbindgen_free && inPtr) {
-          wasm.__wbindgen_free(inPtr, bytes.length, 1);
-          console.log('✅ Input memory freed');
-        }
-      } catch (cleanupError) {
-        console.log('⚠️ Cleanup warning:', cleanupError.message);
-      }
-
-      // Display results
-      console.log('');
-      console.log('🎉 SUCCESS!');
-      console.log('🔑 Full token:');
-      console.log(token);
-      return token;
     } catch (error) {
-      console.error('❌ Failed to generate fp parameter:', error);
+      console.error('❌ createWasmToken critical error:', error);
       return null;
     }
   }
