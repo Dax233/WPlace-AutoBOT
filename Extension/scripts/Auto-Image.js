@@ -12772,78 +12772,93 @@ localStorage.removeItem("lp");
     return false;
   }
 
-  async function sendPixelBatch(pixelBatch, regionX, regionY) {
+// F:\github\WPlace-AutoBOT\Extension\scripts\Auto-Image.js
+
+async function sendPixelBatch(pixelBatch, regionX, regionY) {
     let token = getTurnstileToken();
-
-    // Don't auto-generate tokens during processing - return error if no token available
     if (!token) {
-      console.warn(
-        "⚠️ No token available and auto-generation disabled during processing"
-      );
-      return "token_error";
+        console.warn("⚠️ No token available");
+        return "token_error";
     }
 
-    const coords = new Array(pixelBatch.length * 2);
-    const colors = new Array(pixelBatch.length);
+    // 1. 准备数据
+    const coords = [];
+    const colors = [];
     for (let i = 0; i < pixelBatch.length; i++) {
-      const pixel = pixelBatch[i];
-      coords[i * 2] = pixel.x;
-      coords[i * 2 + 1] = pixel.y;
-      colors[i] = pixel.color;
+        coords.push(pixelBatch[i].x, pixelBatch[i].y);
+        colors.push(pixelBatch[i].color);
     }
+
+    // 2. 获取指纹 (硬编码你抓到的那个，这是最稳的)
+    const fp = "7f4ee776d5d3befe4f362a47e9fd4fe0";
+
+    // 3. 构造 Payload 对象
+    // ⚠️ 顺序很重要！按照你抓包看到的成功顺序：colors, coords, fp
+    const payloadObj = {
+        colors: colors,
+        coords: coords,
+        fp: fp
+    };
+
+    // 4. 🔥 关键步骤：生成唯一的 JSON 字符串
+    // 我们生成一次字符串，然后把它同时传给签名器和 fetch
+    const payloadString = JSON.stringify(payloadObj);
 
     try {
-      const payload = { coords, colors, t: token, fp: fpStr32 };
-      var wasmtoken = await createWasmToken(regionX, regionY, payload);
-      const res = await fetch(
-        `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
-        {
-          method: "POST",
-          headers: {
-            "Content-Type": "text/plain;charset=UTF-8",
-            "x-pawtect-token": wasmtoken,
-          },
-          credentials: "include",
-          body: JSON.stringify(payload),
-        }
-      );
-
-      if (res.status === 403) {
-        let data = null;
-        try {
-          data = await res.json();
-        } catch (_) {}
-        console.error(
-          "❌ 403 Forbidden. Token invalid during painting - regeneration allowed."
-        );
-
-        // 403 errors during painting allow token regeneration per workflow requirements
-        console.log(
-          "� Token invalid (403) during painting - regenerating token as allowed by workflow"
-        );
-        setTurnstileToken(null);
-        createTokenPromise();
-
-        // Attempt to regenerate token immediately
-        const newToken = await ensureToken(true);
-        if (newToken) {
-          console.log(
-            "✅ Token regenerated after 403 error, returning regenerate signal"
-          );
-          return "token_regenerated";
+        // 5. 调用签名器 (传入 regionX, regionY 和 JSON 字符串)
+        // 注意：这里需要 createWasmToken 支持传入字符串，或者直接在这里调 window.__WPLACE_signer
+        let wasmToken = null;
+        
+        if (window.__WPLACE_signer) {
+            // 直接调用新版签名器
+            wasmToken = window.__WPLACE_signer(regionX, regionY, payloadString);
         } else {
-          console.error("❌ Failed to regenerate token after 403 error");
-          return "token_regeneration_failed";
+            // 回退逻辑 (createWasmToken 需要修改以接受 string，或者我们直接在这里绕过它)
+             console.error("❌ Signer not loaded");
+             return false;
         }
-      }
 
-      const data = await res.json();
-      return data?.painted === pixelBatch.length;
+        if (!wasmToken) {
+            // 如果签名失败，尝试用缓存 (虽然可能 403，但死马当活马医)
+            wasmToken = localStorage.getItem("PAWTECT_TOKEN_CACHE");
+            if (!wasmToken) {
+                console.error("❌ Failed to generate WASM token");
+                return false;
+            }
+        }
+
+        // 6. 发送请求
+        const res = await fetch(
+            `https://backend.wplace.live/s0/pixel/${regionX}/${regionY}`,
+            {
+                method: "POST",
+                headers: {
+                    "Content-Type": "text/plain;charset=UTF-8",
+                    "x-pawtect-token": wasmToken,
+                },
+                credentials: "include",
+                body: payloadString, // 🔥 使用完全相同的字符串！
+            }
+        );
+
+        // ... 后面保持原有的 403 处理逻辑 ...
+        if (res.status === 403) {
+            console.error("❌ 403 Forbidden");
+            // ... 你的重试逻辑 ...
+             setTurnstileToken(null);
+             createTokenPromise();
+             await ensureToken(true);
+             return "token_regenerated";
+        }
+
+        const data = await res.json();
+        return data?.painted === pixelBatch.length;
+
     } catch (e) {
-      console.error("Batch paint request failed:", e);
-      return false;
+        console.error("Batch request failed:", e);
+        return false;
     }
-  }
+}
 
   function saveBotSettings() {
     try {
@@ -13315,176 +13330,25 @@ localStorage.removeItem("lp");
   //find module if pawtect_chunk is null
   pawtect_chunk ??= await findTokenModule("pawtect_wasm_bg.BvxCe1S1.wasm");
 
-  // ============================================================
-  // [Helper] 定义 WASM 需要的 Imports 环境 (根据网站源码 aa() 还原)
-  // ============================================================
-  let wasmExports = null; // 用于在 imports 内部访问 exports
-  const textEncoder = new TextEncoder();
-  const textDecoder = new TextDecoder("utf-8");
-
-  function getImports() {
-    return {
-      wbg: {
-        // --- 基础内存操作 ---
-        __wbg_buffer_609cc3eee51ed158: (e) => e.buffer,
-        __wbg_new_a12002a7f91c75be: (e) => new Uint8Array(e),
-        __wbg_newwithbyteoffsetandlength_d97e637ebe145a9a: (e, t, n) =>
-          new Uint8Array(e, t >>> 0, n >>> 0),
-        __wbg_newwithlength_a381634e90c276d4: (e) => new Uint8Array(e >>> 0),
-        __wbg_subarray_aa9065fa9dc5df96: (e, t, n) =>
-          e.subarray(t >>> 0, n >>> 0),
-        __wbg_set_65595bdd868b3009: (e, t, n) => e.set(t, n >>> 0),
-
-        // --- 字符串处理 ---
-        __wbindgen_string_new: (ptr, len) => {
-          const memory = new Uint8Array(wasmExports.memory.buffer);
-          return textDecoder.decode(memory.subarray(ptr, ptr + len));
-        },
-
-        // --- 异常处理 ---
-        __wbindgen_throw: (ptr, len) => {
-          const memory = new Uint8Array(wasmExports.memory.buffer);
-          throw new Error(textDecoder.decode(memory.subarray(ptr, ptr + len)));
-        },
-
-        // --- 关键：ExternRef 表初始化 (对应 aa() 中的逻辑) ---
-        __wbindgen_init_externref_table: () => {
-          const table = wasmExports.__wbindgen_export_2;
-          const offset = table.grow(4);
-          table.set(0, undefined);
-          table.set(offset + 0, undefined);
-          table.set(offset + 1, null);
-          table.set(offset + 2, true);
-          table.set(offset + 3, false);
-        },
-
-        // --- 全局对象访问 ---
-        __wbg_static_accessor_GLOBAL_88a902d13a557d07: () => globalThis,
-        __wbg_static_accessor_GLOBAL_THIS_56578be7e9f832b0: () => globalThis,
-        __wbg_static_accessor_SELF_37c5d418e4bf5819: () => self,
-        __wbg_static_accessor_WINDOW_5de37043a91a9c40: () => window,
-
-        // --- Crypto ---
-        __wbg_crypto_574e78ad8b13b65f: (e) => e.crypto,
-        __wbg_msCrypto_a61aeb35a24c1329: (e) => e.msCrypto,
-        __wbg_getRandomValues_b8f5dbd5f3995a9e: (e, t) => e.getRandomValues(t),
-        __wbg_randomFillSync_ac0988aba3254290: (e, t) => e.randomFillSync(t),
-
-        // --- 其他杂项 ---
-        __wbg_call_672a4d21634d4a24: (e, t) => e.call(t),
-        __wbg_call_7cccdd69e0791ae2: (e, t, n) => e.call(t, n),
-        __wbindgen_memory: () => wasmExports.memory,
-        __wbg_process_dc0fbacc7c1c06f7: (e) => e.process,
-        __wbg_versions_c01dfd4722a88165: (e) => e.versions,
-        __wbg_node_905d3e251edff8a2: (e) => e.node,
-        __wbg_require_60cc747a6bc5215a: () => null,
-        __wbg_newnoargs_105ed471475aaf50: (e, t) => new Function(), // 简化处理
-
-        // --- 类型判断 ---
-        __wbindgen_is_function: (e) => typeof e === "function",
-        __wbindgen_is_object: (e) => typeof e === "object" && e !== null,
-        __wbindgen_is_string: (e) => typeof e === "string",
-        __wbindgen_is_undefined: (e) => e === undefined,
-      },
-    };
-  }
-
-  // ============================================================
-  // [Fix] 重写 createWasmToken
-  // ============================================================
-  async function createWasmToken(regionX, regionY, payload) {
-    try {
-      // 1. 确定 WASM 文件 URL
-      // 注意：网站现在的结构，.wasm 通常在 /_app/immutable/assets/ 目录下
-      // pawtect_chunk 变量如果只是文件名(如 "pawtect_wasm_bg.BvxCe1S1.wasm")，我们需要拼接正确的路径
-      // 建议先在 Network 面板确认一下 fetch 的完整 URL
-      let wasmUrl;
-      if (pawtect_chunk.startsWith("http")) {
-        wasmUrl = pawtect_chunk;
-      } else {
-        // 尝试自动修正路径：如果 pawtect_chunk 是文件名
-        // 如果之前代码是在 chunks 目录下找，现在可能需要去 assets 找
-        wasmUrl = new URL(
-          `/_app/immutable/assets/${pawtect_chunk}`,
-          location.origin
-        ).href;
-      }
-
-      console.log("🌐 Fetching WASM from:", wasmUrl);
-
-      // 2. 下载 WASM
-      const response = await fetch(wasmUrl);
-      if (!response.ok)
-        throw new Error(`Failed to fetch WASM: ${response.status}`);
-      const wasmBytes = await response.arrayBuffer();
-
-      // 3. 实例化 WASM
-      // 这里我们自己提供 imports，不再依赖 mod._()
-      const { instance } = await WebAssembly.instantiate(
-        wasmBytes,
-        getImports()
-      );
-
-      // 保存 exports 供 helper 函数使用
-      wasmExports = instance.exports;
-      const wasm = wasmExports; // 兼容你下方的命名
-
-      // 初始化 (如果有 start 函数)
-      if (wasm.__wbindgen_start) {
-        wasm.__wbindgen_start();
-      }
-      console.log("✅ WASM initialized manually");
-
-      // 4. (可选) 检查是否有设置 ID/URL 的导出函数
-      // 新版疑似已移除 mod.i 和 mod.r，这里打印一下看看有哪些函数
-      // console.log('Available Exports:', Object.keys(wasm));
-
-      // 5. 准备 Payload
-      const bodyStr = JSON.stringify(payload);
-      const bytes = textEncoder.encode(bodyStr);
-
-      // 6. 分配内存
-      if (!wasm.__wbindgen_malloc) {
-        console.error("❌ __wbindgen_malloc function not found");
-        return null;
-      }
-      const inPtr = wasm.__wbindgen_malloc(bytes.length, 1);
-      const memory = new Uint8Array(wasm.memory.buffer);
-      memory.set(bytes, inPtr);
-
-      // 7. 调用核心函数
-      // 新版签名: get_pawtected_endpoint_payload(inPtr, inLen) -> [outPtr, outLen]
-      console.log("🚀 Calling get_pawtected_endpoint_payload...");
-      const result = wasm.get_pawtected_endpoint_payload(inPtr, bytes.length);
-
-      let token = null;
-      let outPtr, outLen;
-
-      // 处理返回值
-      if (Array.isArray(result) && result.length === 2) {
-        // 你的代码里已经正确处理了这种情况，这很好！
-        [outPtr, outLen] = result;
-        const outputBuffer = new Uint8Array(wasm.memory.buffer, outPtr, outLen);
-        token = textDecoder.decode(outputBuffer);
-        console.log("✅ Token decoded successfully");
-      } else {
-        // 防御性编程：如果它返回的是指针(旧版行为)，虽然不太可能
-        console.error("❌ Unexpected result format:", result);
-      }
-
-      // 8. 清理内存
-      if (wasm.__wbindgen_free) {
-        if (outPtr && outLen) wasm.__wbindgen_free(outPtr, outLen, 1);
-        if (inPtr) wasm.__wbindgen_free(inPtr, bytes.length, 1);
-      }
-
-      console.log("🔑 Token generated:", token);
-      return token;
-    } catch (error) {
-      console.error("❌ WASM Logic Failed:", error);
-      return null;
+// ============================================================
+// ⚡ [AutoBOT Fix] 实时签名版 Token 获取器
+// ============================================================
+async function createWasmToken(regionX, regionY, payload) {
+    // 调用我们在 sniffer.js 里定义的函数
+    if (typeof window.__WPLACE_signer === 'function') {
+        // 注意：这里不是异步的了，但加 await 也没事
+        const token = await window.__WPLACE_signer(regionX, regionY);
+        if (token) return token;
     }
-  }
+    
+    // 降级缓存
+    const cachedToken = localStorage.getItem("PAWTECT_TOKEN_CACHE");
+    if (cachedToken) {
+        console.warn("⚠️ [WASM] Signer failed, using fallback...");
+        return cachedToken;
+    }
+    return null;
+}
 
   async function findTokenModule(str) {
     console.log("🔎 Searching for wasm Module...");

@@ -41,7 +41,7 @@
     {
       "matches": ["https://wplace.live/*"],
       "js": ["content-script.js"],
-      "run_at": "document_end"
+      "run_at": "document_start"
     }
   ],
   "background": {
@@ -59,7 +59,8 @@
         "themes/*.css",
         "lang/*.json",
         "lang/lang/*.json",
-        "icons/*.png"
+        "icons/*.png",
+        "scripts/sniffer.js"
       ],
       "matches": ["https://wplace.live/*"]
     }
